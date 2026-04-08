@@ -1,0 +1,45 @@
+/* ============================================
+   ROMRxBodyBuilding — Design System
+   Miami Vice x Golden Era Bodybuilding
+   ============================================ */
+
+/* Color Tokens — Phase 2: refine exact hex values */
+:root {
+  --hot-pink:      #FF2D78;   /* neon pink — accent, CTAs */
+  --electric-teal: #00F5E4;   /* neon teal — secondary accent */
+  --violet:        #B44FE8;   /* soft violet — highlights */
+  --sunset-orange: #FF7043;   /* sunset orange — warmth */
+  --gold:          #FFD700;   /* golden era gold */
+  --dark-bg:       #0D0D1A;   /* near-black base */
+  --mid-bg:        #141428;   /* card backgrounds */
+  --cream:         #F5ECD7;   /* warm cream alternative bg */
+  --text-primary:  #F5ECD7;
+  --text-muted:    rgba(245,236,215,0.6);
+
+  /* Traffic light */
+  --green-safe:    #00E676;
+  --yellow-modify: #FFD600;
+  --red-avoid:     #FF1744;
+}
+
+/* Typography — Phase 2: finalize font selection */
+/* Suggested: Bebas Neue (display) + Inter (body) */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: var(--dark-bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Utility classes */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.text-pink  { color: var(--hot-pink); }
+.text-teal  { color: var(--electric-teal); }
+.text-gold  { color: var(--gold); }
+
+/* Traffic light badges */
+.badge-safe   { background: rgba(0,230,118,0.15); color: var(--green-safe);   border: 1px solid var(--green-safe);   padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+.badge-modify { background: rgba(255,214,0,0.15);  color: var(--yellow-modify); border: 1px solid var(--yellow-modify); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+.badge-avoid  { background: rgba(255,23,68,0.15);   color: var(--red-avoid);     border: 1px solid var(--red-avoid);     padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
