@@ -353,19 +353,17 @@
 
     /* ===== STATS STRIP ===== */
     .stats-strip {
-      display: flex;
-      justify-content: center;
-      gap: 0;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       margin-top: 72px;
       border-top: 1px solid rgba(255,255,255,0.06);
       padding-top: 40px;
       width: 100%;
-      max-width: 800px;
+      max-width: 860px;
     }
     .stat-block {
       text-align: center;
-      padding: 0 40px;
+      padding: 0 20px;
       border-right: 1px solid rgba(255,255,255,0.06);
     }
     .stat-block:last-child { border-right: none; }
