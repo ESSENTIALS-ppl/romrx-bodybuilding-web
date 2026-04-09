@@ -3,16 +3,598 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ROMRxBodyBuilding&#8482; | Stay in the Gym. Out of Urgent Care.</title>
-  <meta name="description" content="Your ROM may predict your next injury. ROMRxBodyBuilding helps you stay in the gym and out of urgent care with a personalized Gym Readiness Profile.">
-  <link rel="stylesheet" href="css/main.css">
+  <title>ROMRxBodyBuilding&#8482; | Coming Soon</title>
+  <meta name="description" content="The first ROM-based training system built for bodybuilders. Know exactly which lifts your body is ready to load. Coming soon.">
+  <meta property="og:title" content="ROMRxBodyBuilding&#8482; | Coming Soon">
+  <meta property="og:description" content="Your ROM limits are the hidden ceiling on your muscle growth. We're about to change that.">
+  <meta property="og:url" content="https://romrxbodybuilding.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://romrxbodybuilding.com">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       ROMRxBodyBuilding — Coming Soon
+       Miami Vice × Golden Era BB × Rockstar / GTA
+       ============================================================ */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #070711;
+      --bg2:         #0A0A18;
+      --hot-pink:    #FF2D78;
+      --pink-glow:   rgba(255,45,120,0.6);
+      --teal:        #00F5E4;
+      --teal-glow:   rgba(0,245,228,0.5);
+      --violet:      #B44FE8;
+      --orange:      #FF6B35;
+      --gold:        #FFD700;
+      --gold-warm:   #F5A623;
+      --text:        #F0EDE8;
+      --text-muted:  rgba(240,237,232,0.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== BACKGROUND GRID + ATMOSPHERE ===== */
+    .scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    /* Perspective grid floor */
+    .grid-floor {
+      position: absolute;
+      bottom: -10%;
+      left: 50%;
+      transform: translateX(-50%) perspective(600px) rotateX(65deg);
+      width: 200%;
+      height: 70%;
+      background-image:
+        linear-gradient(var(--teal) 1px, transparent 1px),
+        linear-gradient(90deg, var(--teal) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.08;
+      transform-origin: bottom center;
+    }
+
+    /* Horizon glow */
+    .horizon {
+      position: absolute;
+      bottom: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--hot-pink), var(--teal), transparent);
+      opacity: 0.4;
+      filter: blur(2px);
+      box-shadow: 0 0 40px 8px var(--hot-pink), 0 0 80px 16px var(--teal);
+    }
+
+    /* Ambient light blobs */
+    .glow-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+    .blob-pink  { width: 600px; height: 400px; background: var(--hot-pink); opacity: 0.08; top: 0; right: -10%; }
+    .blob-teal  { width: 500px; height: 500px; background: var(--teal);     opacity: 0.06; bottom: 10%; left: -5%; }
+    .blob-gold  { width: 400px; height: 300px; background: var(--gold);      opacity: 0.05; top: 30%; left: 50%; transform: translateX(-50%); }
+
+    /* Scanlines */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ===== MAIN LAYOUT ===== */
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px 80px;
+    }
+
+    /* ===== TOP BAR ===== */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: linear-gradient(180deg, rgba(7,7,17,0.95) 0%, transparent 100%);
+    }
+    .top-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .top-logo span { color: var(--hot-pink); }
+    .top-link {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .top-link:hover { color: var(--teal); }
+    .top-link span { color: var(--gold); }
+
+    /* ===== HERO CONTENT ===== */
+    .hero-content {
+      text-align: center;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* COMING SOON badge */
+    .cs-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,45,120,0.1);
+      border: 1px solid rgba(255,45,120,0.35);
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--hot-pink);
+      margin-bottom: 36px;
+    }
+    .cs-badge-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--hot-pink);
+      box-shadow: 0 0 10px var(--hot-pink);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+    /* MAIN HEADLINE */
+    .headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 14vw, 11rem);
+      line-height: 0.92;
+      letter-spacing: 2px;
+      margin-bottom: 0;
+    }
+    .headline .line-1 {
+      display: block;
+      color: var(--text);
+    }
+    .headline .line-2 {
+      display: block;
+      background: linear-gradient(135deg, var(--hot-pink) 0%, var(--orange) 50%, var(--gold-warm) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(255,45,120,0.5));
+    }
+    .headline .line-3 {
+      display: block;
+      color: var(--teal);
+      text-shadow: 0 0 40px var(--teal-glow), 0 0 80px rgba(0,245,228,0.2);
+    }
+
+    /* SUBLINE */
+    .subline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 24px 0 8px;
+    }
+    .subline span { color: var(--gold); }
+
+    /* DIVIDER */
+    .neon-divider {
+      width: 120px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--hot-pink), var(--teal));
+      margin: 28px auto 32px;
+      box-shadow: 0 0 12px var(--pink-glow), 0 0 24px var(--teal-glow);
+    }
+
+    /* PREMISE */
+    .premise {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 48px;
+      line-height: 1.75;
+    }
+    .premise strong { color: var(--text); font-weight: 600; }
+
+    /* ===== FEATURE PILLS ===== */
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 52px;
+    }
+    .pill {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 7px 18px;
+      border-radius: 3px;
+      border: 1px solid;
+    }
+    .pill-pink  { color: var(--hot-pink); border-color: rgba(255,45,120,0.35); background: rgba(255,45,120,0.07); }
+    .pill-teal  { color: var(--teal);     border-color: rgba(0,245,228,0.3);   background: rgba(0,245,228,0.05); }
+    .pill-gold  { color: var(--gold);     border-color: rgba(255,215,0,0.3);   background: rgba(255,215,0,0.05); }
+    .pill-violet{ color: var(--violet);   border-color: rgba(180,79,232,0.3);  background: rgba(180,79,232,0.05);}
+
+    /* ===== WAITLIST FORM ===== */
+    .waitlist-wrap {
+      max-width: 500px;
+      margin: 0 auto 20px;
+    }
+    .waitlist-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .waitlist-form {
+      display: flex;
+      gap: 0;
+      border: 1px solid rgba(255,45,120,0.4);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(255,45,120,0.1), 0 0 40px rgba(0,245,228,0.05);
+      transition: box-shadow 0.3s;
+    }
+    .waitlist-form:focus-within {
+      box-shadow: 0 0 30px rgba(255,45,120,0.25), 0 0 60px rgba(0,245,228,0.1);
+      border-color: rgba(255,45,120,0.7);
+    }
+    .waitlist-input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: none;
+      padding: 14px 18px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .waitlist-input::placeholder { color: rgba(240,237,232,0.3); }
+    .waitlist-btn {
+      background: var(--hot-pink);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+    .waitlist-btn:hover {
+      background: #e01f65;
+      box-shadow: 0 0 20px var(--pink-glow);
+    }
+    .waitlist-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .waitlist-success {
+      display: none;
+      text-align: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--teal);
+      text-shadow: 0 0 20px var(--teal-glow);
+      padding: 14px;
+    }
+    .waitlist-note {
+      font-size: 0.75rem;
+      color: rgba(240,237,232,0.3);
+      text-align: center;
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== STATS STRIP ===== */
+    .stats-strip {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-top: 72px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 40px;
+      width: 100%;
+      max-width: 800px;
+    }
+    .stat-block {
+      text-align: center;
+      padding: 0 40px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-num.pink  { color: var(--hot-pink); text-shadow: 0 0 20px var(--pink-glow); }
+    .stat-num.teal  { color: var(--teal);     text-shadow: 0 0 20px var(--teal-glow); }
+    .stat-num.gold  { color: var(--gold);     text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 32px 24px 40px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 3px;
+      color: rgba(240,237,232,0.3);
+      margin-bottom: 8px;
+    }
+    .footer-logo span { color: rgba(255,45,120,0.5); }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 10px;
+    }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: rgba(240,237,232,0.25);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--teal); }
+    .footer-copy {
+      font-size: 0.7rem;
+      color: rgba(240,237,232,0.15);
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 600px) {
+      .stat-block { padding: 0 20px; }
+      .stats-strip { gap: 8px; }
+      .pill { font-size: 0.78rem; padding: 6px 12px; }
+      .waitlist-form { flex-direction: column; }
+      .waitlist-btn { padding: 14px; text-align: center; }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-content > * {
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards;
+    }
+    .cs-badge      { animation-delay: 0.1s; }
+    .headline      { animation-delay: 0.25s; }
+    .subline       { animation-delay: 0.4s; }
+    .neon-divider  { animation-delay: 0.5s; }
+    .premise       { animation-delay: 0.55s; }
+    .feature-pills { animation-delay: 0.65s; }
+    .waitlist-wrap { animation-delay: 0.75s; }
+    .waitlist-note { animation-delay: 0.8s; }
+    .stats-strip   { animation-delay: 0.9s; }
+  </style>
 </head>
 <body>
-  <!-- Homepage — Phase 2 build -->
-  <div style="font-family:sans-serif;text-align:center;padding:80px 24px;background:#1a1a2e;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-    <h1 style="font-size:2.5rem;margin-bottom:16px;">ROMRxBodyBuilding&#8482;</h1>
-    <p style="font-size:1.1rem;opacity:0.7;margin-bottom:32px;">Your ROM may predict your next injury.<br>We help you stay in the gym and out of urgent care.</p>
-    <p style="opacity:0.4;font-size:0.875rem;">Coming soon &mdash; romrxbodybuilding.com</p>
+
+  <!-- SCENE / BACKGROUND -->
+  <div class="scene" aria-hidden="true">
+    <div class="glow-blob blob-pink"></div>
+    <div class="glow-blob blob-teal"></div>
+    <div class="glow-blob blob-gold"></div>
+    <div class="grid-floor"></div>
+    <div class="horizon"></div>
+    <div class="scanlines"></div>
   </div>
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <a href="https://romrxbodybuilding.com" class="top-logo">ROMRx<span>BB</span></a>
+    <a href="https://romrxbjj.com" class="top-link" target="_blank">
+      ROMRxBJJ is <span>live now</span> &rarr;
+    </a>
+  </header>
+
+  <!-- MAIN PAGE -->
+  <main class="page">
+    <div class="hero-content">
+
+      <div class="cs-badge">
+        <span class="cs-badge-dot"></span>
+        Coming Soon &mdash; Join the Waitlist
+      </div>
+
+      <h1 class="headline">
+        <span class="line-1">KNOW WHAT</span>
+        <span class="line-2">YOUR BODY</span>
+        <span class="line-3">CAN LIFT.</span>
+      </h1>
+
+      <p class="subline">
+        The first ROM-based training system <span>built for bodybuilders</span>
+      </p>
+
+      <div class="neon-divider"></div>
+
+      <p class="premise">
+        Your range of motion is the hidden ceiling on your muscle growth.
+        <strong>ROMRxBodyBuilding</strong> maps 60+ exercises to your exact joint angles
+        and tells you which movements your body is ready to load, which need modification,
+        and which to skip entirely until your mobility catches up.
+        <strong>No guessing. No injuries from ignorance. Just data.</strong>
+      </p>
+
+      <div class="feature-pills">
+        <span class="pill pill-pink">60+ Exercises Rated</span>
+        <span class="pill pill-teal">Gym Readiness Profile</span>
+        <span class="pill pill-gold">Hypertrophy Programs</span>
+        <span class="pill pill-violet">Coach Dashboard</span>
+        <span class="pill pill-pink">Training Log</span>
+        <span class="pill pill-teal">6-Week Reassessment Cycle</span>
+        <span class="pill pill-gold">Free Profile Included</span>
+        <span class="pill pill-violet">Zero Wearables</span>
+      </div>
+
+      <div class="waitlist-wrap">
+        <p class="waitlist-label">Get early access</p>
+        <div class="waitlist-form" id="wl-form">
+          <input
+            type="email"
+            class="waitlist-input"
+            id="wl-email"
+            placeholder="your@email.com"
+            autocomplete="email"
+          >
+          <button class="waitlist-btn" id="wl-btn" type="button">Notify Me</button>
+        </div>
+        <div class="waitlist-success" id="wl-success">
+          &#10003;&nbsp; You&#8217;re on the list. We&#8217;ll hit you first.
+        </div>
+        <p class="waitlist-note">No spam. First access when we launch. Unsubscribe anytime.</p>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-block">
+          <span class="stat-num pink">60+</span>
+          <span class="stat-label">Exercises Rated</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num teal">14</span>
+          <span class="stat-label">Joints Assessed</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num gold">15</span>
+          <span class="stat-label">Min to Full Profile</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num pink">0</span>
+          <span class="stat-label">Wearables Required</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">ROMRx<span>BodyBuilding</span>&#8482;</div>
+    <div class="footer-links">
+      <a href="https://romrx.io" target="_blank">romrx.io</a>
+      <a href="https://romrxbjj.com" target="_blank">ROMRxBJJ (Live)</a>
+      <a href="mailto:info@romrx.io">Contact</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 ROMRx LLC &middot; romrxbodybuilding.com</p>
+  </footer>
+
+  <!-- WAITLIST JS -->
+  <script>
+    const GAS = 'https://script.google.com/macros/s/AKfycbyyeMmDsIECs1mRQVaoDX-sAWAvbgIB2e5suY-rSWzqif4PZJgNFYCk9XOhYbcE4wm6Lw/exec';
+
+    document.getElementById('wl-btn').addEventListener('click', async () => {
+      const email = document.getElementById('wl-email').value.trim().toLowerCase();
+      const btn   = document.getElementById('wl-btn');
+      const form  = document.getElementById('wl-form');
+      const ok    = document.getElementById('wl-success');
+      const input = document.getElementById('wl-email');
+
+      if (!email || !email.includes('@')) {
+        input.style.outline = '2px solid var(--hot-pink)';
+        input.focus();
+        setTimeout(() => input.style.outline = '', 2000);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '...';
+
+      try {
+        const res  = await fetch(GAS + '?action=saveWaitlist&email=' + encodeURIComponent(email) + '&vertical=BodyBuilding');
+        const data = await res.json();
+        if (data.success) {
+          form.style.display = 'none';
+          ok.style.display   = 'block';
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Notify Me';
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = 'Notify Me';
+      }
+    });
+
+    document.getElementById('wl-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('wl-btn').click();
+    });
+  </script>
 </body>
 </html>
