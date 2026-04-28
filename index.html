@@ -355,18 +355,36 @@
     .stats-strip {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      margin-top: 72px;
+      margin-top: 64px;
       border-top: 1px solid rgba(255,255,255,0.06);
-      padding-top: 40px;
+      padding-top: 36px;
       width: 100%;
-      max-width: 860px;
+      max-width: 760px;
     }
     .stat-block {
       text-align: center;
-      padding: 0 20px;
+      padding: 0 12px;
       border-right: 1px solid rgba(255,255,255,0.06);
     }
     .stat-block:last-child { border-right: none; }
+    .science-statement {
+      margin-top: 40px;
+      padding: 20px 32px;
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 4px;
+      background: rgba(255,215,0,0.04);
+      max-width: 760px;
+      text-align: center;
+    }
+    .science-statement p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: rgba(240,237,232,0.75);
+      line-height: 1.5;
+    }
+    .science-statement p strong { color: var(--gold); }
     .stat-num {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 2.5rem;
@@ -544,11 +562,13 @@
           <span class="stat-label">Min to Full Profile</span>
         </div>
         <div class="stat-block">
-          <span class="stat-num gold">150+</span>
-          <span class="stat-label">Peer-Reviewed Data Points</span>
+          <span class="stat-num pink">0</span>
+          <span class="stat-label">Wearables Required</span>
         </div>
       </div>
-      <p class="journals-line">JSCR &middot; BJSM &middot; IJSPT &middot; Biomechanics Textbooks</p>
+      <div class="science-statement">
+        <p><strong>~150+ individual ROM data points</strong> sourced from peer-reviewed journals including JSCR, BJSM, and IJSPT, and leading biomechanics textbooks. Every threshold is evidence-based, not estimated.</p>
+      </div>
 
     </div>
   </main>
