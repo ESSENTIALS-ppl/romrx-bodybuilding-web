@@ -326,25 +326,25 @@ function MeasureInput({ field, value, onChange }: {
           placeholder="—"
           className={cn(
             'w-24 px-3 py-2.5 rounded-xl border text-sm text-center font-mono font-bold transition-all focus:outline-none',
-            score === 'risk'       ? 'border-red-300 bg-red-50 text-red-700 focus:border-red-400' :
-            score === 'functional' ? 'border-miami/50 bg-miami/10 text-miami focus:border-miami' :
-            score === 'yellow'     ? 'border-yellow-300 bg-miami-gold/10 text-miami-gold focus:border-yellow-400' :
-                                     'border-miami/20 bg-miami-bg/60 focus:border-miami focus:bg-miami-bg'
+            score === 'risk'       ? 'border-red-500 bg-red-500/15 text-red-400 focus:border-red-400' :
+            score === 'functional' ? 'border-green-500 bg-green-500/15 text-green-400 focus:border-green-400' :
+            score === 'yellow'     ? 'border-yellow-500 bg-yellow-500/15 text-yellow-400 focus:border-yellow-400' :
+                                     'border-miami/20 bg-miami-bg/60 text-miami-text focus:border-miami focus:bg-miami-bg'
           )}
         />
         <span className="text-sm text-miami-text/60">{field.unit}</span>
         {score === 'risk' && (
-          <span className="flex items-center gap-1 text-xs font-semibold text-red-tier bg-red-tier-bg px-2 py-0.5 rounded-full">
+          <span className="flex items-center gap-1 text-xs font-bold text-red-400 bg-red-500/20 border border-red-500/40 px-2 py-0.5 rounded-full">
             <AlertTriangle size={10} /> AT RISK
           </span>
         )}
         {score === 'functional' && (
-          <span className="flex items-center gap-1 text-xs font-semibold text-miami bg-miami/15 px-2 py-0.5 rounded-full">
+          <span className="flex items-center gap-1 text-xs font-bold text-green-400 bg-green-500/20 border border-green-500/40 px-2 py-0.5 rounded-full">
             <CheckCircle2 size={10} /> FUNCTIONAL
           </span>
         )}
         {score === 'yellow' && (
-          <span className="flex items-center gap-1 text-xs font-semibold text-yellow-tier bg-yellow-tier-bg px-2 py-0.5 rounded-full">
+          <span className="flex items-center gap-1 text-xs font-bold text-yellow-400 bg-yellow-500/20 border border-yellow-500/40 px-2 py-0.5 rounded-full">
             ⚠ LOW
           </span>
         )}
@@ -555,7 +555,7 @@ export function Assessment() {
               📸 Can't tap the screen? Say <span className="font-semibold">&ldquo;Hey Siri, take a screenshot&rdquo;</span> (iPhone) or <span className="font-semibold">&ldquo;Hey Google, take a screenshot&rdquo;</span> (Android).
             </p>
 
-            {error && <p className="text-xs text-red-tier bg-red-tier-bg rounded-lg px-3 py-2">{error}</p>}
+            {error && <p className="text-xs text-red-400 bg-red-500/20 border border-red-500/40 rounded-lg px-3 py-2">{error}</p>}
 
             {/* Navigation */}
             <div className="flex items-center justify-between pt-2">

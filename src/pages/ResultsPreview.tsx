@@ -57,11 +57,11 @@ function computePRS(assessment: Record<string, any>): number {
 }
 
 function getPRSTier(score: number): { label: string; color: string; bg: string; desc: string } {
-  if (score >= 85) return { label: 'ELITE',       color: 'text-miami',       bg: 'bg-miami-light',       desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
-  if (score >= 70) return { label: 'STRONG',      color: 'text-miami',       bg: 'bg-miami-light',       desc: 'Good mobility foundation. A few gaps to address.' }
-  if (score >= 55) return { label: 'DEVELOPING',  color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  desc: 'ROM limitations are affecting your technique readiness.' }
-  if (score >= 40) return { label: 'RESTRICTED',  color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  desc: 'Significant mobility restrictions. Prioritize your protocol.' }
-  return                  { label: 'AT RISK',     color: 'text-red-tier',   bg: 'bg-red-tier-bg',     desc: 'Multiple AT RISK joints. Prioritize injury prevention immediately.' }
+  if (score >= 85) return { label: 'ELITE',       color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
+  if (score >= 70) return { label: 'STRONG',      color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Good mobility foundation. A few gaps to address.' }
+  if (score >= 55) return { label: 'DEVELOPING',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'ROM limitations are affecting your lifting readiness.' }
+  if (score >= 40) return { label: 'RESTRICTED',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Significant mobility restrictions. Prioritize your protocol.' }
+  return                  { label: 'AT RISK',     color: 'text-red-400',   bg: 'bg-red-500/20',    desc: 'Multiple AT RISK joints. Prioritize injury prevention immediately.' }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -167,7 +167,7 @@ export function ResultsPreview() {
         {/* PRS Score Card */}
         <div className="bg-miami-ink rounded-2xl border border-miami/30 p-6 text-center">
           <p className="text-xs font-bold text-miami uppercase tracking-widest mb-4">ROM Readiness Score</p>
-          <div className={cn('inline-flex items-center justify-center w-32 h-32 rounded-full border-4 mb-4', tier.bg, tier.color === 'text-miami' ? 'border-miami/40' : tier.color === 'text-yellow-tier' ? 'border-yellow-tier/40' : 'border-red-tier/40')}>
+          <div className={cn('inline-flex items-center justify-center w-32 h-32 rounded-full border-4 mb-4', tier.bg, tier.color === 'text-green-400' ? 'border-green-500/50' : tier.color === 'text-yellow-400' ? 'border-yellow-500/50' : 'border-red-500/50')}>
             <div>
               <span className={cn('font-display font-bold text-5xl leading-none block', tier.color)}>{prs}</span>
               <span className={cn('text-xs font-bold uppercase tracking-wide', tier.color)}>/ 100</span>
@@ -182,17 +182,17 @@ export function ResultsPreview() {
 
         {/* Top asymmetries */}
         {asymmetries.length > 0 && (
-          <div className="bg-miami-ink rounded-2xl border border-yellow-tier/30 p-5 space-y-3">
+          <div className="bg-miami-ink rounded-2xl border border-yellow-500/40 p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle size={15} className="text-yellow-tier" />
-              <p className="text-sm font-bold text-yellow-tier">Top Asymmetry Flags</p>
+              <AlertTriangle size={15} className="text-yellow-400" />
+              <p className="text-sm font-bold text-yellow-400">Top Asymmetry Flags</p>
             </div>
             {asymmetries.map((a, i) => (
               <div key={i} className="flex items-center justify-between">
                 <span className="text-sm text-miami-text/80">{a.joint}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-miami-text/50">L {a.left}° / R {a.right}°</span>
-                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full', a.gap >= 15 ? 'bg-red-tier-bg text-red-tier' : 'bg-yellow-tier-bg text-yellow-tier')}>
+                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full', a.gap >= 15 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400')}>
                     {a.gap}° gap
                   </span>
                 </div>
@@ -214,8 +214,8 @@ export function ResultsPreview() {
           <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game — Technique Readiness</p>
           <div className="flex gap-2">
             <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">?? GREEN</span>
-            <span className="text-xs bg-yellow-tier-bg text-yellow-tier px-3 py-1 rounded-full font-bold">?? YELLOW</span>
-            <span className="text-xs bg-red-tier-bg text-red-tier px-3 py-1 rounded-full font-bold">?? RED</span>
+            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">?? YELLOW</span>
+            <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">?? RED</span>
           </div>
           <div className="space-y-2">
             {['My Protocol — Top 3 Priority Joints', 'My Game — Offense + Defense Flow', 'ROMBot — Ask anything about your data'].map(item => (
@@ -228,7 +228,7 @@ export function ResultsPreview() {
         </div>
 
         {/* CTA */}
-        {error && <p className="text-xs text-center text-red-tier bg-red-tier-bg rounded-xl px-3 py-2">{error}</p>}
+        {error && <p className="text-xs text-center text-red-400 bg-red-500/20 rounded-xl px-3 py-2">{error}</p>}
         <button
           onClick={handleUnlock}
           disabled={paying}
