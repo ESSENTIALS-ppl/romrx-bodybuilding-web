@@ -6,7 +6,7 @@ import { SectionCard } from '../components/SectionCard'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { cn, beltColor } from '../lib/utils'
-import { supabase } from '../lib/supabase'
+import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 import {
   Users, Flame, FileText, Search, X, Printer,
   ChevronDown, Save, AlertTriangle, ClipboardList,
@@ -20,8 +20,8 @@ import {
 } from 'recharts'
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-const COACH_ROSTER_URL  = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-coach-roster`
-const COACH_ACTIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-actions`
+const COACH_ROSTER_URL  = `${SUPABASE_URL}/functions/v1/get-coach-roster`
+const COACH_ACTIONS_URL = `${SUPABASE_URL}/functions/v1/coach-actions`
 
 const TYPE_LABEL: Record<string, string> = {
   T: 'Takedowns', P: 'Passes', G: 'Guards', S: 'Sweeps', C: 'Controls', X: 'Submissions',
@@ -208,7 +208,7 @@ function InlineNoteEditor({ athleteId, initialNote, session, onClose, onSaved }:
     if (initialNote || !session || !athleteId) { setLoading(false); return }
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_note_for_athlete', athlete_id: athleteId }),
     }).then(r => r.json()).then(d => { setNote(d.note ?? ''); setLoading(false) }).catch(() => setLoading(false))
   }, [athleteId, session, initialNote])
@@ -219,7 +219,7 @@ function InlineNoteEditor({ athleteId, initialNote, session, onClose, onSaved }:
     try {
       await fetch(COACH_ACTIONS_URL, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save_note', athlete_id: athleteId, note }),
       })
       setSaved(true)
@@ -399,7 +399,7 @@ function InjuryForm({ athlete, session, onClose }: {
     try {
       const res = await fetch(COACH_ACTIONS_URL, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'log_injury', athlete_user_id: athlete.user_id, body_part: bodyPart, severity, side, mechanism: mechanism || null, notes: notes.trim() || null }),
       })
       const data = await res.json()
@@ -459,7 +459,7 @@ function AthleteGamePlans({ athleteUserId, session }: { athleteUserId: string; s
     setLoading(true)
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_athlete_game_plans', athlete_user_id: athleteUserId }),
     }).then(r => r.json()).then(data => { setPlans(Array.isArray(data.plans) ? data.plans : []); setLoading(false) }).catch(() => setLoading(false))
   }, [athleteUserId, session, expanded])
@@ -677,7 +677,7 @@ function TechniqueReadinessPanel({ session, code }: {
     setLoading(true)
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_technique_readiness', code }),
     }).then(r => r.json()).then(data => {
       setReadiness(Array.isArray(data.readiness) ? data.readiness : [])
@@ -831,7 +831,7 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
 
   const authHeaders = useCallback(() => ({
     'Authorization': `Bearer ${session?.access_token ?? ''}`,
-    'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+    'apikey': SUPABASE_ANON,
     'Content-Type': 'application/json',
   }), [session])
 
@@ -1007,7 +1007,7 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
 
   const authHeaders = useCallback(() => ({
     'Authorization': `Bearer ${session?.access_token ?? ''}`,
-    'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+    'apikey': SUPABASE_ANON,
     'Content-Type': 'application/json',
   }), [session])
 
@@ -1210,7 +1210,7 @@ function NoteCard({ note, athleteName, session }: { note: AthleteNote; athleteNa
     try {
       await fetch(COACH_ACTIONS_URL, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'save_note', athlete_id: note.athlete_id, note: text }),
       })
       setSaved(true); setTimeout(() => setSaved(false), 2000)
@@ -1245,7 +1245,7 @@ function NotesTab({ roster, session }: { roster: AthleteRosterItem[]; session: {
     setLoading(true)
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_notes' }),
     }).then(r => r.json()).then(data => setNotes(Array.isArray(data) ? data : data.notes ?? [])).catch(() => setNotes([])).finally(() => setLoading(false))
   }, [session])
@@ -1327,9 +1327,9 @@ function InjuryCard({
     if (!session) return
     setSaving(true)
     try {
-      await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-actions`, {
+      await fetch(`${SUPABASE_URL}/functions/v1/coach-actions`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'update_injury_stage', injury_id: injury.id, stage: newStage, status: newStatus ?? injury.status, notes: stageNote.trim() || null }),
       })
       onUpdated(injury.id, newStage, newStatus ?? injury.status)
@@ -1437,9 +1437,9 @@ function MyInjuryTab({ session, roster }: { session: { access_token: string } | 
   useEffect(() => {
     if (!session) return
     setLoading(true)
-    fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach-actions`, {
+    fetch(`${SUPABASE_URL}/functions/v1/coach-actions`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_injuries' }),
     }).then(r => r.json()).then(data => {
       setInjuries(Array.isArray(data.injuries) ? data.injuries : [])
@@ -1557,7 +1557,7 @@ export function CoachDashboard({ defaultSection = 'team' }: { defaultSection?: T
     if (!session) return
     setRosterLoading(true)
     fetch(COACH_ROSTER_URL, {
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON },
     }).then(r => r.json()).then(data => setRoster(Array.isArray(data) ? data : data.athletes ?? [])).catch(() => setRoster([])).finally(() => setRosterLoading(false))
   }, [session])
 
@@ -1567,7 +1567,7 @@ export function CoachDashboard({ defaultSection = 'team' }: { defaultSection?: T
     setCoachingLoadingTechs(true)
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'list_techniques' }),
     }).then(r => r.json()).then(data => setCoachingTechs(Array.isArray(data.techniques) ? data.techniques : [])).catch(() => {}).finally(() => setCoachingLoadingTechs(false))
   }, [session, coachingTechs.length])
@@ -1595,7 +1595,7 @@ export function CoachDashboard({ defaultSection = 'team' }: { defaultSection?: T
     if (userIds.length === 0) return
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_protocol_counts', athlete_user_ids: userIds }),
     }).then(r => r.json()).then(data => setProtocolCounts(data.counts ?? {})).catch(() => {})
   }, [session, roster])
@@ -1605,7 +1605,7 @@ export function CoachDashboard({ defaultSection = 'team' }: { defaultSection?: T
     if (!session) return
     fetch(COACH_ACTIONS_URL, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'get_notes' }),
     }).then(r => r.json()).then(data => {
       const map: Record<string, string> = {}

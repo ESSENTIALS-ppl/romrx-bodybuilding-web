@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { supabase } from '../lib/supabase'
+import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 import { Spinner } from '../components/Spinner'
 import { AlertTriangle, CheckCircle, Unlock, TrendingUp } from 'lucide-react'
 import { cn } from '../lib/utils'
 
-const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`
+const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
 
 // ── PRS scoring algorithm ─────────────────────────────────────────────────────
 const BILATERAL_JOINTS = [
@@ -57,8 +57,8 @@ function computePRS(assessment: Record<string, any>): number {
 }
 
 function getPRSTier(score: number): { label: string; color: string; bg: string; desc: string } {
-  if (score >= 85) return { label: 'ELITE',       color: 'text-teal',       bg: 'bg-teal-light',       desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
-  if (score >= 70) return { label: 'STRONG',      color: 'text-teal',       bg: 'bg-teal-light',       desc: 'Good mobility foundation. A few gaps to address.' }
+  if (score >= 85) return { label: 'ELITE',       color: 'text-miami',       bg: 'bg-miami-light',       desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
+  if (score >= 70) return { label: 'STRONG',      color: 'text-miami',       bg: 'bg-miami-light',       desc: 'Good mobility foundation. A few gaps to address.' }
   if (score >= 55) return { label: 'DEVELOPING',  color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  desc: 'ROM limitations are affecting your technique readiness.' }
   if (score >= 40) return { label: 'RESTRICTED',  color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  desc: 'Significant mobility restrictions. Prioritize your protocol.' }
   return                  { label: 'AT RISK',     color: 'text-red-tier',   bg: 'bg-red-tier-bg',     desc: 'Multiple AT RISK joints. Prioritize injury prevention immediately.' }
@@ -125,7 +125,7 @@ export function ResultsPreview() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'apikey': SUPABASE_ANON,
         },
         body: JSON.stringify({ email: user?.email, plan: 'athlete' }),
       })
@@ -155,19 +155,19 @@ export function ResultsPreview() {
   const asymmetries = getTopAsymmetries(assessment)
 
   return (
-    <div className="min-h-screen bg-charcoal py-10 px-4">
+    <div className="min-h-screen bg-miami-bg py-10 px-4">
       <div className="max-w-lg mx-auto space-y-6">
 
         {/* Header */}
         <div className="text-center">
-          <h1 className="font-display font-bold text-warm-white text-2xl">Your Results Are In</h1>
-          <p className="text-sm text-warm-white/60 mt-1">Position Readiness Protocol™ by ROMRx</p>
+          <h1 className="font-display font-bold text-miami-text text-2xl">Your Results Are In</h1>
+          <p className="text-sm text-miami-text/60 mt-1">Know What Your Body Can Lift — by ROMRxBB</p>
         </div>
 
         {/* PRS Score Card */}
-        <div className="bg-charcoal-dark rounded-2xl border border-teal/30 p-6 text-center">
-          <p className="text-xs font-bold text-teal uppercase tracking-widest mb-4">Position Readiness Score</p>
-          <div className={cn('inline-flex items-center justify-center w-32 h-32 rounded-full border-4 mb-4', tier.bg, tier.color === 'text-teal' ? 'border-teal/40' : tier.color === 'text-yellow-tier' ? 'border-yellow-tier/40' : 'border-red-tier/40')}>
+        <div className="bg-miami-ink rounded-2xl border border-miami/30 p-6 text-center">
+          <p className="text-xs font-bold text-miami uppercase tracking-widest mb-4">ROM Readiness Score</p>
+          <div className={cn('inline-flex items-center justify-center w-32 h-32 rounded-full border-4 mb-4', tier.bg, tier.color === 'text-miami' ? 'border-miami/40' : tier.color === 'text-yellow-tier' ? 'border-yellow-tier/40' : 'border-red-tier/40')}>
             <div>
               <span className={cn('font-display font-bold text-5xl leading-none block', tier.color)}>{prs}</span>
               <span className={cn('text-xs font-bold uppercase tracking-wide', tier.color)}>/ 100</span>
@@ -177,51 +177,51 @@ export function ResultsPreview() {
             <TrendingUp size={14} />
             {tier.label}
           </div>
-          <p className="text-sm text-warm-white/70 leading-relaxed">{tier.desc}</p>
+          <p className="text-sm text-miami-text/70 leading-relaxed">{tier.desc}</p>
         </div>
 
         {/* Top asymmetries */}
         {asymmetries.length > 0 && (
-          <div className="bg-charcoal-dark rounded-2xl border border-yellow-tier/30 p-5 space-y-3">
+          <div className="bg-miami-ink rounded-2xl border border-yellow-tier/30 p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
               <AlertTriangle size={15} className="text-yellow-tier" />
               <p className="text-sm font-bold text-yellow-tier">Top Asymmetry Flags</p>
             </div>
             {asymmetries.map((a, i) => (
               <div key={i} className="flex items-center justify-between">
-                <span className="text-sm text-warm-white/80">{a.joint}</span>
+                <span className="text-sm text-miami-text/80">{a.joint}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-warm-white/50">L {a.left}° / R {a.right}°</span>
+                  <span className="text-xs text-miami-text/50">L {a.left}° / R {a.right}°</span>
                   <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full', a.gap >= 15 ? 'bg-red-tier-bg text-red-tier' : 'bg-yellow-tier-bg text-yellow-tier')}>
                     {a.gap}° gap
                   </span>
                 </div>
               </div>
             ))}
-            <p className="text-xs text-warm-white/40 pt-1">Asymmetry is the #1 predictor of injury in BJJ athletes.</p>
+            <p className="text-xs text-miami-text/40 pt-1">Asymmetry is the #1 predictor of injury under heavy load. Fix it before it fixes you.</p>
           </div>
         )}
 
         {/* Teaser — locked content */}
-        <div className="bg-charcoal-dark rounded-2xl border border-teal/20 p-5 space-y-3 relative overflow-hidden">
-          <div className="absolute inset-0 bg-charcoal/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+        <div className="bg-miami-ink rounded-2xl border border-miami/20 p-5 space-y-3 relative overflow-hidden">
+          <div className="absolute inset-0 bg-miami-bg/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
             <div className="text-center space-y-2">
               <Unlock size={28} className="text-gold mx-auto" />
-              <p className="text-sm font-bold text-warm-white">Unlock Your Full Dashboard</p>
-              <p className="text-xs text-warm-white/60">132 technique ratings, full protocol, ROMBot</p>
+              <p className="text-sm font-bold text-miami-text">Unlock Your Full Dashboard</p>
+              <p className="text-xs text-miami-text/60">132 technique ratings, full protocol, ROMBot</p>
             </div>
           </div>
-          <p className="text-xs font-bold text-teal uppercase tracking-wide mb-2">My Game — Technique Readiness</p>
+          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game — Technique Readiness</p>
           <div className="flex gap-2">
-            <span className="text-xs bg-teal/20 text-teal px-3 py-1 rounded-full font-bold">?? GREEN</span>
+            <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">?? GREEN</span>
             <span className="text-xs bg-yellow-tier-bg text-yellow-tier px-3 py-1 rounded-full font-bold">?? YELLOW</span>
             <span className="text-xs bg-red-tier-bg text-red-tier px-3 py-1 rounded-full font-bold">?? RED</span>
           </div>
           <div className="space-y-2">
             {['My Protocol — Top 3 Priority Joints', 'My Game — Offense + Defense Flow', 'ROMBot — Ask anything about your data'].map(item => (
               <div key={item} className="flex items-center gap-2">
-                <CheckCircle size={14} className="text-teal/40" />
-                <span className="text-sm text-warm-white/40 blur-sm select-none">{item}</span>
+                <CheckCircle size={14} className="text-miami/40" />
+                <span className="text-sm text-miami-text/40 blur-sm select-none">{item}</span>
               </div>
             ))}
           </div>
@@ -238,7 +238,7 @@ export function ResultsPreview() {
             <Unlock size={18} /> Unlock My Full Dashboard — $149/yr
           </>}
         </button>
-        <p className="text-center text-xs text-warm-white/30">
+        <p className="text-center text-xs text-miami-text/30">
           Cancel anytime · Promo codes accepted at checkout · Results saved permanently
         </p>
       </div>

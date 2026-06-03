@@ -7,7 +7,7 @@ import { SectionCard } from '../components/SectionCard'
 import { Spinner } from '../components/Spinner'
 import { Send, Loader2, Settings, Trash2, Wand2 } from 'lucide-react'
 import { cn } from '../lib/utils'
-import { supabase } from '../lib/supabase'
+import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 
 const START_LABELS: Record<string, string> = {
   standing: 'starting on the feet, fighting for takedowns',
@@ -24,7 +24,7 @@ const STYLE_LABELS: Record<string, string> = {
   technical: 'patient and technical',
 }
 
-const AI_CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`
+const AI_CHAT_URL = `${SUPABASE_URL}/functions/v1/ai-chat`
 
 interface Message { role: 'user' | 'assistant'; content: string }
 const PROVIDERS = [
@@ -136,7 +136,7 @@ export function Chat() {
       try {
         const res = await fetch(AI_CHAT_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`, 'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON },
           body: JSON.stringify({ message: msg, sport: 'bjj', provider, provider_key: providerKey }),
         })
         const data = await res.json()
@@ -169,7 +169,7 @@ export function Chat() {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'apikey': SUPABASE_ANON,
         },
         body: JSON.stringify(body),
       })

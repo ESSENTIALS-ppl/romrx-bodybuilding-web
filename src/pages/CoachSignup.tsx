@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 import { Loader2, Users } from 'lucide-react'
 
 const BELTS = ['white', 'blue', 'purple', 'brown', 'black']
-const CHECKOUT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`
+const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
 
 export function CoachSignup() {
   const [fullName, setFullName]   = useState('')
@@ -59,14 +59,14 @@ export function CoachSignup() {
 
       // Notify Jim of new coach account creation (pre-payment)
       // Fire-and-forget — don't block checkout on this
-      fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-coach-signup`, {
+      fetch(`${SUPABASE_URL}/functions/v1/notify-coach-signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, fullName, gym, paid: false }),
       }).catch(() => {})
 
       // Send "complete your payment" email to the coach
-      fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-coach-signup`, {
+      fetch(`${SUPABASE_URL}/functions/v1/notify-coach-signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, fullName, gym, paid: false, sendToCoach: true }),
@@ -82,7 +82,7 @@ export function CoachSignup() {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
-            'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+            'apikey': SUPABASE_ANON,
           },
           body: JSON.stringify({ email, full_name: fullName, plan: 'coach', gym }),
         })
