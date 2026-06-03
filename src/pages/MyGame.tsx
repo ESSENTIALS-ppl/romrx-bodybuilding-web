@@ -352,9 +352,9 @@ function TemplatesPanel({ userTier }: { userTier: string | null }) {
             title={
               <span className="flex items-center gap-2">
                 <span className={cn('inline-block w-2 h-2 rounded-full',
-                  tier === 'beginner' ? 'bg-miami-teal'
-                  : tier === 'intermediate' ? 'bg-miami'
-                  : 'bg-miami-gold')} />
+                  tier === 'beginner' ? 'bg-miami-violet/50'
+                  : tier === 'intermediate' ? 'bg-miami-violet'
+                  : 'bg-miami')} />
                 <span className="capitalize">{tier} hypertrophy</span>
                 <span className="text-xs font-normal text-miami-text/60">
                   · {SPLIT_LABEL[list[0]?.split_type ?? ''] ?? '—'}
