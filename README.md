@@ -1,40 +1,63 @@
 # ROMRxBodyBuilding Web
 
-Frontend for ROMRxBodyBuilding™ — AI-powered ROM assessment for bodybuilders and powerlifters.
+The frontend for **romrxbodybuilding.com** — the ROM-based training system built
+for bodybuilders.
 
-**Domain:** romrxbodybuilding.com  
-**Stack:** Vanilla HTML/CSS/JS + Netlify  
-**Backend:** Google Apps Script (romrx-bodybuilding-gas)  
-**Payments:** Stripe
+This repo is a sibling of [`romrx-bjj-web`](https://github.com/ESSENTIALS-ppl/romrx-bjj-web)
+and shares the same Supabase backend (`romrxbjj-v2`, project `cqzvqzwwevnflinxgnpp`).
+Sport context defaults to `bodybuilding` so users land on BB content.
 
-## Visual Identity
-Miami Vice x Golden Era Bodybuilding (80s/90s aesthetic)  
-Neon pastels: hot pink, electric teal, soft violet, sunset orange on dark background.
+## Stack
 
-## Build Phases
-1. Foundation — folder structure, design system, tokens
-2. Public Pages — Homepage, Pricing, Assessment flow
-3. Auth + Payments — Magic link auth, Stripe checkout
-4. Athlete Dashboard — Gym Readiness Profile, filtered programs, training log
-5. Coach Dashboard — roster, warmup generator, level-up approvals
-6. Polish + Launch
+- React 19 + TypeScript + Vite
+- Tailwind CSS (Miami Vice × Golden Era BB palette)
+- Supabase (auth, DB, edge functions)
+- React Router v7
+- Recharts (ROM/load charting)
+- Radix UI (dialog, dropdown, tabs, tooltip)
 
-## Folder Structure
+## Brand
+
+- **Palette**: hot pink `#FF2D78` · electric teal `#00F5E4` · synthwave violet `#B44FE8`
+  · golden era gold `#FFD700` on near-black `#070711`
+- **Type**: Bebas Neue (display) · Barlow Condensed (subheads) · Inter (body)
+- **Voice**: data-first, evidence-led, no-BS — "KNOW WHAT YOUR BODY CAN LIFT."
+
+## Local dev
+
+```bash
+cp .env.example .env.local   # fill in VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY
+npm install
+npm run dev
 ```
-/                   Homepage (index.html)
-/Assessment/        Self-guided ROM measurement flow
-/Dashboard/         Athlete paid dashboard
-/Coach/             Coach paid dashboard
-/Pricing/           Pricing page
-/css/main.css       Design system + tokens
-/js/config.js       Shared API URL constant
-/images/            Assets
-/netlify.toml       Routing
+
+## Build
+
+```bash
+npm run build       # → dist/
+npm run preview     # serve the production build locally
 ```
 
-## Pricing
-| Plan | Price |
-|------|-------|
-| Gym Readiness Profile | Free |
-| Athlete Dashboard | $149/year |
-| Coach Dashboard | $349/year |
+## Deploy
+
+Deployed to Netlify at `romrxbodybuilding.com`. The site root rewrites to
+`marketing.html`; the React app handles `/login`, `/signup`, `/dashboard/*`,
+`/onboarding/*`, and `/auth/*`.
+
+## Sport mode
+
+This site sets `DEFAULT_SPORT_KEY = 'bodybuilding'` in `src/sports/registry.ts`.
+Users can still switch sports via `SportSwitcher` (which writes to
+`users.active_sport` in Supabase) — the registry only controls the **default**
+sport before the DB row arrives.
+
+- Coach portal: **hidden** (`has_coach_portal: false`) — Trainers are
+  "in development" and shown only as a teaser on the marketing site.
+- Schools: **hidden** — gym portal is "coming soon".
+- Tier gating: BB exercises gated by `users.active_bb_tier` (beginner /
+  intermediate / advanced) via the `unlocked_techniques_v` view.
+
+## Companion repos
+
+- [`romrxbjj-v2`](https://github.com/ESSENTIALS-ppl/romrxbjj-v2) — shared backend
+- [`romrx-bjj-web`](https://github.com/ESSENTIALS-ppl/romrx-bjj-web) — BJJ frontend

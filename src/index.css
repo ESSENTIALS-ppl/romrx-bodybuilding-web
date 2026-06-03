@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    @apply bg-surface text-charcoal font-sans antialiased;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { @apply font-display; }
+}
+
+@layer components {
+  .tier-green  { @apply bg-green-tier-bg text-green-tier  font-semibold; }
+  .tier-yellow { @apply bg-yellow-tier-bg text-yellow-tier font-semibold; }
+  .tier-red    { @apply bg-red-tier-bg text-red-tier      font-semibold; }
+  .tier-delay  { @apply bg-delay-tier-bg text-delay-tier  font-semibold; }
+  .btn-primary {
+    @apply bg-teal text-white font-semibold rounded-xl px-5 py-2.5
+           hover:bg-teal-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-teal-light shadow-sm p-5;
+  }
+}

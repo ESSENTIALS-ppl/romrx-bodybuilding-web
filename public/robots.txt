@@ -1,0 +1,17 @@
+User-agent: *
+
+# Allow marketing and legal pages
+Allow: /
+Allow: /athletes
+Allow: /trainers
+Allow: /gyms
+Allow: /legal
+
+# Block authenticated dashboard, onboarding, and auth pages
+Disallow: /dashboard/
+Disallow: /onboarding/
+Disallow: /login
+Disallow: /signup
+Disallow: /auth/
+
+Sitemap: https://romrxbodybuilding.com/sitemap.xml

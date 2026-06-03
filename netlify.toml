@@ -1,37 +1,103 @@
 [build]
-  publish = "."
+  command   = "npm run build"
+  publish   = "dist"
+
+# Serve marketing page at / via Netlify rewrite (before the SPA catch-all)
+[[redirects]]
+  from   = "/"
+  to     = "/marketing.html"
+  status = 200
+  force  = true
+
+# Legal page
+[[redirects]]
+  from   = "/legal"
+  to     = "/legal.html"
+  status = 200
+  force  = true
+
+# Marketing sub-pages
+[[redirects]]
+  from   = "/athletes"
+  to     = "/athletes.html"
+  status = 200
+  force  = true
 
 [[redirects]]
-  from = "/dashboard"
-  to = "/Dashboard/index.html"
+  from   = "/trainers"
+  to     = "/trainers.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/gyms"
+  to     = "/gyms.html"
+  status = 200
+  force  = true
+
+# React SPA routes
+[[redirects]]
+  from   = "/login"
+  to     = "/index.html"
   status = 200
 
 [[redirects]]
-  from = "/dashboard/*"
-  to = "/Dashboard/:splat"
+  from   = "/signup"
+  to     = "/index.html"
   status = 200
 
 [[redirects]]
-  from = "/coach"
-  to = "/Coach/index.html"
+  from   = "/signup/coach"
+  to     = "/index.html"
   status = 200
 
 [[redirects]]
-  from = "/coach/*"
-  to = "/Coach/:splat"
+  from   = "/onboarding"
+  to     = "/index.html"
   status = 200
 
 [[redirects]]
-  from = "/assessment"
-  to = "/Assessment/index.html"
+  from   = "/onboarding/*"
+  to     = "/index.html"
   status = 200
 
 [[redirects]]
-  from = "/pricing"
-  to = "/Pricing/index.html"
+  from   = "/auth/*"
+  to     = "/index.html"
   status = 200
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from   = "/dashboard"
+  to     = "/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/dashboard/*"
+  to     = "/index.html"
+  status = 200
+
+# Legacy short paths — React app handles the redirect internally to /dashboard/*
+[[redirects]]
+  from   = "/my-body"
+  to     = "/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/my-training"
+  to     = "/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/my-protocol"
+  to     = "/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/chat"
+  to     = "/index.html"
+  status = 200
+
+[[redirects]]
+  from   = "/settings"
+  to     = "/index.html"
   status = 200
