@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,11 +17,206 @@
   .tier-yellow { @apply bg-yellow-tier-bg text-yellow-tier font-semibold; }
   .tier-red    { @apply bg-red-tier-bg text-red-tier      font-semibold; }
   .tier-delay  { @apply bg-delay-tier-bg text-delay-tier  font-semibold; }
+  /* Primary action button — Miami hot-pink for BB site */
   .btn-primary {
-    @apply bg-teal text-white font-semibold rounded-xl px-5 py-2.5
-           hover:bg-teal-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-miami text-white font-semibold rounded-xl px-5 py-2.5
+           hover:bg-miami-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .card {
-    @apply bg-white rounded-2xl border border-teal-light shadow-sm p-5;
+    @apply bg-white rounded-2xl border border-miami-light shadow-sm p-5;
   }
+}
+
+/* ============================================================
+   Miami Vice auth-page chrome (used by Login + Signup)
+   ============================================================ */
+.miami-auth-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top right, rgba(255,45,120,0.12), transparent 50%),
+    radial-gradient(ellipse at bottom left, rgba(0,245,228,0.08), transparent 50%),
+    #070711;
+  position: relative;
+  overflow: hidden;
+}
+.miami-auth-shell::before {
+  /* perspective grid */
+  content: '';
+  position: absolute;
+  bottom: -10%; left: 50%;
+  transform: translateX(-50%) perspective(600px) rotateX(65deg);
+  width: 200%; height: 60%;
+  background-image:
+    linear-gradient(#00F5E4 1px, transparent 1px),
+    linear-gradient(90deg, #00F5E4 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.06;
+  pointer-events: none;
+}
+.miami-auth-shell::after {
+  /* horizon glow */
+  content: '';
+  position: absolute;
+  bottom: 28%; left: 50%;
+  transform: translateX(-50%);
+  width: 120%; height: 2px;
+  background: linear-gradient(90deg, transparent, #FF2D78, #00F5E4, transparent);
+  opacity: 0.35; filter: blur(2px);
+  box-shadow: 0 0 40px 8px #FF2D78, 0 0 80px 16px #00F5E4;
+  pointer-events: none;
+}
+.miami-wordmark {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  letter-spacing: 3px;
+  color: #F0EDE8;
+}
+.miami-wordmark .accent {
+  background: linear-gradient(135deg, #FF2D78 0%, #FF6B35 50%, #FFD700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.miami-sublabel {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(240,237,232,0.55);
+}
+.miami-panel {
+  background: rgba(10,10,24,0.85);
+  border: 1px solid rgba(255,45,120,0.25);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 24px rgba(255,45,120,0.08), 0 0 64px rgba(0,245,228,0.05);
+}
+.miami-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #F0EDE8;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.miami-input:focus {
+  border-color: #FF2D78;
+  background: rgba(255,45,120,0.05);
+}
+.miami-input::placeholder { color: rgba(240,237,232,0.3); }
+.miami-label {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(240,237,232,0.6);
+  margin-bottom: 6px;
+}
+.miami-btn-primary {
+  width: 100%;
+  background: #FF2D78;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.05s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.miami-btn-primary:hover:not(:disabled) {
+  background: #e01f65;
+  box-shadow: 0 0 24px rgba(255,45,120,0.45);
+}
+.miami-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.miami-btn-ghost {
+  background: transparent;
+  color: #00F5E4;
+  border: 1px solid rgba(0,245,228,0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.miami-btn-ghost:hover { background: rgba(0,245,228,0.08); }
+.miami-link { color: #00F5E4; text-decoration: underline; }
+.miami-link:hover { color: #FF2D78; }
+.miami-error {
+  font-size: 0.8rem;
+  color: #ff6b8a;
+  background: rgba(255,45,120,0.08);
+  border: 1px solid rgba(255,45,120,0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.miami-tab-row {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+.miami-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(240,237,232,0.5);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.miami-tab.active {
+  background: #FF2D78;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(255,45,120,0.4);
+}
+.miami-tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+.miami-tier-pill {
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(240,237,232,0.6);
+}
+.miami-tier-pill:hover { color: #F0EDE8; border-color: rgba(255,45,120,0.4); }
+.miami-tier-pill.selected {
+  background: rgba(255,45,120,0.15);
+  border-color: #FF2D78;
+  color: #FF2D78;
+  box-shadow: 0 0 12px rgba(255,45,120,0.25);
 }

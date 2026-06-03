@@ -3,7 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Loader2, UserPlus } from 'lucide-react'
 
-const BELTS = ['white', 'blue', 'purple', 'brown', 'black']
+type BBTier = 'beginner' | 'intermediate' | 'advanced'
+const TIER_OPTIONS: { value: BBTier; label: string; hint: string }[] = [
+  { value: 'beginner',     label: 'Beginner',     hint: '88 lifts' },
+  { value: 'intermediate', label: 'Intermediate', hint: '205 lifts' },
+  { value: 'advanced',     label: 'Advanced',     hint: '274 lifts' },
+]
 
 export function Signup() {
   const navigate = useNavigate()
@@ -11,7 +16,7 @@ export function Signup() {
   const [password, setPassword]   = useState('')
   const [confirm, setConfirm]     = useState('')
   const [fullName, setFullName]   = useState('')
-  const [belt, setBelt]           = useState('white')
+  const [tier, setTier]           = useState<BBTier>('beginner')
   const [loading, setLoading]     = useState(false)
   const [error, setError]         = useState('')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
@@ -27,7 +32,7 @@ export function Signup() {
       email,
       password,
       options: {
-        data: { full_name: fullName, belt },
+        data: { full_name: fullName, active_bb_tier: tier, active_sport: 'bodybuilding' },
         emailRedirectTo: `${window.location.origin}/auth/confirm`,
       },
     })
@@ -39,24 +44,24 @@ export function Signup() {
     }
 
     if (data.user) {
-      // Upsert user profile row
+      // Upsert user profile row — bodybuilding context, BB tier honored
       await supabase.from('users').upsert({
         id: data.user.id,
         email,
         full_name: fullName,
-        belt,
+        active_sport: 'bodybuilding',
+        active_bb_tier: tier,
         portal_role: 'athlete',
         subscription_status: 'trialing',
         subscription_tier: 'athlete',
-        platforms: ['bjj'],
+        platforms: ['bodybuilding'],
       }, { onConflict: 'id' })
 
-      // Create athlete row so assessment can link to it later
+      // Create athlete row so the assessment flow can link to it later
       await supabase.from('athletes').upsert({
         user_id: data.user.id,
         email,
         full_name: fullName,
-        belt,
         dominant_side: 'right',
         injury_flags: [],
         onboarding_status: 'pending_payment',
@@ -72,96 +77,107 @@ export function Signup() {
   }
 
   return (
-    <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm">
+    <div className="miami-auth-shell flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm relative z-10">
+
         <div className="text-center mb-8">
-          <h1 className="font-display font-bold text-teal text-3xl">ROMRx</h1>
-          <p className="text-charcoal-light text-sm mt-1">Create your athlete account</p>
+          <h1 className="miami-wordmark text-4xl">
+            ROMRx<span className="accent">BB</span>
+          </h1>
+          <p className="miami-sublabel text-xs mt-2">Create Your Account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-teal-light p-6 shadow-sm space-y-4">
+        <form onSubmit={handleSubmit} className="miami-panel p-6 space-y-4">
+
           <div>
-            <label className="block text-xs font-semibold text-charcoal-light uppercase tracking-wide mb-1.5">Full name</label>
+            <label className="miami-label">Full Name</label>
             <input
               type="text" value={fullName} onChange={e => setFullName(e.target.value)}
               placeholder="First Last" required autoFocus
-              className="w-full px-4 py-2.5 rounded-xl border border-teal-light bg-surface text-sm focus:outline-none focus:border-teal focus:bg-white transition-colors"
+              className="miami-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-light uppercase tracking-wide mb-1.5">Email</label>
+            <label className="miami-label">Email</label>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com" required
-              className="w-full px-4 py-2.5 rounded-xl border border-teal-light bg-surface text-sm focus:outline-none focus:border-teal focus:bg-white transition-colors"
+              className="miami-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-light uppercase tracking-wide mb-1.5">Password</label>
+            <label className="miami-label">Password</label>
             <input
               type="password" value={password} onChange={e => setPassword(e.target.value)}
               placeholder="Min. 6 characters" required
-              className="w-full px-4 py-2.5 rounded-xl border border-teal-light bg-surface text-sm focus:outline-none focus:border-teal focus:bg-white transition-colors"
+              className="miami-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-light uppercase tracking-wide mb-1.5">Confirm password</label>
+            <label className="miami-label">Confirm Password</label>
             <input
               type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
               placeholder="Repeat password" required
-              className="w-full px-4 py-2.5 rounded-xl border border-teal-light bg-surface text-sm focus:outline-none focus:border-teal focus:bg-white transition-colors"
+              className="miami-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-charcoal-light uppercase tracking-wide mb-2">Belt</label>
-            <div className="flex gap-2 flex-wrap">
-              {BELTS.map(b => (
-                <button key={b} type="button" onClick={() => setBelt(b)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase transition-all ${
-                    belt === b
-                      ? 'bg-teal text-white ring-2 ring-offset-1 ring-teal'
-                      : 'bg-surface text-charcoal-light hover:bg-teal-light'
-                  }`}>
-                  {b}
+            <label className="miami-label">Starting Tier</label>
+            <div className="miami-tier-grid">
+              {TIER_OPTIONS.map(t => (
+                <button
+                  key={t.value} type="button"
+                  onClick={() => setTier(t.value)}
+                  className={`miami-tier-pill ${tier === t.value ? 'selected' : ''}`}
+                >
+                  <div>{t.label}</div>
+                  <div className="text-[10px] opacity-70 font-normal tracking-normal normal-case mt-0.5">
+                    {t.hint}
+                  </div>
                 </button>
               ))}
             </div>
+            <p className="text-[11px] text-white/40 mt-2 leading-relaxed">
+              Pick your honest starting point. Your ROM assessment will fine-tune
+              what you unlock — you can always change this in Settings.
+            </p>
           </div>
 
-          {/* Terms of Service checkbox */}
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className="flex items-start gap-3 cursor-pointer pt-1">
             <input
               type="checkbox"
               checked={agreedToTerms}
               onChange={e => setAgreedToTerms(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-teal-light accent-teal shrink-0 cursor-pointer"
+              className="mt-0.5 h-4 w-4 rounded shrink-0 cursor-pointer accent-miami"
             />
-            <span className="text-xs text-charcoal-light leading-relaxed">
+            <span className="text-xs text-white/60 leading-relaxed">
               I have read and agree to the{' '}
-              <a href="/legal" target="_blank" rel="noopener noreferrer" className="text-teal underline font-medium">
+              <a href="/legal" target="_blank" rel="noopener noreferrer" className="miami-link font-medium">
                 Terms of Service, Privacy Policy &amp; Refund Policy
               </a>
               , including the collection and anonymized use of my ROM data for research and product development. All sales are final.
             </span>
           </label>
 
-          {error && <p className="text-xs text-red-tier bg-red-tier-bg rounded-lg px-3 py-2">{error}</p>}
+          {error && <p className="miami-error">{error}</p>}
 
-          <button type="submit" disabled={loading || !agreedToTerms} className="btn-primary w-full flex items-center justify-center gap-2 mt-2 disabled:opacity-50">
-            {loading ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}
-            Create account & start assessment
+          <button type="submit" disabled={loading || !agreedToTerms} className="miami-btn-primary mt-2">
+            {loading ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
+            Create Account &amp; Start Assessment
           </button>
         </form>
 
-        <p className="text-center text-xs text-charcoal-light mt-4">
+        <p className="text-center text-xs text-white/50 mt-5">
           Already have an account?{' '}
-          <Link to="/login" className="text-teal underline">Sign in</Link>
+          <Link to="/login" className="miami-link">Sign in</Link>
         </p>
-        <p className="text-center text-xs text-charcoal-light mt-6">Position Readiness Protocol™ by ROMRx</p>
+        <p className="text-center text-xs text-white/25 mt-4 tracking-wider uppercase font-condensed">
+          Know What Your Body Can Lift
+        </p>
       </div>
     </div>
   )
