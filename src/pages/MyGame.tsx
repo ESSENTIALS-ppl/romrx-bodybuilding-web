@@ -199,6 +199,14 @@ export function MyGame() {
         subtitle="Hypertrophy programs built around your mobility"
         badge={bbTierLabel(userTier)}
         badgeColor={bbTierColor(userTier)}
+        action={
+          <a
+            href="/dashboard/workout"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-miami to-miami-violet text-white font-bold text-sm shadow-[0_0_20px_-4px_rgba(255,45,120,0.6)] hover:shadow-[0_0_28px_-4px_rgba(255,45,120,0.8)] transition-all inline-flex items-center gap-2"
+          >
+            <Dumbbell size={14} /> Log Workout
+          </a>
+        }
       />
 
       {/* Tabs */}

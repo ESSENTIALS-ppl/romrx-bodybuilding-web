@@ -17,6 +17,7 @@ import {
   GraduationCap,
   Trophy,
   Syringe,
+  Scale,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import type { SportConfig } from '../sports/registry'
@@ -54,6 +55,11 @@ function buildAthleteNav(sport: SportConfig): NavItem[] {
       icon: ClipboardList,
       label: sport.protocol_label,
     })
+  }
+  // Bodybuilding-only: PRs and Body metrics tabs
+  if (sport.slug === 'bodybuilding') {
+    items.push({ to: '/dashboard/prs',  icon: Trophy, label: 'PRs' })
+    items.push({ to: '/dashboard/body', icon: Scale,  label: 'Body' })
   }
   if (sport.has_coach_portal) {
     items.push({ to: '/dashboard/my-coach', icon: UserCheck, label: 'My Coach' })

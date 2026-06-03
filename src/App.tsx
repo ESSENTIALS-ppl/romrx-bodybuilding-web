@@ -9,6 +9,9 @@ import { Assessment } from './pages/Assessment'
 import { MyBody } from './pages/MyBody'
 import { MyGame } from './pages/MyGame'
 import { MyProtocol } from './pages/MyProtocol'
+import { WorkoutLogger } from './pages/WorkoutLogger'
+import { PRTracker } from './pages/PRTracker'
+import { BodyMetrics } from './pages/BodyMetrics'
 import { Chat } from './pages/Chat'
 import { Settings } from './pages/Settings'
 import { CoachDashboard } from './pages/CoachDashboard'
@@ -41,6 +44,9 @@ export default function App() {
             <Route path="/dashboard/my-body"     element={<MyBody />} />
             <Route path="/dashboard/my-game"     element={<MyGame />} />
             <Route path="/dashboard/my-protocol" element={<MyProtocol />} />
+            <Route path="/dashboard/workout"     element={<WorkoutLogger />} />
+            <Route path="/dashboard/prs"         element={<PRTracker />} />
+            <Route path="/dashboard/body"        element={<BodyMetrics />} />
             <Route path="/dashboard/chat"        element={<Chat />} />
             <Route path="/dashboard/settings"    element={<Settings />} />
             <Route path="/dashboard/coach"             element={<CoachDashboard defaultSection="team" />} />
