@@ -8,7 +8,7 @@ interface Props {
   action?: React.ReactNode
 }
 
-export function PageHeader({ title, subtitle, badge, badgeColor = 'bg-teal-light text-teal', action }: Props) {
+export function PageHeader({ title, subtitle, badge, badgeColor = 'bg-miami-light text-miami', action }: Props) {
   return (
     <div className="flex items-start justify-between mb-6">
       <div>

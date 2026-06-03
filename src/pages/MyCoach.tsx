@@ -48,7 +48,7 @@ function formatDate(iso: string): string {
 
 function CategoryPill({ category }: { category: string }) {
   return (
-    <span className="text-[10px] font-semibold uppercase tracking-wide bg-teal-light text-teal px-2 py-0.5 rounded-full">
+    <span className="text-[10px] font-semibold uppercase tracking-wide bg-miami-light text-miami px-2 py-0.5 rounded-full">
       {category}
     </span>
   )
@@ -114,8 +114,8 @@ function CoachConnectionSection({
       <SectionCard title="My Coach">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-teal-light flex items-center justify-center shrink-0">
-              <UserCheck size={18} className="text-teal" />
+            <div className="w-10 h-10 rounded-full bg-miami-light flex items-center justify-center shrink-0">
+              <UserCheck size={18} className="text-miami" />
             </div>
             <div>
               <p className="text-sm font-bold text-charcoal">{currentCoach.full_name ?? 'Coach'}</p>
@@ -153,7 +153,7 @@ function CoachConnectionSection({
             onChange={e => setEmail(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
             placeholder="coach@example.com"
-            className="flex-1 text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal focus:bg-white transition-colors"
+            className="flex-1 text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors"
           />
           <button
             onClick={handleSearch}
@@ -168,7 +168,7 @@ function CoachConnectionSection({
 
       {/* Consent banner */}
       {pendingCoach && (
-        <div className="rounded-2xl border-2 border-teal bg-teal/5 p-4 space-y-3">
+        <div className="rounded-2xl border-2 border-miami bg-miami/5 p-4 space-y-3">
           <p className="text-sm font-semibold text-charcoal">Connect to {pendingCoach.full_name ?? pendingCoach.email}?</p>
           <p className="text-xs text-charcoal-light leading-relaxed">
             By connecting, your coach will be able to view your full ROM assessment results, joint mobility data,
@@ -198,7 +198,7 @@ function CoachConnectionSection({
 
       <p className="text-xs text-charcoal-light mt-3">
         Your coach must have a ROMRx Coach account.{' '}
-        <a href="/signup/coach" className="text-teal hover:underline font-medium">
+        <a href="/signup/coach" className="text-miami hover:underline font-medium">
           Send them here to sign up.
         </a>
       </p>
@@ -269,7 +269,7 @@ function AssignmentsSection({ userId }: { userId: string }) {
               <Circle size={16} className="text-charcoal-light shrink-0 mt-0.5" />
             </div>
             {a.coach_note && (
-              <p className="text-xs text-charcoal-light bg-white rounded-xl px-3 py-2 border border-teal-light leading-relaxed">
+              <p className="text-xs text-charcoal-light bg-white rounded-xl px-3 py-2 border border-miami-light leading-relaxed">
                 {a.coach_note}
               </p>
             )}
@@ -361,7 +361,7 @@ function VideoFeedbackSection({ userId }: { userId: string }) {
               href={v.youtube_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-miami hover:underline"
             >
               <ExternalLink size={12} />
               Watch on YouTube
@@ -401,8 +401,8 @@ function ProtocolActivitySection({ userId }: { userId: string }) {
     <SectionCard title="Protocol Activity">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-teal-light flex items-center justify-center shrink-0">
-            <Activity size={18} className="text-teal" />
+          <div className="w-10 h-10 rounded-full bg-miami-light flex items-center justify-center shrink-0">
+            <Activity size={18} className="text-miami" />
           </div>
           <div>
             <p className="text-2xl font-bold text-charcoal">{recentCount}</p>
@@ -417,12 +417,12 @@ function ProtocolActivitySection({ userId }: { userId: string }) {
             <p className="text-xs font-semibold text-charcoal-light uppercase tracking-wide">Recent sessions</p>
             {sessions.slice(0, 10).map(s => (
               <div key={s.id} className="flex items-center gap-3 bg-surface rounded-xl px-3 py-2">
-                <Calendar size={12} className="text-teal shrink-0" />
+                <Calendar size={12} className="text-miami shrink-0" />
                 <span className="text-xs text-charcoal font-medium">
                   {new Date(s.session_date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                 </span>
                 {s.protocol_day && (
-                  <span className="text-[10px] bg-teal-light text-teal px-2 py-0.5 rounded-full font-semibold ml-auto">
+                  <span className="text-[10px] bg-miami-light text-miami px-2 py-0.5 rounded-full font-semibold ml-auto">
                     {s.protocol_day}
                   </span>
                 )}

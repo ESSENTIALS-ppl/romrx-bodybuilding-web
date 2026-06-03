@@ -14,6 +14,8 @@ export interface Profile {
   active_sport: string
   /** Slugs of every sport this user can access. Mirrors platforms via DB trigger. Added in PR #2. */
   sports_enabled: string[]
+  /** Bodybuilding tier — beginner / intermediate / advanced. Null for non-BB users. */
+  active_bb_tier: string | null
 }
 
 export interface Assessment {

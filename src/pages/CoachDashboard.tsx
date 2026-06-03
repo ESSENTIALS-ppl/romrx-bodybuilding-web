@@ -28,7 +28,7 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 const RAMP_STEPS = [
-  { key: 'raise',      label: 'R — Raise',      minutes: '3 min', field: 'raise_drills',      bg: 'bg-teal',      text: 'text-white' },
+  { key: 'raise',      label: 'R — Raise',      minutes: '3 min', field: 'raise_drills',      bg: 'bg-miami',      text: 'text-white' },
   { key: 'activate',   label: 'A — Activate',   minutes: '5 min', field: 'activate_drills',   bg: 'bg-gold',      text: 'text-charcoal' },
   { key: 'mobilize',   label: 'M — Mobilize',   minutes: '5 min', field: 'mobilize_drills',   bg: 'bg-charcoal',  text: 'text-white' },
   { key: 'potentiate', label: 'P — Potentiate', minutes: '7 min', field: 'potentiate_drills', bg: 'bg-teal-dark', text: 'text-white' },
@@ -42,7 +42,7 @@ const MECHANISMS = ['Tap late', 'Hard landing', 'Drilling', 'Overuse', 'Unknown'
 const SIDES = ['Left', 'Right', 'Both', 'N/A']
 
 const CUE_SECTION_META = [
-  { prefix: 'Why it works:', emoji: '💡', label: 'Why It Works',  bg: 'bg-teal/10',     border: 'border-teal/20',    text: 'text-teal' },
+  { prefix: 'Why it works:', emoji: '💡', label: 'Why It Works',  bg: 'bg-miami/10',     border: 'border-miami/20',    text: 'text-miami' },
   { prefix: 'Verbal cue:',   emoji: '🗣',  label: 'Verbal Cue',   bg: 'bg-gold/10',     border: 'border-gold/20',    text: 'text-gold' },
   { prefix: 'Visual demo:',  emoji: '👁',  label: 'Visual Demo',  bg: 'bg-sky-50',      border: 'border-sky-200',    text: 'text-sky-700' },
   { prefix: 'Tactile cue:',  emoji: '🤲', label: 'Tactile Cue',  bg: 'bg-violet-50',   border: 'border-violet-200', text: 'text-violet-700' },
@@ -228,11 +228,11 @@ function InlineNoteEditor({ athleteId, initialNote, session, onClose, onSaved }:
     } finally { setSaving(false) }
   }
 
-  if (loading) return <div className="mt-3 border-t border-teal-light pt-3"><Spinner /></div>
+  if (loading) return <div className="mt-3 border-t border-miami-light pt-3"><Spinner /></div>
   return (
-    <div className="mt-3 border-t border-teal-light pt-3 space-y-2">
+    <div className="mt-3 border-t border-miami-light pt-3 space-y-2">
       <textarea value={note} onChange={e => setNote(e.target.value)} rows={3} placeholder="Add a coaching note..."
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal focus:bg-white transition-colors resize-none" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors resize-none" />
       <div className="flex gap-2 justify-end">
         <button onClick={onClose} className="text-xs text-charcoal-light hover:text-charcoal px-3 py-1.5 rounded-lg transition-colors">Cancel</button>
         <button onClick={handleSave} disabled={saving || saved} className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1.5">
@@ -266,18 +266,18 @@ function PromoteDialog({ athlete, onPromote, onClose }: {
   }
 
   if (options.length === 0) return (
-    <div className="mt-3 border-t border-teal-light pt-3 text-xs text-charcoal-light">
+    <div className="mt-3 border-t border-miami-light pt-3 text-xs text-charcoal-light">
       {athlete.name} is already at the highest belt rank.
-      <button onClick={onClose} className="ml-2 text-teal hover:underline">Close</button>
+      <button onClick={onClose} className="ml-2 text-miami hover:underline">Close</button>
     </div>
   )
   return (
-    <div className="mt-3 border-t border-teal-light pt-3 space-y-2">
+    <div className="mt-3 border-t border-miami-light pt-3 space-y-2">
       <p className="text-xs font-semibold text-charcoal">Promote to:</p>
       <div className="flex gap-1.5 flex-wrap">
         {options.map(b => (
           <button key={b} onClick={() => setSelected(b)}
-            className={cn('px-3 py-1 rounded-full text-xs font-bold uppercase transition-all', beltColor(b), selected === b ? 'ring-2 ring-offset-1 ring-teal' : 'opacity-60 hover:opacity-90')}>
+            className={cn('px-3 py-1 rounded-full text-xs font-bold uppercase transition-all', beltColor(b), selected === b ? 'ring-2 ring-offset-1 ring-miami' : 'opacity-60 hover:opacity-90')}>
             {b}
           </button>
         ))}
@@ -315,16 +315,16 @@ function AssignDrillForm({ athlete, coachId, onClose }: { athlete: AthleteRoster
   }
 
   return (
-    <div className="mt-3 border-t border-teal-light pt-3 space-y-2">
+    <div className="mt-3 border-t border-miami-light pt-3 space-y-2">
       <p className="text-xs font-semibold text-charcoal">Assign Drill to {athlete.name}</p>
       <input type="text" value={techniqueName} onChange={e => setTechniqueName(e.target.value)} placeholder="Technique name (required)"
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors" />
       <select value={category} onChange={e => setCategory(e.target.value)}
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors">
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors">
         {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
       <textarea value={note} onChange={e => setNote(e.target.value)} rows={2} placeholder="Optional note for athlete..."
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors resize-none" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors resize-none" />
       {err && <p className="text-xs text-red-tier">{err}</p>}
       <div className="flex gap-2 justify-end">
         <button onClick={onClose} className="text-xs text-charcoal-light hover:text-charcoal px-3 py-1.5 rounded-lg transition-colors">Cancel</button>
@@ -361,14 +361,14 @@ function AddVideoForm({ athlete, coachId, onClose }: { athlete: AthleteRosterIte
   }
 
   return (
-    <div className="mt-3 border-t border-teal-light pt-3 space-y-2">
+    <div className="mt-3 border-t border-miami-light pt-3 space-y-2">
       <p className="text-xs font-semibold text-charcoal">Add Video for {athlete.name}</p>
       <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Video title (required)"
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors" />
       <input type="url" value={url} onChange={e => setUrl(e.target.value)} placeholder="YouTube URL (required)"
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors" />
       <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Optional notes..."
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors resize-none" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors resize-none" />
       {err && <p className="text-xs text-red-tier">{err}</p>}
       <div className="flex gap-2 justify-end">
         <button onClick={onClose} className="text-xs text-charcoal-light hover:text-charcoal px-3 py-1.5 rounded-lg transition-colors">Cancel</button>
@@ -410,32 +410,32 @@ function InjuryForm({ athlete, session, onClose }: {
   }
 
   return (
-    <div className="mt-3 border-t border-teal-light pt-3 space-y-2">
+    <div className="mt-3 border-t border-miami-light pt-3 space-y-2">
       <p className="text-xs font-semibold text-charcoal flex items-center gap-1.5">
         <Syringe size={12} className="text-red-tier" /> Report Injury — {athlete.name}
       </p>
       <div className="grid grid-cols-2 gap-2">
         <select value={bodyPart} onChange={e => setBodyPart(e.target.value)}
-          className="text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors">
+          className="text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors">
           <option value="">Body part...</option>
           {BODY_PARTS.map(b => <option key={b} value={b}>{b}</option>)}
         </select>
         <select value={side} onChange={e => setSide(e.target.value)}
-          className="text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors">
+          className="text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors">
           {SIDES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
       <div className="flex items-center gap-3">
         <span className="text-xs text-charcoal-light shrink-0">Severity: {severity}/10</span>
-        <input type="range" min={1} max={10} value={severity} onChange={e => setSeverity(Number(e.target.value))} className="flex-1 accent-teal" />
+        <input type="range" min={1} max={10} value={severity} onChange={e => setSeverity(Number(e.target.value))} className="flex-1 accent-miami" />
       </div>
       <select value={mechanism} onChange={e => setMechanism(e.target.value)}
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors">
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors">
         <option value="">Mechanism (optional)...</option>
         {MECHANISMS.map(m => <option key={m} value={m}>{m}</option>)}
       </select>
       <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Optional notes..."
-        className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors resize-none" />
+        className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors resize-none" />
       {err && <p className="text-xs text-red-tier">{err}</p>}
       {saved && <p className="text-xs text-green-tier flex items-center gap-1"><CheckCircle2 size={12} /> Injury logged. Stage 0 — Off Mat assigned.</p>}
       <div className="flex gap-2 justify-end">
@@ -465,9 +465,9 @@ function AthleteGamePlans({ athleteUserId, session }: { athleteUserId: string; s
   }, [athleteUserId, session, expanded])
 
   return (
-    <div className="border-t border-teal-light pt-3">
+    <div className="border-t border-miami-light pt-3">
       <button onClick={() => setExpanded(o => !o)} className="flex items-center justify-between w-full text-xs font-semibold text-charcoal-light hover:text-charcoal transition-colors">
-        <span className="flex items-center gap-1.5"><BookOpen size={12} className="text-teal" /> Game Plans</span>
+        <span className="flex items-center gap-1.5"><BookOpen size={12} className="text-miami" /> Game Plans</span>
         <ChevronRight size={12} className={cn('transition-transform', expanded && 'rotate-90')} />
       </button>
       {expanded && (
@@ -514,7 +514,7 @@ function AthleteCard({ athlete, session, coachId, drillCount, protocolCount, onB
     readiness.color === 'red'    ? 'border-red-tier/70' :
     readiness.color === 'green'  ? 'border-green-tier/60' :
     readiness.color === 'yellow' ? 'border-gold/60' :
-                                   'border-teal-light'
+                                   'border-miami-light'
 
   async function handlePromote(newBelt: string) {
     const { data, error } = await supabase.rpc('coach_promote_athlete', { p_athlete_user_id: athlete.user_id, p_new_belt: newBelt })
@@ -546,7 +546,7 @@ function AthleteCard({ athlete, session, coachId, drillCount, protocolCount, onB
         ) : (
           <span className="text-xs font-semibold text-gold bg-gold/10 px-2 py-0.5 rounded-full">Not yet assessed</span>
         )}
-        {drillCount > 0 && <span className="text-[10px] bg-teal-light text-teal px-2 py-0.5 rounded-full font-medium">{drillCount} drill{drillCount !== 1 ? 's' : ''}</span>}
+        {drillCount > 0 && <span className="text-[10px] bg-miami-light text-miami px-2 py-0.5 rounded-full font-medium">{drillCount} drill{drillCount !== 1 ? 's' : ''}</span>}
         <span className={cn('text-[10px] px-2 py-0.5 rounded-full font-medium',
           protocolCount >= 5 ? 'bg-green-tier-bg text-green-tier' : protocolCount >= 3 ? 'bg-yellow-tier-bg text-yellow-tier' : 'bg-surface text-charcoal-light')}>
           {protocolCount}/7 ROM this wk
@@ -589,12 +589,12 @@ function AthleteCard({ athlete, session, coachId, drillCount, protocolCount, onB
           </button>
           <button onClick={() => { closeAll(); setAssignDrillOpen(o => !o) }}
             className={cn('flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-all',
-              assignDrillOpen ? 'bg-teal text-white' : 'bg-surface text-charcoal-light hover:text-charcoal hover:bg-gray-100')}>
+              assignDrillOpen ? 'bg-miami text-white' : 'bg-surface text-charcoal-light hover:text-charcoal hover:bg-gray-100')}>
             <Dumbbell size={12} /> Assign Drill
           </button>
           <button onClick={() => { closeAll(); setAddVideoOpen(o => !o) }}
             className={cn('flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl transition-all',
-              addVideoOpen ? 'bg-teal text-white' : 'bg-surface text-charcoal-light hover:text-charcoal hover:bg-gray-100')}>
+              addVideoOpen ? 'bg-miami text-white' : 'bg-surface text-charcoal-light hover:text-charcoal hover:bg-gray-100')}>
             <Video size={12} /> Add Video
           </button>
           <button onClick={() => { closeAll(); setInjuryOpen(o => !o) }}
@@ -689,10 +689,10 @@ function TechniqueReadinessPanel({ session, code }: {
   if (readiness.length === 0) return null
 
   return (
-    <div className="mt-4 rounded-2xl border border-teal-light bg-white p-4">
+    <div className="mt-4 rounded-2xl border border-miami-light bg-white p-4">
       <div className="mb-3">
         <p className="text-xs font-bold text-charcoal uppercase tracking-wide flex items-center gap-1.5">
-          <Users size={13} className="text-teal" /> Athlete Readiness
+          <Users size={13} className="text-miami" /> Athlete Readiness
         </p>
       </div>
       <div className="space-y-3">
@@ -712,7 +712,7 @@ function TechniqueReadinessPanel({ session, code }: {
               tier === 'red' ? 'border-red-tier/30 bg-red-50/50' :
               tier === 'yellow' ? 'border-gold/30 bg-gold/5' :
               tier === 'green' ? 'border-green-tier/30 bg-green-50/50' :
-              'border-teal-light bg-surface'
+              'border-miami-light bg-surface'
             )}>
               {/* Athlete header row */}
               <div className="flex items-center justify-between gap-2">
@@ -792,7 +792,7 @@ function RosterTab({ roster, setRoster, loading, session, coachId, drillCounts, 
       <div className="relative">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search athletes..."
-          className="w-full pl-8 pr-4 py-2 text-sm rounded-xl border border-teal-light bg-surface focus:outline-none focus:border-teal focus:bg-white transition-colors" />
+          className="w-full pl-8 pr-4 py-2 text-sm rounded-xl border border-miami-light bg-surface focus:outline-none focus:border-miami focus:bg-white transition-colors" />
       </div>
       {filtered.length === 0 ? (
         <EmptyState icon={Users} title="No athletes found" description={search ? 'Try a different name.' : 'No athletes on your roster yet.'} />
@@ -863,7 +863,7 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
           <button
             onClick={() => setDropdownOpen(o => !o)}
             className={cn('w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all',
-              selectedCode ? 'border-teal bg-teal/5' : 'border-teal-light bg-white hover:border-teal/30')}>
+              selectedCode ? 'border-miami bg-miami/5' : 'border-miami-light bg-white hover:border-miami/30')}>
             <span className={cn('text-sm', selectedCode ? 'text-charcoal font-semibold' : 'text-charcoal-light')}>
               {selectedCode ? (selectedTech?.technique_name ?? selectedCode) : 'Choose a technique...'}
             </span>
@@ -871,14 +871,14 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
           </button>
 
           {dropdownOpen && (
-            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-2xl border border-teal-light shadow-lg overflow-hidden max-h-72 overflow-y-auto">
+            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-2xl border border-miami-light shadow-lg overflow-hidden max-h-72 overflow-y-auto">
               {techniques.length === 0 ? <div className="px-4 py-3 text-xs text-charcoal-light">No techniques available.</div> : (
                 beltOrder.map(belt => {
                   const types = grouped[belt]
                   if (!types) return null
                   return (
                     <div key={belt}>
-                      <div className="px-4 py-2 bg-surface border-b border-teal-light/50 sticky top-0">
+                      <div className="px-4 py-2 bg-surface border-b border-miami-light/50 sticky top-0">
                         <span className={cn('text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full', beltColor(belt.toLowerCase()))}>{belt} Belt</span>
                       </div>
                       {Object.entries(types).map(([typeName, items]) => (
@@ -888,8 +888,8 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
                           </div>
                           {items.map(t => (
                             <button key={t.code} onClick={() => handleSelectCode(t.code)}
-                              className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface transition-colors border-b border-teal-light/30 last:border-0',
-                                selectedCode === t.code && 'bg-teal/5')}>
+                              className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface transition-colors border-b border-miami-light/30 last:border-0',
+                                selectedCode === t.code && 'bg-miami/5')}>
                               <span className="text-sm text-charcoal leading-snug">{t.technique_name}</span>
                             </button>
                           ))}
@@ -915,11 +915,11 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
               <div className="flex flex-wrap gap-1.5 mt-1.5">
                 <BeltBadge belt={warmup.belt} />
                 {warmup.primary_joints.split(',').map(j => j.trim()).filter(Boolean).map(j => (
-                  <span key={j} className="text-[11px] bg-teal-light text-teal px-2 py-0.5 rounded-full font-medium">{formatJointName(j)}</span>
+                  <span key={j} className="text-[11px] bg-miami-light text-miami px-2 py-0.5 rounded-full font-medium">{formatJointName(j)}</span>
                 ))}
               </div>
             </div>
-            <button onClick={() => window.print()} className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-charcoal bg-surface hover:bg-gray-100 px-3 py-2 rounded-xl transition-colors border border-teal-light">
+            <button onClick={() => window.print()} className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-charcoal bg-surface hover:bg-gray-100 px-3 py-2 rounded-xl transition-colors border border-miami-light">
               <Printer size={13} /> Print
             </button>
           </div>
@@ -939,9 +939,9 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
           <TechniqueReadinessPanel session={session} code={warmup.code} />
 
           {/* Session Notes */}
-          <div className="mt-3 rounded-2xl border border-teal-light bg-white p-4 space-y-2">
+          <div className="mt-3 rounded-2xl border border-miami-light bg-white p-4 space-y-2">
             <p className="text-xs font-bold text-charcoal uppercase tracking-wide flex items-center gap-1.5">
-              <FileText size={13} className="text-teal" /> Session Notes
+              <FileText size={13} className="text-miami" /> Session Notes
             </p>
             <p className="text-[11px] text-charcoal-light">
               Optional notes for this session — included when you log to Journal below.
@@ -951,7 +951,7 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
               onChange={e => setSessionNotes(e.target.value)}
               rows={3}
               placeholder="e.g. 8 athletes, 20 min drilling. Blue belts struggled with the entry timing..."
-              className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal focus:bg-white transition-colors resize-none"
+              className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors resize-none"
             />
           </div>
 
@@ -1098,19 +1098,19 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
         <div className="space-y-3">
           <div className="relative">
             <button onClick={() => setDropOpen(o => !o)} className={cn('w-full flex items-center justify-between gap-3 px-4 py-3 rounded-2xl border-2 text-left transition-all',
-              selectedCode ? 'border-teal bg-teal/5' : 'border-teal-light bg-white hover:border-teal/30')}>
+              selectedCode ? 'border-miami bg-miami/5' : 'border-miami-light bg-white hover:border-miami/30')}>
               <span className={cn('text-sm', selectedCode ? 'text-charcoal font-semibold' : 'text-charcoal-light')}>
                 {selectedCode ? (selectedTech?.technique_name ?? selectedCode) : 'Select a technique you taught...'}
               </span>
               <ChevronDown size={14} className={cn('text-charcoal-light shrink-0 transition-transform', dropOpen && 'rotate-180')} />
             </button>
             {dropOpen && (
-              <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-2xl border border-teal-light shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+              <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white rounded-2xl border border-miami-light shadow-lg overflow-hidden max-h-64 overflow-y-auto">
                 {beltOrder.map(belt => {
                   const types = grouped[belt]; if (!types) return null
                   return (
                     <div key={belt}>
-                      <div className="px-4 py-2 bg-surface border-b border-teal-light/50 sticky top-0">
+                      <div className="px-4 py-2 bg-surface border-b border-miami-light/50 sticky top-0">
                         <span className={cn('text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full', beltColor(belt.toLowerCase()))}>{belt} Belt</span>
                       </div>
                       {Object.entries(types).map(([typeName, items]) => (
@@ -1118,7 +1118,7 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
                           <div className="px-4 py-1.5 bg-surface/50"><span className="text-[10px] font-semibold text-charcoal-light uppercase tracking-wider">{typeName}</span></div>
                           {items.map(t => (
                             <button key={t.code} onClick={() => { setSelectedCode(t.code); setDropOpen(false) }}
-                              className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface transition-colors border-b border-teal-light/30 last:border-0', selectedCode === t.code && 'bg-teal/5')}>
+                              className={cn('w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-surface transition-colors border-b border-miami-light/30 last:border-0', selectedCode === t.code && 'bg-miami/5')}>
                               <span className="text-sm text-charcoal">{t.technique_name}</span>
                             </button>
                           ))}
@@ -1131,7 +1131,7 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
             )}
           </div>
           <textarea value={logNote} onChange={e => setLogNote(e.target.value)} rows={2} placeholder="Session notes (optional)..."
-            className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors resize-none" />
+            className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors resize-none" />
           <div className="flex justify-end">
             <button onClick={handleLog} disabled={!selectedCode || logging} className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5 disabled:opacity-50">
               <Plus size={12} /> Log It
@@ -1155,7 +1155,7 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
             <div className="flex flex-wrap gap-2 justify-center">
               {radarData.filter(d => d.value > 0).map(d => (
                 <span key={d.category} className="text-[11px] bg-surface px-2 py-1 rounded-full">
-                  <span className="font-semibold text-teal">{d.value}</span><span className="text-charcoal-light ml-1">{d.category}</span>
+                  <span className="font-semibold text-miami">{d.value}</span><span className="text-charcoal-light ml-1">{d.category}</span>
                 </span>
               ))}
             </div>
@@ -1167,7 +1167,7 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
         <SectionCard title="Recent Teaching Log">
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {entries.slice(0, 20).map(e => (
-              <div key={e.id} className="flex items-start justify-between gap-3 text-xs py-2 border-b border-teal-light/40 last:border-0">
+              <div key={e.id} className="flex items-start justify-between gap-3 text-xs py-2 border-b border-miami-light/40 last:border-0">
                 <div className="min-w-0">
                   <p className="font-semibold text-charcoal truncate">{e.technique_name}</p>
                   {e.notes && <p className="text-charcoal-light mt-0.5 truncate">{e.notes}</p>}
@@ -1186,7 +1186,7 @@ function JournalTab({ session, pendingLog }: { session: { access_token: string }
         <div className="space-y-3">
           <textarea value={journalNote} onChange={e => setJournalNote(e.target.value)} rows={5}
             placeholder="Personal coaching notes, class plans, observations, goals..."
-            className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal focus:bg-white transition-colors resize-none" />
+            className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors resize-none" />
           <div className="flex justify-end">
             <button onClick={handleSaveNote} disabled={savingNote || noteSaved} className="btn-primary text-xs px-4 py-2 flex items-center gap-1.5">
               {noteSaved ? <><CheckCircle2 size={12} /> Saved</> : savingNote ? 'Saving...' : <><Save size={12} /> Save Notes</>}
@@ -1225,7 +1225,7 @@ function NoteCard({ note, athleteName, session }: { note: AthleteNote; athleteNa
           <span className="text-xs text-charcoal-light">{new Date(note.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
         </div>
         <textarea value={text} onChange={e => setText(e.target.value)} rows={4}
-          className="w-full text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal focus:bg-white transition-colors resize-none" />
+          className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors resize-none" />
         <div className="flex justify-end">
           <button onClick={handleSave} disabled={saving || saved} className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1.5">
             {saved ? '✓ Saved' : saving ? 'Saving...' : <><Save size={12} /> Save</>}
@@ -1278,7 +1278,7 @@ function InDevelopmentTab({ title, description, features }: {
         <ul className="space-y-2">
           {features.map((f, i) => (
             <li key={i} className="flex items-start gap-2 text-xs text-charcoal-light">
-              <span className="text-teal mt-0.5">•</span>
+              <span className="text-miami mt-0.5">•</span>
               {f}
             </li>
           ))}
@@ -1296,9 +1296,9 @@ const STAGE_LABELS: Record<number, { name: string; description: string; color: s
   2: { name: 'Solo Movement',      description: 'Individual movement patterns, no contact.',             color: 'text-gold' },
   3: { name: 'Technical Solo',     description: 'Solo drilling of non-affected techniques only.',       color: 'text-gold' },
   4: { name: 'Technical Drilling', description: 'Compliant partner, zero resistance.',                  color: 'text-gold' },
-  5: { name: 'Positional (Protected)', description: 'Sparring avoiding the injury area.',             color: 'text-teal' },
-  6: { name: 'Flow Rolling',       description: 'Light intensity, injury-aware partner only.',         color: 'text-teal' },
-  7: { name: 'Modified Training',  description: 'Full class with specific technique restrictions.',    color: 'text-teal' },
+  5: { name: 'Positional (Protected)', description: 'Sparring avoiding the injury area.',             color: 'text-miami' },
+  6: { name: 'Flow Rolling',       description: 'Light intensity, injury-aware partner only.',         color: 'text-miami' },
+  7: { name: 'Modified Training',  description: 'Full class with specific technique restrictions.',    color: 'text-miami' },
   8: { name: 'Full Training',      description: 'No modifications — full intensity.',                  color: 'text-green-tier' },
   9: { name: 'Competition Ready',  description: 'Competition cleared — coach sign-off required.',     color: 'text-green-tier' },
 }
@@ -1339,7 +1339,7 @@ function InjuryCard({
   const severityColor = injury.severity >= 8 ? 'text-red-tier' : injury.severity >= 5 ? 'text-gold' : 'text-charcoal-light'
 
   return (
-    <div className={cn('rounded-2xl border-2 p-4 space-y-3', isCleared ? 'border-green-tier/40 bg-green-50/30' : 'border-teal-light bg-white')}>
+    <div className={cn('rounded-2xl border-2 p-4 space-y-3', isCleared ? 'border-green-tier/40 bg-green-50/30' : 'border-miami-light bg-white')}>
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -1367,8 +1367,8 @@ function InjuryCard({
               {expanded ? 'Less' : 'Advance'}
             </button>
           </div>
-          <div className="w-full bg-teal-light rounded-full h-1.5">
-            <div className="bg-teal h-1.5 rounded-full transition-all duration-500" style={{ width: `${(injury.stage / 9) * 100}%` }} />
+          <div className="w-full bg-miami-light rounded-full h-1.5">
+            <div className="bg-miami h-1.5 rounded-full transition-all duration-500" style={{ width: `${(injury.stage / 9) * 100}%` }} />
           </div>
           <p className="text-[11px] text-charcoal-light">{stageInfo.description}</p>
         </div>
@@ -1376,7 +1376,7 @@ function InjuryCard({
 
       {/* Stage advancement controls */}
       {expanded && !isCleared && (
-        <div className="border-t border-teal-light pt-3 space-y-3">
+        <div className="border-t border-miami-light pt-3 space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
               <p className="text-[10px] font-bold text-charcoal uppercase tracking-wide">Next Stage</p>
@@ -1394,7 +1394,7 @@ function InjuryCard({
           </div>
           <textarea value={stageNote} onChange={e => setStageNote(e.target.value)} rows={2}
             placeholder="Advancement notes (optional)..."
-            className="w-full text-xs rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal transition-colors resize-none" />
+            className="w-full text-xs rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors resize-none" />
           <div className="flex gap-2 flex-wrap">
             {injury.stage > 0 && (
               <button onClick={() => advance(injury.stage - 1)} disabled={saving}

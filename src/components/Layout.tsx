@@ -153,7 +153,7 @@ export function Layout() {
       <header className={cn('sticky top-0 z-10 bg-white border-b', theme.border)}>
         <div className="max-w-5xl mx-auto px-4 flex items-center h-14 gap-1">
           <span className={cn('font-display tracking-wider mr-4 text-lg', theme.brand)}>
-            ROMRx{activeSport.slug !== 'bodybuilding' ? ` · ${activeSport.short_name}` : 'BodyBuilding'}
+            ROMRx<span className="opacity-60">·</span>{activeSport.short_name}
           </span>
           <nav className="flex gap-1 flex-1 overflow-x-auto scrollbar-none">
             {nav.map(({ to, icon: Icon, label, end: isEnd }) => (

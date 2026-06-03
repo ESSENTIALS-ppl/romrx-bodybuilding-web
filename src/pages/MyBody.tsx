@@ -6,7 +6,7 @@ import { SectionCard } from '../components/SectionCard'
 import { EmptyState } from '../components/EmptyState'
 import { Spinner } from '../components/Spinner'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from 'recharts'
-import { cn, beltColor, formatJoint } from '../lib/utils'
+import { cn, bbTierColor, bbTierLabel, formatJoint } from '../lib/utils'
 import { AlertTriangle, Activity, TrendingUp } from 'lucide-react'
 
 // ── Position Readiness Score ──────────────────────────────────────────────────
@@ -51,8 +51,8 @@ function computePRS(a: Assessment): number {
 }
 
 function getPRSTier(s: number) {
-  if (s >= 85) return { label: 'ELITE',      color: 'text-teal',       bg: 'bg-teal-light',      ring: 'border-teal/40' }
-  if (s >= 70) return { label: 'STRONG',     color: 'text-teal',       bg: 'bg-teal-light',      ring: 'border-teal/40' }
+  if (s >= 85) return { label: 'ELITE',      color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
+  if (s >= 70) return { label: 'STRONG',     color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
   if (s >= 55) return { label: 'DEVELOPING', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
   if (s >= 40) return { label: 'RESTRICTED', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
   return              { label: 'AT RISK',    color: 'text-red-tier',   bg: 'bg-red-tier-bg',     ring: 'border-red-tier/40' }
@@ -101,7 +101,7 @@ function JointBar({ label, left, right, midline, optimal }: {
       <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
         <div
           className={cn('h-full rounded-full transition-all duration-500',
-            pct >= 100 ? 'bg-teal' : pct >= 75 ? 'bg-gold' : 'bg-red-400')}
+            pct >= 100 ? 'bg-miami' : pct >= 75 ? 'bg-miami-orange' : 'bg-red-400')}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -110,7 +110,7 @@ function JointBar({ label, left, right, midline, optimal }: {
       </div>
       <div className="w-8 text-right shrink-0">
         <span className={cn('text-xs font-bold',
-          pct >= 100 ? 'text-teal' : pct >= 75 ? 'text-yellow-600' : 'text-red-tier')}>
+          pct >= 100 ? 'text-miami' : pct >= 75 ? 'text-miami-orange' : 'text-red-tier')}>
           {pct}%
         </span>
       </div>
@@ -134,7 +134,7 @@ export function MyBody() {
   )
 
   const radarData = buildRadar(assessment)
-  const belt = profile?.belt ?? 'white'
+  const bbTier = profile?.active_bb_tier ?? null
   const prs = computePRS(assessment)
   const tier = getPRSTier(prs)
 
@@ -143,11 +143,11 @@ export function MyBody() {
       <PageHeader
         title="My Body"
         subtitle={`Assessed ${new Date(assessment.assessed_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}
-        badge={`${belt} belt`}
-        badgeColor={beltColor(belt)}
+        badge={bbTierLabel(bbTier)}
+        badgeColor={bbTierColor(bbTier)}
       />
 
-      {/* Position Readiness Score */}
+      {/* Movement Readiness Score */}
       <div className={cn('flex items-center gap-4 rounded-2xl border p-4', tier.bg, tier.ring.replace('border-', 'border ').replace('/40', ''))}>
         <div className={cn('w-16 h-16 rounded-full border-2 flex flex-col items-center justify-center shrink-0', tier.ring)}>
           <span className={cn('font-display font-bold text-2xl leading-none', tier.color)}>{prs}</span>
@@ -156,7 +156,7 @@ export function MyBody() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <TrendingUp size={13} className={tier.color} />
-            <span className={cn('text-xs font-bold uppercase tracking-wider', tier.color)}>Position Readiness Score</span>
+            <span className={cn('text-xs font-bold uppercase tracking-wider', tier.color)}>Movement Readiness Score</span>
           </div>
           <p className={cn('text-lg font-bold leading-tight', tier.color)}>{tier.label}</p>
           <p className="text-xs text-charcoal-light mt-0.5">Retest every 6 weeks to track progress</p>
@@ -179,11 +179,11 @@ export function MyBody() {
         <SectionCard title="ROM Profile">
           <ResponsiveContainer width="100%" height={260}>
             <RadarChart data={radarData} margin={{ top: 4, right: 20, bottom: 4, left: 20 }}>
-              <PolarGrid stroke="#cde0e0" />
+              <PolarGrid stroke="#ffd0e0" />
               <PolarAngleAxis dataKey="joint" tick={{ fontSize: 10, fill: '#5a7070', fontFamily: 'Inter' }} />
-              <Radar dataKey="value" stroke="#008080" fill="#008080" fillOpacity={0.2} dot={{ fill: '#008080', r: 3 }} />
+              <Radar dataKey="value" stroke="#FF2D78" fill="#FF2D78" fillOpacity={0.2} dot={{ fill: '#FF2D78', r: 3 }} />
               <Tooltip
-                contentStyle={{ fontSize: 12, borderRadius: 10, border: '1px solid #e0ecec', fontFamily: 'Inter' }}
+                contentStyle={{ fontSize: 12, borderRadius: 10, border: '1px solid #ffd0e0', fontFamily: 'Inter' }}
                 formatter={(v) => [`${v}°`, 'ROM']}
               />
             </RadarChart>
@@ -205,13 +205,13 @@ export function MyBody() {
               </div>
             )}
             {assessment.rom_total != null && (
-              <div className="flex justify-between items-center py-2.5 border-t border-teal-light">
+              <div className="flex justify-between items-center py-2.5 border-t border-miami-light">
                 <span className="text-sm text-charcoal-light">ROM Total Score</span>
                 <span className="text-sm font-bold text-charcoal">{assessment.rom_total}</span>
               </div>
             )}
             {assessment.rom_percentile != null && (
-              <div className="flex justify-between items-center py-2.5 border-t border-teal-light">
+              <div className="flex justify-between items-center py-2.5 border-t border-miami-light">
                 <span className="text-sm text-charcoal-light">Percentile</span>
                 <span className="text-sm font-bold text-charcoal">{assessment.rom_percentile}th</span>
               </div>
@@ -221,7 +221,7 @@ export function MyBody() {
       </div>
 
       <SectionCard title="Joint Breakdown" subtitle="Best side shown · % of optimal range">
-        <div className="divide-y divide-teal-light/60">
+        <div className="divide-y divide-miami-light/60">
           <JointBar label="Hip ER"         left={assessment.hip_er_l}        right={assessment.hip_er_r}        optimal={OPTIMAL['Hip ER']} />
           <JointBar label="Hip IR"         left={assessment.hip_ir_l}        right={assessment.hip_ir_r}        optimal={OPTIMAL['Hip IR']} />
           <JointBar label="Hip Abduction"  left={assessment.hip_abd_l}       right={assessment.hip_abd_r}       optimal={OPTIMAL['Hip Abd']} />

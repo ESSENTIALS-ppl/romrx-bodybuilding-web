@@ -101,10 +101,10 @@ export function Chat() {
   useEffect(() => {
     if (messages.length === 0 && user && !profileLoading) {
       const name = (profile?.full_name ?? 'there').split(' ')[0]
-      const belt = profile?.belt ?? 'white'
+      const tier = profile?.active_bb_tier ?? 'beginner'
       const coachWelcome = isCoach
-        ? `Hey ${name} - I'm ROMBot, your team intelligence assistant.\n\nI can see your full roster's ROM scores and technique tiers. You can ask about specific athletes or your whole team:\n- "Who on my team is most at risk?"\n- "What's blocking [athlete] from Triangle Choke?"\n- "Who is ready to compete?"\n\nNote: ROMBot provides educational information only and is not medical advice.`
-        : `Hey ${name} \u2014 I'm ROMBot, your mobility intelligence assistant.\n\nI can see your ${belt} belt profile, ROM scores, technique tiers, and protocol. Ask me anything:\n\u2022 "Why is my Triangle Choke RED?"\n\u2022 "What exercises unlock De La Riva?"\n\u2022 "Which techniques am I closest to unlocking?"\n\nNote: ROMBot provides educational information only and is not medical advice. Consult a healthcare professional before changing your training if you have pain or injury.`
+        ? `Hey ${name} \u2014 I'm ROMBot, your team intelligence assistant.\n\nI can see your athletes' ROM scores and training tiers. Ask me anything about your roster.\n\nNote: ROMBot provides educational information only and is not medical advice.`
+        : `Hey ${name} \u2014 I'm ROMBot, your bodybuilding intelligence assistant.\n\nI can see your ${tier} tier profile, ROM scores, and protocol. Ask me anything:\n\u2022 "What exercises should I prioritize this week?"\n\u2022 "Which lifts am I closest to unlocking?"\n\u2022 "How do I program around tight ankles?"\n\nNote: ROMBot provides educational information only and is not medical advice. Consult a healthcare professional before changing your training if you have pain or injury.`
       setMessages([{ role: 'assistant', content: coachWelcome }])
     }
   }, [user, profile, profileLoading, messages.length, isCoach])
@@ -137,7 +137,7 @@ export function Chat() {
         const res = await fetch(AI_CHAT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({ message: msg, sport: 'bjj', provider, provider_key: providerKey }),
+          body: JSON.stringify({ message: msg, sport: 'bodybuilding', provider, provider_key: providerKey }),
         })
         const data = await res.json()
         if (data.error) throw new Error(data.error)
@@ -159,7 +159,7 @@ export function Chat() {
       const body: Record<string, unknown> = {
         message: msg,
         conversation_id: convId,
-        sport: 'bjj',
+        sport: 'bodybuilding',
         provider,
         provider_key: providerKey,
       }
@@ -202,7 +202,7 @@ export function Chat() {
               <Trash2 size={15} />
             </button>
             <button onClick={() => setShowSettings(s => !s)}
-              className="p-2 rounded-xl hover:bg-teal-light text-charcoal-light hover:text-teal transition-colors" title="Settings">
+              className="p-2 rounded-xl hover:bg-miami-light text-charcoal-light hover:text-miami transition-colors" title="Settings">
               <Settings size={15} />
             </button>
           </div>
@@ -212,21 +212,21 @@ export function Chat() {
       {showSettings && (
         <SectionCard className="mb-4">
           <div className="space-y-3">
-            <p className="text-xs bg-teal-light text-teal rounded-xl px-3 py-2">
+            <p className="text-xs bg-miami-light text-miami rounded-xl px-3 py-2">
               ROMBot (GPT-4o-mini) is included free. Use your own key for other models.
             </p>
             <select value={provider} onChange={e => setProvider(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-teal-light bg-surface text-sm focus:outline-none focus:border-teal">
+              className="w-full px-3 py-2 rounded-xl border border-miami-light bg-surface text-sm focus:outline-none focus:border-miami">
               {PROVIDERS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
             </select>
             {provider !== 'rombot' && (
               <input type="password" value={providerKey} onChange={e => setProviderKey(e.target.value)}
                 placeholder="API key..."
-                className="w-full px-3 py-2 rounded-xl border border-teal-light bg-surface text-sm font-mono focus:outline-none focus:border-teal" />
+                className="w-full px-3 py-2 rounded-xl border border-miami-light bg-surface text-sm font-mono focus:outline-none focus:border-miami" />
             )}
             <div className="flex gap-2">
               <button onClick={savePrefs} className="btn-primary flex-1 py-2 text-sm">Save</button>
-              <button onClick={() => setShowSettings(false)} className="flex-1 py-2 text-sm rounded-xl border border-teal-light text-charcoal-light hover:bg-surface">Cancel</button>
+              <button onClick={() => setShowSettings(false)} className="flex-1 py-2 text-sm rounded-xl border border-miami-light text-charcoal-light hover:bg-surface">Cancel</button>
             </div>
           </div>
         </SectionCard>
@@ -234,8 +234,8 @@ export function Chat() {
 
       {/* Coach team context badge */}
       {isCoach && (
-        <div className="flex items-center gap-2 bg-teal-light border border-teal/20 rounded-xl px-3 py-2 mb-2">
-          <span className="text-xs font-medium text-teal flex-1">
+        <div className="flex items-center gap-2 bg-miami-light border border-miami/20 rounded-xl px-3 py-2 mb-2">
+          <span className="text-xs font-medium text-miami flex-1">
             Team mode - ROMBot has full access to all your athletes' ROM profiles and technique readiness
           </span>
         </div>
@@ -244,7 +244,7 @@ export function Chat() {
 
       {/* Game plan context banner */}
       {gamePlanBanner && (
-        <div className="flex items-center gap-2 bg-teal text-white rounded-xl px-3 py-2 mb-2">
+        <div className="flex items-center gap-2 bg-miami text-white rounded-xl px-3 py-2 mb-2">
           <Wand2 size={13} className="shrink-0" />
           <span className="text-xs font-medium flex-1">{gamePlanBanner}</span>
           <button onClick={() => setGamePlanBanner(null)} className="text-white/70 hover:text-white text-xs">x</button>
@@ -252,9 +252,9 @@ export function Chat() {
       )}
 
       {/* Disclaimer banner */}
-      <div className="flex items-start gap-2 bg-surface border border-teal-light rounded-xl px-3 py-2 mb-2">
+      <div className="flex items-start gap-2 bg-surface border border-miami-light rounded-xl px-3 py-2 mb-2">
         <span className="text-xs text-charcoal-light leading-relaxed">
-          <span className="font-semibold text-charcoal">Educational use only.</span> ROMBot is not medical advice - consult a healthcare professional for pain or injury. ROMBot is also not a black belt - consult your coach before attempting new techniques.
+          <span className="font-semibold text-charcoal">Educational use only.</span> ROMBot is not medical advice — consult a healthcare professional for pain or injury, and a qualified coach before attempting new lifts.
         </span>
       </div>
 
@@ -265,8 +265,8 @@ export function Chat() {
             <div className={cn(
               'max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
               m.role === 'user'
-                ? 'bg-teal text-white rounded-br-sm'
-                : 'bg-white border border-teal-light text-charcoal rounded-bl-sm'
+                ? 'bg-miami text-white rounded-br-sm'
+                : 'bg-white border border-miami-light text-charcoal rounded-bl-sm'
             )}>
               {formatLines(m.content).map((line, j) => (
                 <p key={j} dangerouslySetInnerHTML={{ __html: line }} className={j > 0 ? 'mt-1' : ''} />
@@ -277,10 +277,10 @@ export function Chat() {
 
         {busy && (
           <div className="flex justify-start">
-            <div className="bg-white border border-teal-light rounded-2xl rounded-bl-sm px-4 py-3">
+            <div className="bg-white border border-miami-light rounded-2xl rounded-bl-sm px-4 py-3">
               <div className="flex gap-1.5">
                 {[0, 160, 320].map(d => (
-                  <div key={d} className="w-2 h-2 bg-teal rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                  <div key={d} className="w-2 h-2 bg-miami rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
                 ))}
               </div>
             </div>
@@ -291,12 +291,12 @@ export function Chat() {
       </div>
 
       {/* Input */}
-      <div className="flex gap-2 pt-3 border-t border-teal-light mt-2">
+      <div className="flex gap-2 pt-3 border-t border-miami-light mt-2">
         <textarea
           value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() } }}
           placeholder="Ask about your mobility, techniques, or protocol..."
-          rows={1} className="flex-1 px-4 py-2.5 rounded-xl border border-teal-light bg-surface text-sm resize-none focus:outline-none focus:border-teal focus:bg-white transition-colors"
+          rows={1} className="flex-1 px-4 py-2.5 rounded-xl border border-miami-light bg-surface text-sm resize-none focus:outline-none focus:border-miami focus:bg-white transition-colors"
           style={{ minHeight: 44, maxHeight: 120 }}
         />
         <button onClick={send} disabled={busy || !input.trim()} className="btn-primary px-4 flex items-center gap-1.5 shrink-0">

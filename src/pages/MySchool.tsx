@@ -21,8 +21,8 @@ export function MySchool() {
 
       <SectionCard title="">
         <div className="flex flex-col items-center text-center py-8 space-y-5 max-w-sm mx-auto">
-          <div className="w-16 h-16 rounded-full bg-teal-light flex items-center justify-center">
-            <Building2 size={28} className="text-teal" />
+          <div className="w-16 h-16 rounded-full bg-miami-light flex items-center justify-center">
+            <Building2 size={28} className="text-miami" />
           </div>
 
           <div className="space-y-2">
@@ -52,7 +52,7 @@ export function MySchool() {
                   onChange={e => setEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleNotify()}
                   placeholder="your@email.com"
-                  className="flex-1 text-sm rounded-xl border border-teal-light bg-surface px-3 py-2 focus:outline-none focus:border-teal focus:bg-white transition-colors"
+                  className="flex-1 text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors"
                 />
                 <button
                   onClick={handleNotify}

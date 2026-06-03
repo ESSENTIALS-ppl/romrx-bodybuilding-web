@@ -34,3 +34,19 @@ export function beltColor(belt: string): string {
   }
   return map[belt] ?? 'bg-gray-100 text-gray-700'
 }
+
+// Bodybuilding tier badge color (Miami palette).
+export function bbTierColor(tier: string | null | undefined): string {
+  switch ((tier ?? '').toLowerCase()) {
+    case 'beginner':     return 'bg-miami-light text-miami-dark'
+    case 'intermediate': return 'bg-miami text-white'
+    case 'advanced':     return 'bg-gradient-to-r from-miami via-miami-orange to-miami-gold text-white'
+    default:             return 'bg-gray-100 text-gray-700'
+  }
+}
+
+export function bbTierLabel(tier: string | null | undefined): string {
+  const t = (tier ?? '').toLowerCase()
+  if (!t) return 'Set tier'
+  return t.charAt(0).toUpperCase() + t.slice(1)
+}

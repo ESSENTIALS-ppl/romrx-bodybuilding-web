@@ -664,14 +664,14 @@ function RetestBanner({ assessedAt }: { assessedAt: string }) {
 // ── Why Statement card ────────────────────────────────────────────────────────
 function WhyStatement() {
   return (
-    <div className="rounded-2xl border border-teal/40 p-5" style={{ backgroundColor: '#36454F' }}>
-      <p className="text-[10px] font-bold uppercase tracking-widest text-teal mb-3">
+    <div className="rounded-2xl border border-miami/40 p-5" style={{ backgroundColor: '#36454F' }}>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-miami mb-3">
         WHY YOUR Rx IS BUILT THIS WAY
       </p>
       <p className="text-sm text-white/90 leading-relaxed">
-        9 out of 10 BJJ athletes get hurt, and most of those injuries happen in practice, not competition. The people who keep showing up for decades all share the same thing: both sides of their body move the same way. When one side is tighter than the other, your injury risk jumps by up to 30%. Most people train until their body stops letting them. We built this so you become someone who never has to quit.
+        9 out of 10 lifters get hurt, and most of those injuries happen in practice, not competition. The people who keep showing up for decades all share the same thing: both sides of their body move the same way. When one side is tighter than the other, your injury risk jumps by up to 30%. Most people train until their body stops letting them. We built this so you become someone who never has to quit.
       </p>
-      <p className="mt-3 text-[10px] text-teal leading-relaxed">
+      <p className="mt-3 text-[10px] text-miami leading-relaxed">
         Research:{' '}
         <a
           href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6745816/"
@@ -723,12 +723,12 @@ function TodayMovementCard({ rx, index }: { rx: Rx; index: number }) {
   return (
     <div className={cn(
       'rounded-xl border transition-colors overflow-hidden',
-      checked ? 'border-teal/20 bg-teal/[0.03]' : 'border-teal-light bg-white'
+      checked ? 'border-miami/20 bg-miami/[0.03]' : 'border-miami-light bg-white'
     )}>
       <div className="flex items-start gap-3 px-3.5 py-3">
         <button
           onClick={() => setChecked(c => !c)}
-          className="mt-0.5 shrink-0 text-teal hover:scale-110 transition-transform"
+          className="mt-0.5 shrink-0 text-miami hover:scale-110 transition-transform"
         >
           {checked
             ? <CheckCircle2 size={17} fill="currentColor" strokeWidth={0} />
@@ -737,23 +737,23 @@ function TodayMovementCard({ rx, index }: { rx: Rx; index: number }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <p className="text-[10px] text-teal font-bold uppercase tracking-wider mb-0.5">{labels[index]}</p>
+              <p className="text-[10px] text-miami font-bold uppercase tracking-wider mb-0.5">{labels[index]}</p>
               <p className={cn('text-sm font-semibold leading-snug', checked ? 'line-through text-charcoal-light' : 'text-charcoal')}>
                 {rx.name}
               </p>
             </div>
             <button
               onClick={() => setOpen(o => !o)}
-              className="text-charcoal-light hover:text-teal transition-colors mt-0.5 shrink-0"
+              className="text-charcoal-light hover:text-miami transition-colors mt-0.5 shrink-0"
             >
               {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
             </button>
           </div>
-          <span className="inline-block text-xs bg-teal-light text-teal font-semibold px-2.5 py-0.5 rounded-full mt-1.5">
+          <span className="inline-block text-xs bg-miami-light text-miami font-semibold px-2.5 py-0.5 rounded-full mt-1.5">
             {rx.dose}
           </span>
           {open && (
-            <div className="mt-2.5 pt-2.5 border-t border-teal-light space-y-2">
+            <div className="mt-2.5 pt-2.5 border-t border-miami-light space-y-2">
               <p className="text-xs text-charcoal-light leading-relaxed">
                 <span className="font-semibold text-charcoal">Coaching cue: </span>{rx.cue}
               </p>
@@ -855,27 +855,27 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
     : []
 
   return (
-    <div className="rounded-2xl border-2 border-teal bg-white shadow-md overflow-hidden">
+    <div className="rounded-2xl border-2 border-miami bg-white shadow-md overflow-hidden">
       {/* Header row */}
       <div className="px-5 pt-5 pb-3">
         <div className="flex items-start justify-between gap-3 mb-1">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-teal">TODAY &middot; {dayName.toUpperCase()}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-miami">TODAY &middot; {dayName.toUpperCase()}</p>
             <h2 className="font-display font-bold text-charcoal text-xl leading-tight mt-0.5">
               {todayPriority ? todayPriority.def.label : 'Recovery Day'}
             </h2>
           </div>
           <div className="text-right shrink-0">
             <p className="text-[10px] text-charcoal-light uppercase tracking-wide">Session</p>
-            <p className="text-lg font-bold text-teal leading-tight">{sessionsThisCycle}<span className="text-sm font-normal text-charcoal-light">/36</span></p>
+            <p className="text-lg font-bold text-miami leading-tight">{sessionsThisCycle}<span className="text-sm font-normal text-charcoal-light">/36</span></p>
           </div>
         </div>
 
         {/* Progress bar */}
         <div className="mt-3 mb-2">
-          <div className="w-full bg-teal-light rounded-full h-2">
+          <div className="w-full bg-miami-light rounded-full h-2">
             <div
-              className="bg-teal h-2 rounded-full transition-all duration-500"
+              className="bg-miami h-2 rounded-full transition-all duration-500"
               style={{ width: `${progressPct}%` }}
             />
           </div>
@@ -883,7 +883,7 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
 
         {/* Retest line */}
         <div className="flex items-center gap-1.5 text-xs text-charcoal-light">
-          <TrendingUp size={11} className="text-teal shrink-0" />
+          <TrendingUp size={11} className="text-miami shrink-0" />
           {daysUntilRetest > 0
             ? <span>Retest in <strong className="text-charcoal">{daysUntilRetest} days</strong> &middot; {retestDateStr}</span>
             : <span className="text-red-tier font-semibold">Retest due</span>
@@ -947,10 +947,10 @@ function RxItem({
         {items.map((rx, i) => (
           <div key={i} className={cn(
             'rounded-xl border transition-colors overflow-hidden',
-            checked[i] ? 'border-teal/20 bg-teal/[0.03]' : 'border-teal-light bg-white'
+            checked[i] ? 'border-miami/20 bg-miami/[0.03]' : 'border-miami-light bg-white'
           )}>
             <div className="flex items-start gap-3 px-3.5 py-3">
-              <button onClick={() => check(i)} className="mt-0.5 shrink-0 text-teal hover:scale-110 transition-transform">
+              <button onClick={() => check(i)} className="mt-0.5 shrink-0 text-miami hover:scale-110 transition-transform">
                 {checked[i]
                   ? <CheckCircle2 size={17} fill="currentColor" strokeWidth={0} />
                   : <Circle size={17} />}
@@ -960,18 +960,18 @@ function RxItem({
                   <p className={cn('text-sm font-semibold leading-snug', checked[i] ? 'line-through text-charcoal-light' : 'text-charcoal')}>
                     {rx.name}
                   </p>
-                  <button onClick={() => toggle(i)} className="text-charcoal-light hover:text-teal transition-colors mt-0.5 shrink-0">
+                  <button onClick={() => toggle(i)} className="text-charcoal-light hover:text-miami transition-colors mt-0.5 shrink-0">
                     {openIdx === i ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
-                  <span className="text-xs bg-teal-light text-teal font-semibold px-2.5 py-0.5 rounded-full">{rx.dose}</span>
+                  <span className="text-xs bg-miami-light text-miami font-semibold px-2.5 py-0.5 rounded-full">{rx.dose}</span>
                   {rx.equipment && rx.equipment !== 'Bodyweight' && (
                     <span className="text-xs bg-surface text-charcoal-light px-2.5 py-0.5 rounded-full">{rx.equipment}</span>
                   )}
                 </div>
                 {openIdx === i && (
-                  <div className="mt-2.5 pt-2.5 border-t border-teal-light space-y-2">
+                  <div className="mt-2.5 pt-2.5 border-t border-miami-light space-y-2">
                     <p className="text-xs text-charcoal-light leading-relaxed">
                       <span className="font-semibold text-charcoal">Coaching cue: </span>{rx.cue}
                     </p>
@@ -993,12 +993,12 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
   const rx = RX[def.rxKey]
 
   const rankLabel = rank === 1 ? '#1 Priority' : rank === 2 ? '#2 Priority' : '#3 Priority'
-  const rankColor = rank === 1 ? 'bg-red-tier text-white' : rank === 2 ? 'bg-yellow-tier text-white' : 'bg-teal text-white'
+  const rankColor = rank === 1 ? 'bg-red-tier text-white' : rank === 2 ? 'bg-yellow-tier text-white' : 'bg-miami text-white'
 
   const hasAsymmetry = left !== null && right !== null && asymmetry > 0
 
   return (
-    <div className="bg-white rounded-2xl border border-teal-light shadow-sm overflow-hidden">
+    <div className="bg-white rounded-2xl border border-miami-light shadow-sm overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full text-left"
@@ -1029,13 +1029,13 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
             <>
               <div className="bg-surface rounded-xl px-3 py-1.5 text-center">
                 <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Left</p>
-                <p className={cn('text-sm font-bold', (left ?? 0) < def.riskBelow ? 'text-red-tier' : (left ?? 0) < def.normalMin ? 'text-yellow-tier' : 'text-teal')}>
+                <p className={cn('text-sm font-bold', (left ?? 0) < def.riskBelow ? 'text-red-tier' : (left ?? 0) < def.normalMin ? 'text-yellow-tier' : 'text-miami')}>
                   {left}{def.unit}
                 </p>
               </div>
               <div className="bg-surface rounded-xl px-3 py-1.5 text-center">
                 <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Right</p>
-                <p className={cn('text-sm font-bold', (right ?? 0) < def.riskBelow ? 'text-red-tier' : (right ?? 0) < def.normalMin ? 'text-yellow-tier' : 'text-teal')}>
+                <p className={cn('text-sm font-bold', (right ?? 0) < def.riskBelow ? 'text-red-tier' : (right ?? 0) < def.normalMin ? 'text-yellow-tier' : 'text-miami')}>
                   {right}{def.unit}
                 </p>
               </div>
@@ -1048,7 +1048,7 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
             <>
               <div className="bg-surface rounded-xl px-3 py-1.5">
                 <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Value</p>
-                <p className={cn('text-sm font-bold', (single ?? 0) < def.riskBelow ? 'text-red-tier' : (single ?? 0) < def.normalMin ? 'text-yellow-tier' : 'text-teal')}>
+                <p className={cn('text-sm font-bold', (single ?? 0) < def.riskBelow ? 'text-red-tier' : (single ?? 0) < def.normalMin ? 'text-yellow-tier' : 'text-miami')}>
                   {single}{def.unit}
                 </p>
               </div>
@@ -1068,9 +1068,9 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
       </button>
 
       {open && rx && (
-        <div className="px-5 pb-5 border-t border-teal-light pt-4 space-y-5">
-          <RxItem label="Exercises (3)" icon={Dumbbell} color="text-teal" items={rx.exercises} />
-          <RxItem label="Stretches (2)" icon={PersonStanding} color="text-teal/70" items={rx.stretches} />
+        <div className="px-5 pb-5 border-t border-miami-light pt-4 space-y-5">
+          <RxItem label="Exercises (3)" icon={Dumbbell} color="text-miami" items={rx.exercises} />
+          <RxItem label="Stretches (2)" icon={PersonStanding} color="text-miami/70" items={rx.stretches} />
           <RxItem label="Foam Rolling (1)" icon={Flame} color="text-charcoal-light" items={[rx.foam]} />
         </div>
       )}
@@ -1154,7 +1154,7 @@ export function MyProtocol() {
       {/* 5. Full protocol (3 priority cards) */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <BookOpen size={14} className="text-teal shrink-0" />
+          <BookOpen size={14} className="text-miami shrink-0" />
           <p className="text-xs font-bold uppercase tracking-wider text-charcoal-light">Full Protocol</p>
         </div>
         <div className="space-y-4">

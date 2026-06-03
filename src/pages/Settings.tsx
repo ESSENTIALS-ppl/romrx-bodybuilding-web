@@ -9,9 +9,10 @@ import {
   LogOut, Trash2, ChevronRight, ClipboardList, TrendingUp,
   UserCheck, UserX, School, KeyRound, CheckCircle2, Bell,
 } from 'lucide-react'
-import { beltColor, cn } from '../lib/utils'
+import { bbTierColor, bbTierLabel, cn } from '../lib/utils'
 
-const BELTS = ['white', 'blue', 'purple', 'brown', 'black']
+const BB_TIERS = ['beginner', 'intermediate', 'advanced'] as const
+type BBTier = typeof BB_TIERS[number]
 const SIDES = ['right', 'left']
 
 // ── PRS helpers (mirrors MyBody.tsx) ─────────────────────────────────────────
@@ -56,8 +57,8 @@ function computePRS(a: Assessment): number {
 }
 
 function getPRSTier(s: number) {
-  if (s >= 85) return { label: 'ELITE',      color: 'text-teal',        bg: 'bg-teal-light' }
-  if (s >= 70) return { label: 'STRONG',     color: 'text-teal',        bg: 'bg-teal-light' }
+  if (s >= 85) return { label: 'ELITE',      color: 'text-miami',        bg: 'bg-miami-light' }
+  if (s >= 70) return { label: 'STRONG',     color: 'text-miami',        bg: 'bg-miami-light' }
   if (s >= 55) return { label: 'DEVELOPING', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
   if (s >= 40) return { label: 'RESTRICTED', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
   return              { label: 'AT RISK',    color: 'text-red-tier',    bg: 'bg-red-tier-bg' }
@@ -103,6 +104,10 @@ function AthleteSettings() {
   // ── Profile fields ──
   const [fullName, setFullName]         = useState('')
   const [belt, setBelt]                 = useState('')
+  const [bbTier, setBbTier]             = useState<BBTier | ''>('')
+  const [originalBbTier, setOriginalBbTier] = useState<BBTier | ''>('')
+  const [bbTierSaving, setBbTierSaving] = useState(false)
+  const [bbTierErr, setBbTierErr]       = useState<string | null>(null)
   const [originalBelt, setOriginalBelt] = useState('')
   const [dominantSide, setDominantSide] = useState('right')
   const [saving, setSaving]             = useState(false)
@@ -160,6 +165,9 @@ function AthleteSettings() {
     if (profile) {
       setFullName(profile.full_name ?? '')
       const b = profile.belt ?? 'white'
+      const t = (profile.active_bb_tier ?? '') as BBTier | ''
+      setBbTier(t)
+      setOriginalBbTier(t)
       setBelt(b)
       setOriginalBelt(b)
     }
@@ -465,7 +473,7 @@ function AthleteSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-4 border-teal border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-miami border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -488,7 +496,7 @@ function AthleteSettings() {
               value={fullName}
               onChange={e => setFullName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-xl border border-teal-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-teal"
+              className="w-full rounded-xl border border-miami-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-miami"
             />
           </div>
 
@@ -498,30 +506,46 @@ function AthleteSettings() {
           </div>
 
           <div>
-            <p className="text-xs text-charcoal-light font-semibold uppercase tracking-wide mb-2">Belt</p>
+            <p className="text-xs text-charcoal-light font-semibold uppercase tracking-wide mb-2">Training Tier</p>
             <div className="flex gap-2 flex-wrap">
-              {BELTS.map(b => (
+              {BB_TIERS.map(t => (
                 <button
-                  key={b}
-                  onClick={() => { if (!currentCoach) setBelt(b) }}
-                  disabled={!!currentCoach}
+                  key={t}
+                  onClick={() => setBbTier(t)}
                   className={cn(
-                    'px-3 py-1.5 rounded-full text-xs font-bold uppercase transition-all',
-                    currentCoach ? 'opacity-50 cursor-not-allowed' : '',
-                    belt === b
-                      ? beltColor(b) + ' ring-2 ring-offset-1 ring-teal'
-                      : beltColor(b) + ' opacity-50 hover:opacity-80'
+                    'px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition-all',
+                    bbTier === t
+                      ? bbTierColor(t) + ' ring-2 ring-offset-1 ring-miami shadow-sm'
+                      : bbTierColor(t) + ' opacity-50 hover:opacity-80'
                   )}
                 >
-                  {b}
+                  {bbTierLabel(t)}
                 </button>
               ))}
             </div>
-            {currentCoach && (
-              <p className="text-xs text-charcoal-light mt-2">
-                Your coach manages your belt. {currentCoach.full_name ?? currentCoach.email} can promote you from the team dashboard.
-              </p>
+            <p className="text-xs text-charcoal-light mt-2">
+              Beginner: full-body. Intermediate: upper/lower split. Advanced: push/pull/legs + specialization. Sets which workout templates and exercises you unlock.
+            </p>
+            {bbTier && bbTier !== originalBbTier && (
+              <button
+                onClick={async () => {
+                  setBbTierSaving(true)
+                  setBbTierErr(null)
+                  const { data, error } = await supabase.rpc('set_my_bb_tier', { p_tier: bbTier })
+                  setBbTierSaving(false)
+                  if (error || data?.ok === false) {
+                    setBbTierErr(error?.message ?? data?.error ?? 'Save failed')
+                    return
+                  }
+                  setOriginalBbTier(bbTier)
+                }}
+                disabled={bbTierSaving}
+                className="mt-3 btn-primary text-xs"
+              >
+                {bbTierSaving ? 'Saving…' : `Save tier: ${bbTierLabel(bbTier)}`}
+              </button>
             )}
+            {bbTierErr && <p className="text-xs text-red-tier mt-2">{bbTierErr}</p>}
           </div>
 
           <div>
@@ -536,8 +560,8 @@ function AthleteSettings() {
                   className={cn(
                     'px-4 py-1.5 rounded-full text-xs font-semibold capitalize transition-colors',
                     dominantSide === s
-                      ? 'bg-teal text-white'
-                      : 'bg-surface text-charcoal-light border border-teal-light hover:bg-teal-light'
+                      ? 'bg-miami text-white'
+                      : 'bg-surface text-charcoal-light border border-miami-light hover:bg-miami-light'
                   )}
                 >
                   {s}
@@ -551,8 +575,8 @@ function AthleteSettings() {
           )}
           {recomputing && (
             <div className="flex items-center gap-2 text-xs text-charcoal-light">
-              <Loader2 size={12} className="animate-spin text-teal" />
-              Updating technique library for your new belt...
+              <Loader2 size={12} className="animate-spin text-miami" />
+              Updating exercise library...
             </div>
           )}
           <button
@@ -579,8 +603,8 @@ function AthleteSettings() {
               type="text"
               value={gymName}
               onChange={e => setGymName(e.target.value)}
-              placeholder="e.g. Alliance BJJ Columbus"
-              className="w-full rounded-xl border border-teal-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-teal"
+              placeholder="e.g. Gold's Gym Columbus"
+              className="w-full rounded-xl border border-miami-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-miami"
             />
           </div>
 
@@ -606,11 +630,11 @@ function AthleteSettings() {
           {/* Connected coach card */}
           {coachLoading ? (
             <div className="flex items-center gap-2 py-2">
-              <Loader2 size={14} className="animate-spin text-teal" />
+              <Loader2 size={14} className="animate-spin text-miami" />
               <span className="text-sm text-charcoal-light">Loading...</span>
             </div>
           ) : currentCoach ? (
-            <div className="flex items-center justify-between rounded-xl bg-teal-light border border-teal/20 px-4 py-3">
+            <div className="flex items-center justify-between rounded-xl bg-miami-light border border-miami/20 px-4 py-3">
               <div>
                 <p className="text-sm font-semibold text-charcoal">
                   {currentCoach.full_name ?? currentCoach.email}
@@ -631,7 +655,7 @@ function AthleteSettings() {
 
           {/* Pending coach consent banner */}
           {pendingCoach && (
-            <div className="space-y-3 bg-teal-light border border-teal/20 rounded-xl px-4 py-3">
+            <div className="space-y-3 bg-miami-light border border-miami/20 rounded-xl px-4 py-3">
               <p className="text-sm text-charcoal leading-snug">
                 Connecting to <span className="font-semibold">{pendingCoach.full_name ?? pendingCoach.email}</span> will allow them to view your full ROM data, technique readiness, and training history. Continue?
               </p>
@@ -644,7 +668,7 @@ function AthleteSettings() {
                 </button>
                 <button
                   onClick={() => setPendingCoach(null)}
-                  className="text-xs px-4 py-2 rounded-xl border border-teal-light text-charcoal-light hover:bg-white transition-colors"
+                  className="text-xs px-4 py-2 rounded-xl border border-miami-light text-charcoal-light hover:bg-white transition-colors"
                 >
                   Cancel
                 </button>
@@ -665,7 +689,7 @@ function AthleteSettings() {
                   onChange={e => setCoachEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleConnectCoach()}
                   placeholder="coach@example.com"
-                  className="flex-1 rounded-xl border border-teal-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-teal"
+                  className="flex-1 rounded-xl border border-miami-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-miami"
                 />
                 <button
                   onClick={handleConnectCoach}
@@ -678,7 +702,7 @@ function AthleteSettings() {
               </div>
               <p className="text-xs text-charcoal-light">
                 Your coach must have a ROMRx Coach account. Send them to{' '}
-                <a href="/signup/coach" className="text-teal hover:underline font-medium">
+                <a href="/signup/coach" className="text-miami hover:underline font-medium">
                   romrxbodybuilding.com/signup/coach
                 </a>
               </p>
@@ -690,7 +714,7 @@ function AthleteSettings() {
             <div className={cn(
               'flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium',
               coachMsg.type === 'ok'
-                ? 'bg-teal-light text-teal'
+                ? 'bg-miami-light text-miami'
                 : 'bg-red-tier-bg text-red-tier'
             )}>
               {coachMsg.type === 'ok'
@@ -707,7 +731,7 @@ function AthleteSettings() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm text-charcoal-light">Plan</p>
-              <span className="text-xs bg-teal-light text-teal font-semibold px-3 py-1 rounded-full capitalize">
+              <span className="text-xs bg-miami-light text-miami font-semibold px-3 py-1 rounded-full capitalize">
                 {profile?.subscription_tier ?? 'free'}
               </span>
             </div>
@@ -740,11 +764,11 @@ function AthleteSettings() {
             <button
               onClick={handleManageSub}
               disabled={portalLoading}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
             >
               <span>Manage Subscription</span>
               {portalLoading
-                ? <Loader2 size={15} className="animate-spin text-teal" />
+                ? <Loader2 size={15} className="animate-spin text-miami" />
                 : <ExternalLink size={15} className="text-charcoal-light" />
               }
             </button>
@@ -755,25 +779,25 @@ function AthleteSettings() {
         <Section title="Assessment History">
           <div className="flex items-center justify-between -mt-2 mb-1">
             <p className="text-xs text-charcoal-light">Your past ROM snapshots</p>
-            <a href="/onboarding/assessment" className="text-xs font-semibold text-teal hover:underline">
+            <a href="/onboarding/assessment" className="text-xs font-semibold text-miami hover:underline">
               + New Assessment
             </a>
           </div>
 
           {asLoading ? (
             <div className="flex justify-center py-6">
-              <div className="w-5 h-5 border-2 border-teal border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-miami border-t-transparent rounded-full animate-spin" />
             </div>
           ) : assessments.length === 0 ? (
             <div className="text-center py-6">
               <ClipboardList size={28} className="mx-auto text-charcoal-light mb-2" />
               <p className="text-sm text-charcoal-light mb-2">No assessments on file yet.</p>
-              <a href="/onboarding/assessment" className="inline-block text-sm font-semibold text-teal hover:underline">
+              <a href="/onboarding/assessment" className="inline-block text-sm font-semibold text-miami hover:underline">
                 Take your first assessment
               </a>
             </div>
           ) : (
-            <div className="divide-y divide-teal-light/60">
+            <div className="divide-y divide-miami-light/60">
               {assessments.map((a, i) => {
                 const prs  = computePRS(a)
                 const tier = getPRSTier(prs)
@@ -794,13 +818,13 @@ function AthleteSettings() {
                     </div>
                     <div className="flex items-center gap-3">
                       {i === 0 && (
-                        <span className="text-xs bg-teal-light text-teal px-2 py-0.5 rounded-full font-semibold">
+                        <span className="text-xs bg-miami-light text-miami px-2 py-0.5 rounded-full font-semibold">
                           Latest
                         </span>
                       )}
                       <a
                         href="/onboarding/assessment"
-                        className="flex items-center gap-1 text-xs font-semibold text-teal hover:underline"
+                        className="flex items-center gap-1 text-xs font-semibold text-miami hover:underline"
                       >
                         <TrendingUp size={12} />
                         Retest
@@ -818,9 +842,9 @@ function AthleteSettings() {
           <div className="space-y-2 -mt-1">
             <a
               href="mailto:ROMRxBB@gmail.com"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
             >
-              <Mail size={15} className="text-teal shrink-0" />
+              <Mail size={15} className="text-miami shrink-0" />
               <span className="flex-1">
                 Email us
                 <span className="block text-xs text-charcoal-light font-normal mt-0.5">ROMRxBB@gmail.com</span>
@@ -829,9 +853,9 @@ function AthleteSettings() {
             </a>
             <a
               href="mailto:ROMRxBB@gmail.com?subject=ROMRxBB%20Question"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
             >
-              <HelpCircle size={15} className="text-teal shrink-0" />
+              <HelpCircle size={15} className="text-miami shrink-0" />
               <span className="flex-1">Questions and FAQ</span>
               <ChevronRight size={14} className="text-charcoal-light" />
             </a>
@@ -839,9 +863,9 @@ function AthleteSettings() {
               href="/legal"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
             >
-              <ExternalLink size={15} className="text-teal shrink-0" />
+              <ExternalLink size={15} className="text-miami shrink-0" />
               <span className="flex-1">
                 Terms of Service &amp; Privacy Policy
                 <span className="block text-xs text-charcoal-light font-normal mt-0.5">romrxbodybuilding.com/legal</span>
@@ -855,7 +879,7 @@ function AthleteSettings() {
         <Section title="Notifications" icon={<Bell size={14} />}>
           {notifLoading ? (
             <div className="flex items-center gap-2 py-2">
-              <Loader2 size={14} className="animate-spin text-teal" />
+              <Loader2 size={14} className="animate-spin text-miami" />
               <span className="text-sm text-charcoal-light">Loading preferences...</span>
             </div>
           ) : (
@@ -863,7 +887,7 @@ function AthleteSettings() {
               {/* Timezone display */}
               <div className="flex items-center justify-between">
                 <p className="text-xs text-charcoal-light font-semibold uppercase tracking-wide">Your Timezone</p>
-                <span className="text-xs font-medium text-charcoal bg-teal-light px-2.5 py-1 rounded-full">
+                <span className="text-xs font-medium text-charcoal bg-miami-light px-2.5 py-1 rounded-full">
                   {browserTimezone}
                 </span>
               </div>
@@ -882,8 +906,8 @@ function AthleteSettings() {
                     aria-checked={emailReminders}
                     onClick={() => setEmailReminders(v => !v)}
                     className={cn(
-                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2',
-                      emailReminders ? 'bg-teal' : 'bg-charcoal-light/30'
+                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-miami focus:ring-offset-2',
+                      emailReminders ? 'bg-miami' : 'bg-charcoal-light/30'
                     )}
                   >
                     <span
@@ -905,7 +929,7 @@ function AthleteSettings() {
                       type="time"
                       value={reminderTime}
                       onChange={e => setReminderTime(e.target.value)}
-                      className="rounded-xl border border-teal-light bg-surface px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-teal"
+                      className="rounded-xl border border-miami-light bg-surface px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-miami"
                     />
                     <span className="text-xs text-charcoal-light">({browserTimezone})</span>
                   </div>
@@ -933,8 +957,8 @@ function AthleteSettings() {
                     }}
                     disabled={pushLoading}
                     className={cn(
-                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 disabled:opacity-50',
-                      pushReminders ? 'bg-teal' : 'bg-charcoal-light/30'
+                      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-miami focus:ring-offset-2 disabled:opacity-50',
+                      pushReminders ? 'bg-miami' : 'bg-charcoal-light/30'
                     )}
                   >
                     {pushLoading ? (
@@ -954,7 +978,7 @@ function AthleteSettings() {
                   <div className={cn(
                     'flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium',
                     pushMsg.type === 'ok'
-                      ? 'bg-teal-light text-teal'
+                      ? 'bg-miami-light text-miami'
                       : 'bg-red-tier-bg text-red-tier'
                   )}>
                     {pushMsg.type === 'ok' ? <CheckCircle2 size={12} /> : <span className="font-bold">!</span>}
@@ -964,7 +988,7 @@ function AthleteSettings() {
               </div>
 
               {/* Protocol schedule reference */}
-              <div className="rounded-xl bg-surface border border-teal-light/60 px-4 py-3 space-y-1.5">
+              <div className="rounded-xl bg-surface border border-miami-light/60 px-4 py-3 space-y-1.5">
                 <p className="text-xs font-semibold text-charcoal-light uppercase tracking-wide">Protocol Schedule</p>
                 <div className="space-y-1">
                   {[
@@ -974,7 +998,7 @@ function AthleteSettings() {
                   ].map(({ days, protocol }) => (
                     <div key={days} className="flex items-center justify-between">
                       <span className="text-xs text-charcoal-light">{days}</span>
-                      <span className="text-xs font-semibold text-teal">{protocol}</span>
+                      <span className="text-xs font-semibold text-miami">{protocol}</span>
                     </div>
                   ))}
                 </div>
@@ -1011,19 +1035,19 @@ function AthleteSettings() {
                 value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 placeholder="New password"
-                className="w-full rounded-xl border border-teal-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-teal"
+                className="w-full rounded-xl border border-miami-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-miami"
               />
               <input
                 type="password"
                 value={confirmPw}
                 onChange={e => setConfirmPw(e.target.value)}
                 placeholder="Confirm new password"
-                className="w-full rounded-xl border border-teal-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-teal"
+                className="w-full rounded-xl border border-miami-light bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-miami"
               />
               {pwMsg && (
                 <p className={cn(
                   'text-xs font-medium flex items-center gap-1.5',
-                  pwMsg.type === 'ok' ? 'text-teal' : 'text-red-tier'
+                  pwMsg.type === 'ok' ? 'text-miami' : 'text-red-tier'
                 )}>
                   {pwMsg.type === 'ok' && <CheckCircle2 size={12} />}
                   {pwMsg.text}
@@ -1039,10 +1063,10 @@ function AthleteSettings() {
               </button>
             </div>
 
-            <div className="border-t border-teal-light pt-3">
+            <div className="border-t border-miami-light pt-3">
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
               >
                 <LogOut size={15} className="text-charcoal-light shrink-0" />
                 <span className="flex-1 text-left">Sign out</span>
@@ -1092,7 +1116,7 @@ function AthleteSettings() {
             <div className="flex gap-3 pt-1">
               <button
                 onClick={() => { setShowDelete(false); setDeleteText('') }}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
               >
                 Cancel
               </button>
