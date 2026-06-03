@@ -100,7 +100,7 @@ export function ResultsPreview() {
         .eq('id', user.id)
         .maybeSingle()
 
-      if (userRow?.subscription_status === 'active') {
+      if (userRow?.subscription_status === 'active' || userRow?.subscription_status === 'trialing') {
         navigate('/dashboard/my-body', { replace: true })
         return
       }
