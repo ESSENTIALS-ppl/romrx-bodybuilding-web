@@ -220,3 +220,44 @@
   color: #FF2D78;
   box-shadow: 0 0 12px rgba(255,45,120,0.25);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Dashboard Miami Vice override layer.
+
+   The athlete & coach pages were originally written with a light theme
+   (bg-white cards, text-charcoal copy). The BB dashboard shell now uses
+   a near-black background (bg-miami-bg), so we remap a handful of the
+   high-traffic light-theme utility classes inside the dashboard shell to
+   their dark equivalents. This avoids editing every page file just to
+   change colors.
+
+   Anything wrapped by Layout.tsx's <div class="bg-miami-bg ..."> gets this.
+   ───────────────────────────────────────────────────────────────────────── */
+.bg-miami-bg .bg-white          { background-color: rgba(10, 10, 24, 0.82) !important; /* miami-ink/82 */ }
+.bg-miami-bg .bg-surface        { background-color: transparent !important; }
+.bg-miami-bg .text-charcoal     { color: #F0EDE8 !important; /* miami-text */ }
+.bg-miami-bg .text-charcoal-light { color: rgba(240, 237, 232, 0.65) !important; }
+
+/* Light tinted backgrounds → faint violet on dark */
+.bg-miami-bg .bg-miami-light    { background-color: rgba(180, 79, 232, 0.15) !important; }
+.bg-miami-bg .border-miami-light { border-color: rgba(180, 79, 232, 0.25) !important; }
+.bg-miami-bg .bg-teal-light     { background-color: rgba(0, 245, 228, 0.12) !important; }
+.bg-miami-bg .border-teal-light { border-color: rgba(0, 245, 228, 0.25) !important; }
+.bg-miami-bg .bg-crimson-light  { background-color: rgba(255, 45, 120, 0.12) !important; }
+.bg-miami-bg .border-crimson-light { border-color: rgba(255, 45, 120, 0.28) !important; }
+
+/* Inputs need a dark background so they don't look like white slabs */
+.bg-miami-bg input:not([type=checkbox]):not([type=radio]),
+.bg-miami-bg textarea,
+.bg-miami-bg select {
+  background-color: rgba(10, 10, 24, 0.6) !important;
+  color: #F0EDE8 !important;
+  border-color: rgba(180, 79, 232, 0.3) !important;
+}
+.bg-miami-bg input::placeholder,
+.bg-miami-bg textarea::placeholder { color: rgba(240, 237, 232, 0.4) !important; }
+
+/* gray-100 / gray-200 borders inside the dashboard read better as faint violet */
+.bg-miami-bg .bg-gray-100       { background-color: rgba(180, 79, 232, 0.10) !important; }
+.bg-miami-bg .text-gray-400,
+.bg-miami-bg .text-gray-500     { color: rgba(240, 237, 232, 0.45) !important; }

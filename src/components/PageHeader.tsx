@@ -12,9 +12,9 @@ export function PageHeader({ title, subtitle, badge, badgeColor = 'bg-miami-ligh
   return (
     <div className="flex items-start justify-between mb-6">
       <div>
-        <h1 className="font-display font-bold text-2xl text-charcoal tracking-tight">{title}</h1>
+        <h1 className="font-display font-bold text-2xl text-miami-text tracking-tight">{title}</h1>
         {subtitle && (
-          <p className="text-sm text-charcoal-light mt-0.5">{subtitle}</p>
+          <p className="text-sm text-miami-text/60 mt-0.5">{subtitle}</p>
         )}
       </div>
       <div className="flex items-center gap-2 mt-0.5">

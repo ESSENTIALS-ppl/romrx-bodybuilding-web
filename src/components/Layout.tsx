@@ -131,7 +131,9 @@ export function Layout() {
     [isCoach, activeSport],
   )
 
-  const theme = useMemo(() => getThemeClasses(activeSport.theme_accent), [activeSport.theme_accent])
+  // theme accent map kept available for future tinting but the BB build is
+  // fully Miami Vice dark mode — active nav uses the literal miami palette.
+  void getThemeClasses
 
   // Redirect coaches away from athlete-only pages
   useEffect(() => {
@@ -147,11 +149,11 @@ export function Layout() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface">
-      {/* Top nav */}
-      <header className={cn('sticky top-0 z-10 bg-white border-b', theme.border)}>
+    <div className="min-h-screen flex flex-col bg-miami-bg text-miami-text">
+      {/* Top nav — Miami Vice ink */}
+      <header className="sticky top-0 z-10 bg-miami-ink/95 backdrop-blur border-b border-miami-violet/20">
         <div className="max-w-5xl mx-auto px-4 flex items-center h-14 gap-1">
-          <span className={cn('font-display tracking-wider mr-4 text-lg', theme.brand)}>
+          <span className="font-display tracking-wider mr-4 text-lg text-miami-text">
             ROMRx<span className="opacity-60">·</span>{activeSport.short_name}
           </span>
           <nav className="flex gap-1 flex-1 overflow-x-auto scrollbar-none">
@@ -163,7 +165,9 @@ export function Layout() {
                 className={({ isActive }) =>
                   cn(
                     'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
-                    isActive ? theme.activeBg : cn('text-charcoal-light', theme.hover),
+                    isActive
+                      ? 'bg-miami text-white shadow-[0_0_18px_-4px_rgba(255,45,120,0.55)]'
+                      : 'text-miami-text/70 hover:bg-miami/15 hover:text-miami',
                   )
                 }
               >
@@ -174,7 +178,7 @@ export function Layout() {
           </nav>
           <button
             onClick={handleSignOut}
-            className="ml-2 p-2 rounded-full text-charcoal-light hover:bg-red-50 hover:text-red-600 transition-colors"
+            className="ml-2 p-2 rounded-full text-miami-text/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
             title="Sign out"
           >
             <LogOut size={16} />
