@@ -19,7 +19,6 @@ import {
   Syringe,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
-import { SportSwitcher } from '../sports/SportSwitcher'
 import type { SportConfig } from '../sports/registry'
 
 interface NavItem {
@@ -173,7 +172,6 @@ export function Layout() {
               </NavLink>
             ))}
           </nav>
-          <SportSwitcher />
           <button
             onClick={handleSignOut}
             className="ml-2 p-2 rounded-full text-charcoal-light hover:bg-red-50 hover:text-red-600 transition-colors"
