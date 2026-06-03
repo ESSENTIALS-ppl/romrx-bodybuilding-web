@@ -13,17 +13,19 @@ import { AlertTriangle, Activity, TrendingUp } from 'lucide-react'
 const PRS_BILATERAL = [
   { l: 'hip_er_l',       r: 'hip_er_r',        riskBelow: 40,  normalMin: 40  },
   { l: 'hip_ir_l',       r: 'hip_ir_r',        riskBelow: 30,  normalMin: 30  },
-  { l: 'hip_abd_l',      r: 'hip_abd_r',       riskBelow: 30,  normalMin: 40  },
+  { l: 'hip_abd_l',      r: 'hip_abd_r',       riskBelow: 25,  normalMin: 35  },
   { l: 'hip_flex_l',     r: 'hip_flex_r',      riskBelow: 100, normalMin: 100 },
   { l: 'shoulder_er_l',  r: 'shoulder_er_r',   riskBelow: 60,  normalMin: 60  },
   { l: 'shoulder_flex_l',r: 'shoulder_flex_r', riskBelow: 120, normalMin: 140 },
   { l: 'ankle_df_l',     r: 'ankle_df_r',      riskBelow: 10,  normalMin: 10  },
-  { l: 'cervical_rot_l', r: 'cervical_rot_r',  riskBelow: 60,  normalMin: 70  },
+  { l: 'cervical_lat_l', r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
+  { l: 'thoracic_rot_l', r: 'thoracic_rot_r',  riskBelow: 30,  normalMin: 40  },
 ]
 const PRS_UNILATERAL = [
-  { key: 'lumbar_flex', riskBelow: 40, normalMin: 40 },
-  { key: 'lumbar_ext',  riskBelow: 15, normalMin: 20 },
-  { key: 'thoracic_rot',riskBelow: 30, normalMin: 40 },
+  { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },
+  { key: 'lumbar_ext',    riskBelow: 15, normalMin: 20 },
+  { key: 'cervical_flex', riskBelow: 35, normalMin: 45 },
+  { key: 'cervical_ext',  riskBelow: 40, normalMin: 55 },
 ]
 
 function computePRS(a: Assessment): number {
@@ -61,7 +63,8 @@ function getPRSTier(s: number) {
 const OPTIMAL: Record<string, number> = {
   'Hip ER': 55, 'Hip IR': 40, 'Hip Abd': 50, 'Hip Flex': 110,
   'Shoulder ER': 80, 'Shoulder Flex': 165, 'Ankle DF': 15,
-  'Lumbar Flex': 50, 'Lumbar Ext': 25, 'Cervical Rot': 70,
+  'Lumbar Flex': 50, 'Lumbar Ext': 25,
+  'Cervical Lat': 45, 'Cervical Flex': 55, 'Cervical Ext': 65, 'Thoracic Rot': 55,
 }
 
 function buildRadar(a: Assessment) {
@@ -75,7 +78,8 @@ function buildRadar(a: Assessment) {
     { joint: 'Ankle DF',     value: Math.max(a.ankle_df_l ?? 0, a.ankle_df_r ?? 0) },
     { joint: 'Lumbar Flex',  value: a.lumbar_flex ?? 0 },
     { joint: 'Lumbar Ext',   value: a.lumbar_ext ?? 0 },
-    { joint: 'Cervical Rot', value: Math.max(a.cervical_rot_l ?? 0, a.cervical_rot_r ?? 0) },
+    { joint: 'Cervical Lat', value: Math.max(a.cervical_lat_l ?? 0, a.cervical_lat_r ?? 0) },
+    { joint: 'Thoracic Rot', value: Math.max(a.thoracic_rot_l ?? 0, a.thoracic_rot_r ?? 0) },
   ]
 }
 
@@ -231,7 +235,10 @@ export function MyBody() {
           <JointBar label="Ankle DF"       left={assessment.ankle_df_l}      right={assessment.ankle_df_r}      optimal={OPTIMAL['Ankle DF']} />
           <JointBar label="Lumbar Flex"    midline={assessment.lumbar_flex}   optimal={OPTIMAL['Lumbar Flex']} />
           <JointBar label="Lumbar Ext"     midline={assessment.lumbar_ext}    optimal={OPTIMAL['Lumbar Ext']} />
-          <JointBar label="Cervical Rot"   left={assessment.cervical_rot_l}  right={assessment.cervical_rot_r}  optimal={OPTIMAL['Cervical Rot']} />
+          <JointBar label="Cervical Lateral" left={assessment.cervical_lat_l} right={assessment.cervical_lat_r} optimal={OPTIMAL['Cervical Lat']} />
+          <JointBar label="Cervical Flexion"  midline={assessment.cervical_flex} optimal={OPTIMAL['Cervical Flex']} />
+          <JointBar label="Cervical Extension" midline={assessment.cervical_ext} optimal={OPTIMAL['Cervical Ext']} />
+          <JointBar label="Thoracic Rot"   left={assessment.thoracic_rot_l}  right={assessment.thoracic_rot_r}  optimal={OPTIMAL['Thoracic Rot']} />
         </div>
       </SectionCard>
     </div>

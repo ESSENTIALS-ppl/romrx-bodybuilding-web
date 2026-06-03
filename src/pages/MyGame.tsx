@@ -67,7 +67,9 @@ interface UnlockedTechnique {
   ankle_df_min: number | null
   lumbar_flex_min: number | null
   lumbar_ext_min: number | null
-  cervical_rot_min: number | null
+  cervical_lat_min: number | null
+  cervical_flex_min: number | null
+  cervical_ext_min: number | null
   thoracic_rot_min: number | null
 }
 
@@ -85,8 +87,10 @@ const JOINT_MAP: ReadonlyArray<{
   { pick: a => bestBilateral(a.ankle_df_l, a.ankle_df_r),             minKey: 'ankle_df_min' },
   { pick: a => a.lumbar_flex,                                         minKey: 'lumbar_flex_min' },
   { pick: a => a.lumbar_ext,                                          minKey: 'lumbar_ext_min' },
-  { pick: a => bestBilateral(a.cervical_rot_l, a.cervical_rot_r),     minKey: 'cervical_rot_min' },
-  { pick: a => a.thoracic_rot,                                        minKey: 'thoracic_rot_min' },
+  { pick: a => bestBilateral(a.cervical_lat_l, a.cervical_lat_r),     minKey: 'cervical_lat_min' },
+  { pick: a => a.cervical_flex,                                       minKey: 'cervical_flex_min' },
+  { pick: a => a.cervical_ext,                                        minKey: 'cervical_ext_min' },
+  { pick: a => bestBilateral(a.thoracic_rot_l, a.thoracic_rot_r),     minKey: 'thoracic_rot_min' },
 ]
 
 function bestBilateral(l: number | null, r: number | null): number | null {
@@ -551,7 +555,7 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
     // client-side using the user's assessment.
     supabase
       .from('unlocked_techniques_v')
-      .select('id, code, name, category, subcategory, sport, tier, hip_er_min, hip_ir_min, hip_abd_min, hip_flex_min, shoulder_er_min, shoulder_flex_min, ankle_df_min, lumbar_flex_min, lumbar_ext_min, cervical_rot_min, thoracic_rot_min')
+      .select('id, code, name, category, subcategory, sport, tier, hip_er_min, hip_ir_min, hip_abd_min, hip_flex_min, shoulder_er_min, shoulder_flex_min, ankle_df_min, lumbar_flex_min, lumbar_ext_min, cervical_lat_min, cervical_flex_min, cervical_ext_min, thoracic_rot_min')
       .eq('sport', 'bodybuilding')
       .order('category')
       .order('name')

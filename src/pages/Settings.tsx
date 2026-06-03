@@ -19,17 +19,19 @@ const SIDES = ['right', 'left']
 const PRS_BILATERAL = [
   { l: 'hip_er_l',        r: 'hip_er_r',        riskBelow: 40,  normalMin: 40  },
   { l: 'hip_ir_l',        r: 'hip_ir_r',        riskBelow: 30,  normalMin: 30  },
-  { l: 'hip_abd_l',       r: 'hip_abd_r',       riskBelow: 30,  normalMin: 40  },
+  { l: 'hip_abd_l',       r: 'hip_abd_r',       riskBelow: 25,  normalMin: 35  },
   { l: 'hip_flex_l',      r: 'hip_flex_r',      riskBelow: 100, normalMin: 100 },
   { l: 'shoulder_er_l',   r: 'shoulder_er_r',   riskBelow: 60,  normalMin: 60  },
   { l: 'shoulder_flex_l', r: 'shoulder_flex_r', riskBelow: 120, normalMin: 140 },
   { l: 'ankle_df_l',      r: 'ankle_df_r',      riskBelow: 10,  normalMin: 10  },
-  { l: 'cervical_rot_l',  r: 'cervical_rot_r',  riskBelow: 60,  normalMin: 70  },
+  { l: 'cervical_lat_l',  r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
+  { l: 'thoracic_rot_l',  r: 'thoracic_rot_r',  riskBelow: 30,  normalMin: 40  },
 ]
 const PRS_UNILATERAL = [
-  { key: 'lumbar_flex', riskBelow: 40, normalMin: 40 },
-  { key: 'lumbar_ext',  riskBelow: 15, normalMin: 20 },
-  { key: 'thoracic_rot',riskBelow: 30, normalMin: 40 },
+  { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },
+  { key: 'lumbar_ext',    riskBelow: 15, normalMin: 20 },
+  { key: 'cervical_flex', riskBelow: 35, normalMin: 45 },
+  { key: 'cervical_ext',  riskBelow: 40, normalMin: 55 },
 ]
 
 function computePRS(a: Assessment): number {

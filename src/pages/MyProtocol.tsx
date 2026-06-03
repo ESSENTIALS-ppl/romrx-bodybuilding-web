@@ -391,7 +391,7 @@ const RX: Record<string, Prescription> = {
     },
   },
 
-  cervical_rot: {
+  cervical_lat: {
     exercises: [
       {
         name: 'Cervical CARs (Controlled Articular Rotations)',
@@ -431,6 +431,92 @@ const RX: Record<string, Prescription> = {
       dose: '60-90 sec',
       cue: 'Tape two tennis balls together or use a small firm ball. Lie on your back and place the balls at the base of your skull where your head meets your neck. Gently nod yes and shake no in tiny movements. Stay on any sore spots for 20-30 seconds.',
       equipment: 'Two tennis balls or massage ball',
+    },
+  },
+
+  cervical_flex: {
+    exercises: [
+      {
+        name: 'Deep Neck Flexor Chin Tuck',
+        dose: '3 sets x 10 reps, hold 5 sec',
+        cue: 'Sit or lie on your back. Gently pull your head straight back like you are making a double chin. Do not tilt your head up or down. Hold 5 seconds, then relax. This builds the deep front-neck muscles that protect you under front-loaded bars.',
+        equipment: 'Bodyweight',
+      },
+      {
+        name: 'Supine Neck Flexion Curl',
+        dose: '2-3 sets x 8-12 reps',
+        cue: 'Lie on your back. Start with a chin tuck, then slowly curl your head up to lift it off the floor an inch or two. Keep the chin tucked the whole time. Lower slowly. Do not lead with your chin.',
+        equipment: 'Bodyweight',
+      },
+      {
+        name: 'Banded Chin Tuck Hold',
+        dose: '3 sets x hold 15-20 sec',
+        cue: 'Loop a light band behind your head and anchor it in front of you at head height. Pull your head straight back into a chin tuck against the band and hold. Keep your jaw relaxed and eyes level. This loads the deep flexors that brace front-rack and shrug positions.',
+        equipment: 'Resistance band',
+      },
+    ],
+    stretches: [
+      {
+        name: 'Levator Scapulae Stretch',
+        dose: '2-3 sets x hold 30-45 sec each side',
+        cue: 'Sit up straight. Turn your head about 45 degrees toward one armpit and look down. Use the same-side hand to gently pull your head further down toward that armpit. Hold and breathe, then switch.',
+        equipment: 'Bodyweight',
+      },
+      {
+        name: 'Upper Trap Stretch',
+        dose: '2-3 sets x hold 30 sec each side',
+        cue: 'Sit up straight and anchor one hand under your thigh to pin that shoulder down. Tilt your head to the opposite side, bringing your ear toward your shoulder. Use your free hand to add a gentle pull. Hold and breathe, then switch.',
+        equipment: 'Bodyweight',
+      },
+    ],
+    foam: {
+      name: 'Upper Trap / Suboccipital Release',
+      dose: '60-90 sec',
+      cue: 'Lie on your back with a small firm ball at the base of your skull. Slowly nod your chin toward your chest to load the ball, then relax. Stay on sore spots for 20-30 seconds.',
+      equipment: 'Massage ball',
+    },
+  },
+
+  cervical_ext: {
+    exercises: [
+      {
+        name: 'Prone Neck Extension',
+        dose: '3 sets x 8-10 reps, hold 3 sec',
+        cue: 'Lie face down with your forehead resting on a folded towel. Slowly lift your head and look forward, leading with your eyes. Stop at a comfortable end range, hold 3 seconds, then lower slowly. Keep the movement smooth, never jerky.',
+        equipment: 'Bodyweight / towel',
+      },
+      {
+        name: 'Quadruped Neck Extension Isometric',
+        dose: '3 sets x hold 10 sec',
+        cue: 'On all fours, gently look up to a comfortable end range. Place one hand on the back of your head and lightly resist as you press your head back into your hand. Build the extensors that brace your neck at lockout.',
+        equipment: 'Bodyweight',
+      },
+      {
+        name: 'Banded Neck Extension Hold',
+        dose: '3 sets x hold 15-20 sec',
+        cue: 'Loop a light band over the back of your head and anchor it behind you. Press your head back against the band to a comfortable end range and hold. Keep the chin level, not jutting. This strengthens the extensors that keep a neutral neck at deadlift lockout.',
+        equipment: 'Resistance band',
+      },
+    ],
+    stretches: [
+      {
+        name: 'Anterior Neck / Throat Stretch',
+        dose: '2 sets x hold 20-30 sec',
+        cue: 'Sit up straight. Tilt your head back gently to look at the ceiling, then slowly turn your chin toward one side. You should feel a stretch along the front of your neck. Keep it gentle and never force it. Switch sides.',
+        equipment: 'Bodyweight',
+      },
+      {
+        name: 'Chin Tuck Decompression',
+        dose: '2-3 sets x hold 20-30 sec',
+        cue: 'Sit tall and draw your head straight back into a gentle chin tuck, lengthening the back of your neck. Imagine growing taller through the crown of your head. This counters the cranked-back posture that builds up after heavy pressing. Hold and breathe.',
+        equipment: 'Bodyweight',
+      },
+    ],
+    foam: {
+      name: 'Upper Thoracic Extension over Roller',
+      dose: '60-90 sec',
+      cue: 'Place a foam roller across your upper back just below the neck. Support your head with your hands and gently extend back over the roller to free up the neck-to-thoracic junction. Breathe and move 1 inch at a time.',
+      equipment: 'Foam roller',
     },
   },
 
@@ -496,62 +582,74 @@ interface JointDef {
 const JOINTS: JointDef[] = [
   {
     key: 'hip_er', label: 'Hip External Rotation',
-    bjjWhy: 'Triangles, De La Riva guard, seated guard mobility',
+    bjjWhy: 'Hip mobility for deep squats, sumo deadlift stance, and lunge depth without knee cave.',
     leftKey: 'hip_er_l', rightKey: 'hip_er_r',
     normalMin: 40, normalMax: 60, riskBelow: 40, unit: '°', rxKey: 'hip_er',
   },
   {
     key: 'hip_ir', label: 'Hip Internal Rotation',
-    bjjWhy: 'Guard passing, knee cuts, hip switches in scrambles',
+    bjjWhy: 'Protects your knees in squats and lunges. Low IR is a top driver of knee valgus under load.',
     leftKey: 'hip_ir_l', rightKey: 'hip_ir_r',
     normalMin: 30, normalMax: 45, riskBelow: 30, unit: '°', rxKey: 'hip_ir',
   },
   {
     key: 'hip_abd', label: 'Hip Abduction',
-    bjjWhy: 'Mount stability, open guard hooks, wide base positions',
+    bjjWhy: 'Wide stance squats, sumo pulls, and lateral lunges all live and die on this range.',
     leftKey: 'hip_abd_l', rightKey: 'hip_abd_r',
-    normalMin: 40, normalMax: 50, riskBelow: 30, unit: '°', rxKey: 'hip_abd',
+    normalMin: 35, normalMax: 45, riskBelow: 25, unit: '°', rxKey: 'hip_abd',
   },
   {
     key: 'hip_flex', label: 'Hip Flexion',
-    bjjWhy: 'Closed guard, armbar mechanics, guard retention',
+    bjjWhy: 'Squat depth. Without it you butt-wink, lose tightness, and leak power off the bottom.',
     leftKey: 'hip_flex_l', rightKey: 'hip_flex_r',
     normalMin: 100, normalMax: 120, riskBelow: 100, unit: '°', rxKey: 'hip_flex',
   },
   {
     key: 'shoulder_er', label: 'Shoulder External Rotation',
-    bjjWhy: 'Defending Americana / Kimura, grip fighting, frames',
+    bjjWhy: 'Your shoulder safety zone for benching, OHP, and behind-the-neck work. Low ER = high injury risk.',
     leftKey: 'shoulder_er_l', rightKey: 'shoulder_er_r',
     normalMin: 60, normalMax: 90, riskBelow: 60, unit: '°', rxKey: 'shoulder_er',
   },
   {
     key: 'shoulder_flex', label: 'Shoulder Flexion',
-    bjjWhy: 'Spider guard, overhead sweeps, rear naked choke mechanics',
+    bjjWhy: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
     leftKey: 'shoulder_flex_l', rightKey: 'shoulder_flex_r',
     normalMin: 140, normalMax: 180, riskBelow: 120, unit: '°', rxKey: 'shoulder_flex',
   },
   {
     key: 'ankle_df', label: 'Ankle Dorsiflexion',
-    bjjWhy: 'Base, balance, and proprioception in every standing position',
+    bjjWhy: 'Depth and stability in squats and lunges. Stiff ankles = forward shin = quads chew it, knees take it.',
     leftKey: 'ankle_df_l', rightKey: 'ankle_df_r',
     normalMin: 10, normalMax: 20, riskBelow: 10, unit: 'cm', rxKey: 'ankle_df',
   },
   {
-    key: 'cervical_rot', label: 'Cervical Rotation',
-    bjjWhy: 'Awareness, safety, and avoiding neck injury in scrambles',
-    leftKey: 'cervical_rot_l', rightKey: 'cervical_rot_r',
-    normalMin: 70, normalMax: 90, riskBelow: 60, unit: '°', rxKey: 'cervical_rot',
+    key: 'cervical_lat', label: 'Cervical Lateral Flexion',
+    bjjWhy: 'Neck strength holds bar position under heavy squats and rows without your head pulling off-line.',
+    leftKey: 'cervical_lat_l', rightKey: 'cervical_lat_r',
+    normalMin: 40, normalMax: 45, riskBelow: 30, unit: '°', rxKey: 'cervical_lat',
+  },
+  {
+    key: 'cervical_flex', label: 'Cervical Flexion',
+    bjjWhy: 'Protects your neck during shrugs and front-loaded work where the chin tucks under load.',
+    singleKey: 'cervical_flex',
+    normalMin: 45, normalMax: 60, riskBelow: 35, unit: '°', rxKey: 'cervical_flex',
+  },
+  {
+    key: 'cervical_ext', label: 'Cervical Extension',
+    bjjWhy: 'Deadlift lockout and overhead pressing — extension keeps a neutral, braced neck under the bar.',
+    singleKey: 'cervical_ext',
+    normalMin: 55, normalMax: 70, riskBelow: 40, unit: '°', rxKey: 'cervical_ext',
   },
   {
     key: 'lumbar', label: 'Lumbar Spine',
-    bjjWhy: 'Bridging, guard recovery, turtle position, back escapes',
+    bjjWhy: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings — low extension is what loads your discs.',
     singleKey: 'lumbar_flex',
     normalMin: 40, normalMax: 80, riskBelow: 40, unit: '°', rxKey: 'lumbar',
   },
   {
     key: 'thoracic_rot', label: 'Thoracic Rotation',
-    bjjWhy: 'Hip escapes, guard recovery, back take entries',
-    singleKey: 'thoracic_rot',
+    bjjWhy: 'Torso rotation drives Olympic lifts, rotational accessories, and overhead bar path.',
+    leftKey: 'thoracic_rot_l', rightKey: 'thoracic_rot_r',
     normalMin: 40, normalMax: 60, riskBelow: 30, unit: '°', rxKey: 'thoracic_rot',
   },
 ]
