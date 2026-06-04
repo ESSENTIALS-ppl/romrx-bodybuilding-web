@@ -25,7 +25,6 @@ const PRS_BILATERAL = [
   { l: 'shoulder_flex_l', r: 'shoulder_flex_r', riskBelow: 120, normalMin: 140 },
   { l: 'ankle_df_l',      r: 'ankle_df_r',      riskBelow: 10,  normalMin: 10  },
   { l: 'cervical_lat_l',  r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
-  { l: 'thoracic_rot_l',  r: 'thoracic_rot_r',  riskBelow: 30,  normalMin: 40  },
 ]
 const PRS_UNILATERAL = [
   { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },

@@ -18,7 +18,6 @@ const BILATERAL_JOINTS = [
   { l: 'shoulder_flex_l',r: 'shoulder_flex_r', riskBelow: 120, normalMin: 140 },
   { l: 'ankle_df_l',     r: 'ankle_df_r',     riskBelow: 10,  normalMin: 10  },
   { l: 'cervical_lat_l', r: 'cervical_lat_r', riskBelow: 30,  normalMin: 40  },
-  { l: 'thoracic_rot_l', r: 'thoracic_rot_r', riskBelow: 30,  normalMin: 40  },
 ]
 const UNILATERAL_JOINTS = [
   { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },
@@ -33,7 +32,6 @@ const JOINT_LABELS: Record<string, string> = {
   ankle_df: 'Ankle Dorsiflexion', cervical_lat: 'Cervical Lateral Flexion',
   cervical_flex: 'Cervical Flexion', cervical_ext: 'Cervical Extension',
   lumbar_flex: 'Lumbar Flexion', lumbar_ext: 'Lumbar Extension',
-  thoracic_rot: 'Thoracic Rotation',
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
