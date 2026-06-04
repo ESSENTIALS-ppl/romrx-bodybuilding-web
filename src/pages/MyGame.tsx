@@ -209,7 +209,7 @@ function programTierBorder(tier: string | null | undefined): string {
 //  Main page
 // ────────────────────────────────────────────────────────────────────────────
 
-type TabKey = 'generate' | 'templates' | 'mine' | 'library' | 'volume'
+type TabKey = 'generate' | 'mesocycle' | 'templates' | 'mine' | 'library' | 'volume'
 
 export function MyGame() {
   const { user } = useAuth()
@@ -242,6 +242,9 @@ export function MyGame() {
         <TabBtn active={tab === 'generate'} onClick={() => setTab('generate')} icon={Wand2}>
           Generate
         </TabBtn>
+        <TabBtn active={tab === 'mesocycle'} onClick={() => setTab('mesocycle')} icon={Activity}>
+          Mesocycle
+        </TabBtn>
         <TabBtn active={tab === 'templates'} onClick={() => setTab('templates')} icon={Layers}>
           Templates
         </TabBtn>
@@ -257,6 +260,7 @@ export function MyGame() {
       </div>
 
       {tab === 'generate' && <ProgramGenerator assessment={assessment} onSaved={() => setTab('mine')} />}
+      {tab === 'mesocycle' && <MesocyclePanel />}
       {tab === 'templates' && <TemplatesPanel userTier={userTier} />}
       {tab === 'mine' && <MyWorkoutsPanel userId={user?.id} />}
       {tab === 'library' && <ExerciseLibraryPanel assessment={assessment} />}
@@ -951,7 +955,6 @@ function VolumePanel() {
 
   return (
     <div className="space-y-4">
-      <MesocycleCard />
       <VolumeBoard
         landmarks={landmarks} setLandmarks={setLandmarks}
         volume={volume} setVolume={setVolume}
@@ -991,6 +994,7 @@ function MesocycleCard() {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [weeks, setWeeks] = useState(5)
+  const [name, setName] = useState('')
 
   useEffect(() => {
     let active = true
@@ -1011,11 +1015,13 @@ function MesocycleCard() {
   async function start() {
     setBusy(true)
     const { data: u } = await supabase.auth.getUser()
+    // Only one active block at a time — retire any prior active mesocycle first.
+    await supabase.from('mesocycles').update({ status: 'complete' }).eq('user_id', u.user?.id).eq('status', 'active')
     const { data, error } = await supabase
       .from('mesocycles')
       .insert({
         user_id: u.user?.id,
-        name: `${weeks}-Week Hypertrophy Block`,
+        name: name.trim() || `${weeks}-Week Hypertrophy Block`,
         sport: 'bodybuilding',
         weeks,
         current_week: 1,
@@ -1046,13 +1052,22 @@ function MesocycleCard() {
 
   if (!meso) {
     return (
-      <SectionCard title={<span className="flex items-center gap-2"><Activity size={15} className="text-miami" /> Mesocycle</span>}>
+      <SectionCard title={<span className="flex items-center gap-2"><Activity size={15} className="text-miami" /> Start a mesocycle</span>}>
         <p className="text-xs text-miami-text/70 mb-3">
-          Run a progressive block: ramp volume from MEV toward MRV week over week, drop RIR as you go, then deload. Your Volume board tracks you against the plan.
+          A mesocycle is a progressive training block. You ramp volume from MEV toward MRV week over week and drop RIR (push closer to failure) as you go, then deload on the final week. Your Volume board and ROMBot track you against the plan and set your target RIR automatically when you log.
         </p>
+
+        <label className="block text-[11px] font-semibold text-miami-text/60 mb-1">Block name (optional)</label>
+        <input
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder={`${weeks}-Week Hypertrophy Block`}
+          className="w-full text-sm rounded-lg px-3 py-2 mb-3"
+        />
+
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-miami-text/60">Length:</span>
-          {[4, 5, 6].map(w => (
+          {[3, 4, 5, 6, 8].map(w => (
             <button
               key={w}
               onClick={() => setWeeks(w)}
@@ -1072,6 +1087,7 @@ function MesocycleCard() {
             {busy ? 'Starting…' : 'Start block'}
           </button>
         </div>
+        <p className="text-[11px] text-miami-text/50 mt-2">The last week is always a deload (RIR 4–5, ~50% volume). A {weeks}-week block = {weeks - 1} working weeks + 1 deload.</p>
       </SectionCard>
     )
   }
@@ -1149,6 +1165,37 @@ function MesocycleCard() {
         </button>
       </div>
     </SectionCard>
+  )
+}
+
+// Mesocycle tab content: the block manager + a short explainer of how the
+// phases drive RIR and volume across the program.
+function MesocyclePanel() {
+  return (
+    <div className="space-y-4">
+      <MesocycleCard />
+      <SectionCard title="How your block progresses">
+        <div className="space-y-2 text-xs text-miami-text/80">
+          <div className="flex items-start gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-miami mt-1 shrink-0" />
+            <p><span className="font-semibold text-miami-text">Accumulation (early weeks)</span> — RIR 3–4, volume MEV → low MAV. Add 1–2 sets per muscle each week.</p>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-miami mt-1 shrink-0" />
+            <p><span className="font-semibold text-miami-text">Build (mid)</span> — RIR 2–3, volume mid-MAV. Push sets toward your MAV ceiling.</p>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-miami mt-1 shrink-0" />
+            <p><span className="font-semibold text-miami-text">Overreach (late)</span> — RIR 1–2, volume high-MAV → MRV. Hardest week before the deload.</p>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-yellow-tier mt-1 shrink-0" />
+            <p><span className="font-semibold text-miami-text">Deload (final week)</span> — RIR 4–5, ~50% volume. Recover, then start the next block.</p>
+          </div>
+          <p className="pt-1 text-miami-text/60">When you log a workout, the set’s target RIR is filled in from your current week automatically. ROMBot reads your block and tailors its coaching to the phase.</p>
+        </div>
+      </SectionCard>
+    </div>
   )
 }
 
