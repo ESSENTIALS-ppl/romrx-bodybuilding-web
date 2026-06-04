@@ -861,6 +861,217 @@ function VolumePanel() {
   const [loading, setLoading] = useState(true)
   const [days, setDays] = useState(7)
 
+  return (
+    <div className="space-y-4">
+      <MesocycleCard />
+      <VolumeBoard
+        landmarks={landmarks} setLandmarks={setLandmarks}
+        volume={volume} setVolume={setVolume}
+        loading={loading} setLoading={setLoading}
+        days={days} setDays={setDays}
+      />
+    </div>
+  )
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  Mesocycle builder (light v1) — progressive volume → deload, autoregulated
+// ────────────────────────────────────────────────────────────────────────────
+
+interface Mesocycle {
+  id: string
+  name: string
+  weeks: number
+  current_week: number
+  status: string
+  created_at: string
+}
+
+// Weekly target as % of your MAV range — ramp volume, then deload on the final week.
+function weekPlan(week: number, weeks: number): { rir: string; volume: string; note: string; deload: boolean } {
+  const isDeload = week === weeks
+  if (isDeload) return { rir: '4–5', volume: '~50%', note: 'Deload — halve sets, keep the bar moving', deload: true }
+  const progress = (week - 1) / Math.max(1, weeks - 1) // 0 .. 1 across accumulation
+  if (progress < 0.34) return { rir: '3–4', volume: 'MEV → low MAV', note: 'Accumulation — add 1–2 sets/muscle from last week', deload: false }
+  if (progress < 0.67) return { rir: '2–3', volume: 'mid MAV', note: 'Build — push sets toward your MAV ceiling', deload: false }
+  return { rir: '1–2', volume: 'high MAV → MRV', note: 'Overreach — near MRV, RIR 1–2, then deload next', deload: false }
+}
+
+function MesocycleCard() {
+  const [meso, setMeso] = useState<Mesocycle | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [weeks, setWeeks] = useState(5)
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      const { data } = await supabase
+        .from('mesocycles')
+        .select('id, name, weeks, current_week, status, created_at')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+      if (!active) return
+      setMeso((data?.[0] as Mesocycle) ?? null)
+      setLoading(false)
+    })()
+    return () => { active = false }
+  }, [])
+
+  async function start() {
+    setBusy(true)
+    const { data: u } = await supabase.auth.getUser()
+    const { data, error } = await supabase
+      .from('mesocycles')
+      .insert({
+        user_id: u.user?.id,
+        name: `${weeks}-Week Hypertrophy Block`,
+        sport: 'bodybuilding',
+        weeks,
+        current_week: 1,
+        status: 'active',
+      })
+      .select('id, name, weeks, current_week, status, created_at')
+      .single()
+    setBusy(false)
+    if (!error && data) setMeso(data as Mesocycle)
+  }
+
+  async function advance(dir: 1 | -1) {
+    if (!meso) return
+    const next = Math.min(meso.weeks, Math.max(1, meso.current_week + dir))
+    setMeso({ ...meso, current_week: next })
+    await supabase.from('mesocycles').update({ current_week: next }).eq('id', meso.id)
+  }
+
+  async function complete() {
+    if (!meso) return
+    setBusy(true)
+    await supabase.from('mesocycles').update({ status: 'complete' }).eq('id', meso.id)
+    setMeso(null)
+    setBusy(false)
+  }
+
+  if (loading) return null
+
+  if (!meso) {
+    return (
+      <SectionCard title={<span className="flex items-center gap-2"><Activity size={15} className="text-miami" /> Mesocycle</span>}>
+        <p className="text-xs text-miami-text/70 mb-3">
+          Run a progressive block: ramp volume from MEV toward MRV week over week, drop RIR as you go, then deload. Your Volume board tracks you against the plan.
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-miami-text/60">Length:</span>
+          {[4, 5, 6].map(w => (
+            <button
+              key={w}
+              onClick={() => setWeeks(w)}
+              className={cn(
+                'text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors',
+                weeks === w ? 'bg-miami text-white' : 'bg-miami-violet/15 text-miami-text/80 hover:bg-miami-violet/30',
+              )}
+            >
+              {w} wk
+            </button>
+          ))}
+          <button
+            onClick={start}
+            disabled={busy}
+            className="ml-auto text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-miami to-miami-violet text-white disabled:opacity-50"
+          >
+            {busy ? 'Starting…' : 'Start block'}
+          </button>
+        </div>
+      </SectionCard>
+    )
+  }
+
+  const plan = weekPlan(meso.current_week, meso.weeks)
+  return (
+    <SectionCard
+      title={
+        <span className="flex items-center gap-2">
+          <Activity size={15} className="text-miami" /> {meso.name}
+          <span className="text-xs font-normal text-miami-text/60">· Week {meso.current_week} of {meso.weeks}</span>
+        </span>
+      }
+    >
+      {/* Week dots */}
+      <div className="flex items-center gap-1.5 mb-3">
+        {Array.from({ length: meso.weeks }).map((_, i) => {
+          const wk = i + 1
+          const isDeload = wk === meso.weeks
+          return (
+            <div
+              key={wk}
+              className={cn(
+                'flex-1 h-2 rounded-full',
+                wk < meso.current_week ? 'bg-green-tier'
+                : wk === meso.current_week ? (isDeload ? 'bg-yellow-tier' : 'bg-miami')
+                : isDeload ? 'bg-yellow-tier/25' : 'bg-miami-violet/20',
+              )}
+              title={isDeload ? `Week ${wk} · Deload` : `Week ${wk}`}
+            />
+          )
+        })}
+      </div>
+
+      <div className={cn(
+        'rounded-lg px-3 py-2 mb-3 border',
+        plan.deload ? 'bg-yellow-tier-bg border-yellow-tier/30' : 'bg-miami-violet/10 border-miami-violet/20',
+      )}>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+          <span className="text-miami-text/60">Target RIR <span className="font-bold text-miami-text">{plan.rir}</span></span>
+          <span className="text-miami-text/60">Volume <span className="font-bold text-miami-text">{plan.volume}</span></span>
+        </div>
+        <p className={cn('text-xs mt-1 font-medium', plan.deload ? 'text-yellow-tier' : 'text-miami-text/80')}>{plan.note}</p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => advance(-1)}
+          disabled={meso.current_week <= 1}
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-miami-violet/15 text-miami-text/80 hover:bg-miami-violet/30 disabled:opacity-40"
+        >
+          ← Prev week
+        </button>
+        {meso.current_week < meso.weeks ? (
+          <button
+            onClick={() => advance(1)}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-miami text-white hover:bg-miami-dark"
+          >
+            Next week →
+          </button>
+        ) : (
+          <button
+            onClick={complete}
+            disabled={busy}
+            className="text-xs font-bold px-3 py-1.5 rounded-lg bg-green-tier-bg text-green-tier border border-green-tier/40 hover:bg-green-tier/20 disabled:opacity-50"
+          >
+            {busy ? 'Finishing…' : 'Complete block'}
+          </button>
+        )}
+        <button
+          onClick={complete}
+          className="ml-auto text-xs text-miami-text/40 hover:text-red-tier"
+        >
+          End early
+        </button>
+      </div>
+    </SectionCard>
+  )
+}
+
+function VolumeBoard({
+  landmarks, setLandmarks, volume, setVolume, loading, setLoading, days, setDays,
+}: {
+  landmarks: VolumeLandmark[]; setLandmarks: (v: VolumeLandmark[]) => void
+  volume: Record<string, number>; setVolume: (v: Record<string, number>) => void
+  loading: boolean; setLoading: (v: boolean) => void
+  days: number; setDays: (v: number) => void
+}) {
+
   useEffect(() => {
     let active = true
     setLoading(true)
@@ -879,6 +1090,7 @@ function VolumePanel() {
       setLoading(false)
     })()
     return () => { active = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days])
 
   const rows = useMemo(() => {
