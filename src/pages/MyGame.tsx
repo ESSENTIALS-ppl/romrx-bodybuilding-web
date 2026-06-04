@@ -15,8 +15,9 @@ import { Spinner } from '../components/Spinner'
 import { cn, bbTierLabel, bbTierColor } from '../lib/utils'
 import {
   Dumbbell, Layers, BookOpen, Copy, Check, ChevronRight,
-  Plus, Search, Filter, Sparkles, AlertTriangle, BarChart3, ArrowRightLeft, Activity,
+  Plus, Search, Filter, Sparkles, AlertTriangle, BarChart3, ArrowRightLeft, Activity, Wand2,
 } from 'lucide-react'
+import { ProgramGenerator } from '../components/ProgramGenerator'
 
 // ────────────────────────────────────────────────────────────────────────────
 //  Types
@@ -208,12 +209,12 @@ function programTierBorder(tier: string | null | undefined): string {
 //  Main page
 // ────────────────────────────────────────────────────────────────────────────
 
-type TabKey = 'templates' | 'mine' | 'library' | 'volume'
+type TabKey = 'generate' | 'templates' | 'mine' | 'library' | 'volume'
 
 export function MyGame() {
   const { user } = useAuth()
   const { profile, assessment, loading: profileLoading } = useProfile(user?.id)
-  const [tab, setTab] = useState<TabKey>('templates')
+  const [tab, setTab] = useState<TabKey>('generate')
 
   if (profileLoading) return <Spinner />
 
@@ -237,7 +238,10 @@ export function MyGame() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-miami-light">
+      <div className="flex gap-1 border-b border-miami-light overflow-x-auto">
+        <TabBtn active={tab === 'generate'} onClick={() => setTab('generate')} icon={Wand2}>
+          Generate
+        </TabBtn>
         <TabBtn active={tab === 'templates'} onClick={() => setTab('templates')} icon={Layers}>
           Templates
         </TabBtn>
@@ -252,6 +256,7 @@ export function MyGame() {
         </TabBtn>
       </div>
 
+      {tab === 'generate' && <ProgramGenerator assessment={assessment} onSaved={() => setTab('mine')} />}
       {tab === 'templates' && <TemplatesPanel userTier={userTier} />}
       {tab === 'mine' && <MyWorkoutsPanel userId={user?.id} />}
       {tab === 'library' && <ExerciseLibraryPanel assessment={assessment} />}
@@ -855,11 +860,14 @@ function zoneBarColor(zone: VolumeZone): string {
   }
 }
 
+type VolumeMode = 'logged' | 'planned'
+
 function VolumePanel() {
   const [landmarks, setLandmarks] = useState<VolumeLandmark[]>([])
   const [volume, setVolume] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [days, setDays] = useState(7)
+  const [mode, setMode] = useState<VolumeMode>('logged')
 
   return (
     <div className="space-y-4">
@@ -869,6 +877,7 @@ function VolumePanel() {
         volume={volume} setVolume={setVolume}
         loading={loading} setLoading={setLoading}
         days={days} setDays={setDays}
+        mode={mode} setMode={setMode}
       />
     </div>
   )
@@ -1064,34 +1073,38 @@ function MesocycleCard() {
 }
 
 function VolumeBoard({
-  landmarks, setLandmarks, volume, setVolume, loading, setLoading, days, setDays,
+  landmarks, setLandmarks, volume, setVolume, loading, setLoading, days, setDays, mode, setMode,
 }: {
   landmarks: VolumeLandmark[]; setLandmarks: (v: VolumeLandmark[]) => void
   volume: Record<string, number>; setVolume: (v: Record<string, number>) => void
   loading: boolean; setLoading: (v: boolean) => void
   days: number; setDays: (v: number) => void
+  mode: VolumeMode; setMode: (v: VolumeMode) => void
 }) {
 
   useEffect(() => {
     let active = true
     setLoading(true)
     ;(async () => {
-      const [{ data: lm }, { data: vol }] = await Promise.all([
+      const [{ data: lm }, volRes] = await Promise.all([
         supabase.from('muscle_volume_landmarks').select('muscle, mv, mev, mav_low, mav_high, mrv'),
-        supabase.rpc('weekly_muscle_volume', { p_days: days }),
+        mode === 'planned'
+          ? supabase.rpc('program_planned_volume', { p_program: null })
+          : supabase.rpc('weekly_muscle_volume', { p_days: days }),
       ])
       if (!active) return
       setLandmarks((lm as VolumeLandmark[]) ?? [])
       const map: Record<string, number> = {}
-      for (const row of (vol as { muscle: string; working_sets: number }[]) ?? []) {
-        map[row.muscle] = Number(row.working_sets)
+      const setsKey = mode === 'planned' ? 'planned_sets' : 'working_sets'
+      for (const row of (volRes.data as Record<string, unknown>[]) ?? []) {
+        map[row.muscle as string] = Number(row[setsKey])
       }
       setVolume(map)
       setLoading(false)
     })()
     return () => { active = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [days])
+  }, [days, mode])
 
   const rows = useMemo(() => {
     return [...landmarks]
@@ -1105,24 +1118,43 @@ function VolumeBoard({
 
   return (
     <div className="space-y-4">
+      {/* Logged vs Planned toggle */}
+      <div className="flex items-center gap-1 p-0.5 rounded-lg bg-miami-violet/10 w-fit">
+        {(['logged', 'planned'] as VolumeMode[]).map(m => (
+          <button
+            key={m}
+            onClick={() => setMode(m)}
+            className={cn(
+              'text-xs font-semibold px-3 py-1.5 rounded-md transition-colors capitalize',
+              mode === m ? 'bg-miami text-white' : 'text-miami-text/70 hover:text-miami',
+            )}
+          >
+            {m === 'logged' ? 'Logged' : 'Planned (program)'}
+          </button>
+        ))}
+      </div>
+
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-miami-text/70">
-          <span className="font-bold text-miami-text">{totalSets}</span> working sets in the last {days} days
+          <span className="font-bold text-miami-text">{totalSets}</span>{' '}
+          {mode === 'planned' ? 'planned sets/week in your program' : `working sets in the last ${days} days`}
         </p>
-        <div className="flex items-center gap-1">
-          {[7, 14].map(d => (
-            <button
-              key={d}
-              onClick={() => setDays(d)}
-              className={cn(
-                'text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors',
-                days === d ? 'bg-miami text-white' : 'bg-miami-violet/15 text-miami-text/80 hover:bg-miami-violet/30',
-              )}
-            >
-              {d}d
-            </button>
-          ))}
-        </div>
+        {mode === 'logged' && (
+          <div className="flex items-center gap-1">
+            {[7, 14].map(d => (
+              <button
+                key={d}
+                onClick={() => setDays(d)}
+                className={cn(
+                  'text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors',
+                  days === d ? 'bg-miami text-white' : 'bg-miami-violet/15 text-miami-text/80 hover:bg-miami-violet/30',
+                )}
+              >
+                {d}d
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Legend */}
@@ -1133,9 +1165,14 @@ function VolumeBoard({
         <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-3 rounded-sm bg-red-tier" /> Over MRV</span>
       </div>
 
-      {totalSets === 0 && (
+      {totalSets === 0 && mode === 'logged' && (
         <div className="rounded-lg bg-miami-violet/10 border border-miami-violet/20 px-3 py-2 text-xs text-miami-text/70">
           No working sets logged yet in this window. Log a workout and your weekly volume per muscle will populate here vs scientific MEV/MAV/MRV landmarks.
+        </div>
+      )}
+      {totalSets === 0 && mode === 'planned' && (
+        <div className="rounded-lg bg-miami-violet/10 border border-miami-violet/20 px-3 py-2 text-xs text-miami-text/70">
+          No generated program yet. Head to the Generate tab to auto-build a ROM-tuned program — its planned weekly volume per muscle will show here vs your MEV/MAV/MRV landmarks.
         </div>
       )}
 
