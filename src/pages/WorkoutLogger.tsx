@@ -24,6 +24,7 @@ interface LoggedSet {
   weight_kg: number | null
   reps: number | null
   rpe: number | null
+  rir: number | null      // Reps in reserve — preferred proximity-to-failure metric for hypertrophy
   is_warmup: boolean
   saved: boolean
   pr?: boolean
@@ -142,7 +143,7 @@ export function WorkoutLogger() {
       ...b,
       {
         exercise: ex,
-        sets: [{ set_index: 1, weight_kg: null, reps: null, rpe: null, is_warmup: false, saved: false }],
+        sets: [{ set_index: 1, weight_kg: null, reps: null, rpe: null, rir: null, is_warmup: false, saved: false }],
         history: (history ?? []) as ExerciseBlock['history'],
       },
     ])
@@ -163,6 +164,7 @@ export function WorkoutLogger() {
             weight_kg: last?.weight_kg ?? null,
             reps: last?.reps ?? null,
             rpe: null,
+            rir: null,
             is_warmup: false,
             saved: false,
           },
@@ -203,7 +205,7 @@ export function WorkoutLogger() {
       p_weight_kg: weightKg,
       p_reps: set.reps,
       p_rpe: set.rpe,
-      p_rir: null,
+      p_rir: set.rir,
       p_is_warmup: set.is_warmup,
       p_notes: null,
       p_technique_id: block.exercise.id,
@@ -283,12 +285,22 @@ export function WorkoutLogger() {
         const lastBest = block.history && block.history.length > 0
           ? Math.max(...block.history.map(h => h.estimated_1rm_kg))
           : null
+        // Most recent session for inline "last time" reference.
+        const lastSession = block.history && block.history.length > 0
+          ? [...block.history].sort((a, b) => +new Date(b.performed_at) - +new Date(a.performed_at))[0]
+          : null
+        const fmtW = (kg: number) => Math.round(unit === 'lb' ? kg / 0.453592 : kg)
         return (
           <SectionCard key={bi}>
             <div className="flex items-start justify-between mb-3">
               <div>
                 <div className="font-bold text-miami-text">{block.exercise.name}</div>
                 <div className="text-xs text-miami-text/60 mt-0.5">{block.exercise.subcategory ?? 'General'}</div>
+                {lastSession && (
+                  <div className="text-[11px] text-miami-violet mt-1 inline-flex items-center gap-1">
+                    <TrendingUp size={11} /> Last time: {fmtW(lastSession.weight_kg)} {unit} × {lastSession.reps}
+                  </div>
+                )}
               </div>
               {lastBest != null && (
                 <div className="text-right">
@@ -306,6 +318,7 @@ export function WorkoutLogger() {
                   <th className="text-left pb-2 w-8">#</th>
                   <th className="text-left pb-2">Weight ({unit})</th>
                   <th className="text-left pb-2">Reps</th>
+                  <th className="text-left pb-2" title="Reps in reserve — how many reps you left in the tank">RIR</th>
                   <th className="text-left pb-2">RPE</th>
                   <th className="text-left pb-2 w-12"></th>
                   <th className="text-left pb-2 w-8"></th>
@@ -345,6 +358,20 @@ export function WorkoutLogger() {
                         onChange={e => updateSet(bi, si, { reps: e.target.value === '' ? null : Number(e.target.value), saved: false })}
                         disabled={s.saved}
                         className="w-16 bg-miami-bg border border-miami-violet/20 rounded-md px-2 py-1 text-miami-text tabular-nums focus:border-miami-violet outline-none disabled:opacity-60"
+                      />
+                    </td>
+                    <td className="py-2">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        step="1"
+                        min="0"
+                        max="10"
+                        placeholder="RIR"
+                        value={s.rir ?? ''}
+                        onChange={e => updateSet(bi, si, { rir: e.target.value === '' ? null : Number(e.target.value), saved: false })}
+                        disabled={s.saved}
+                        className="w-14 bg-miami-bg border border-miami-violet/20 rounded-md px-2 py-1 text-miami-text tabular-nums focus:border-miami-violet outline-none disabled:opacity-60"
                       />
                     </td>
                     <td className="py-2">

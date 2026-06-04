@@ -15,7 +15,7 @@ import { Spinner } from '../components/Spinner'
 import { cn, bbTierLabel, bbTierColor } from '../lib/utils'
 import {
   Dumbbell, Layers, BookOpen, Copy, Check, ChevronRight,
-  Plus, Search, Filter, Sparkles,
+  Plus, Search, Filter, Sparkles, AlertTriangle, BarChart3, ArrowRightLeft, Activity,
 } from 'lucide-react'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -70,6 +70,31 @@ interface UnlockedTechnique {
   cervical_lat_min: number | null
   cervical_flex_min: number | null
   cervical_ext_min: number | null
+  // Hypertrophy muscle / stretch metadata (BB build).
+  primary_muscle: string | null
+  secondary_muscles: string[] | null
+  stretch_emphasis: string | null      // 'high' | 'medium' | 'low'
+  limiting_joint: string | null        // 'ankle_df' | 'hip_flex' | 'shoulder_flex' | 'shoulder_er'
+  rom_note: string | null
+}
+
+// Human-readable joint labels for ROM alerts.
+const JOINT_LABEL: Record<string, string> = {
+  ankle_df: 'ankle dorsiflexion',
+  hip_flex: 'hip flexion',
+  shoulder_flex: 'shoulder flexion',
+  shoulder_er: 'shoulder external rotation',
+  hip_er: 'hip external rotation',
+  hip_ir: 'hip internal rotation',
+  hip_abd: 'hip abduction',
+  lumbar_flex: 'lumbar flexion',
+  lumbar_ext: 'lumbar extension',
+}
+
+const STRETCH_LABEL: Record<string, { label: string; cls: string }> = {
+  high:   { label: 'High stretch', cls: 'bg-miami/20 text-miami' },
+  medium: { label: 'Mod stretch',  cls: 'bg-miami-violet/20 text-miami-violet' },
+  low:    { label: 'Peak / short', cls: 'bg-miami-violet/10 text-miami-text/60' },
 }
 
 // Each tuple: (assessment best-side value getter, technique min column)
@@ -183,7 +208,7 @@ function programTierBorder(tier: string | null | undefined): string {
 //  Main page
 // ────────────────────────────────────────────────────────────────────────────
 
-type TabKey = 'templates' | 'mine' | 'library'
+type TabKey = 'templates' | 'mine' | 'library' | 'volume'
 
 export function MyGame() {
   const { user } = useAuth()
@@ -222,11 +247,15 @@ export function MyGame() {
         <TabBtn active={tab === 'library'} onClick={() => setTab('library')} icon={BookOpen}>
           Exercise Library
         </TabBtn>
+        <TabBtn active={tab === 'volume'} onClick={() => setTab('volume')} icon={BarChart3}>
+          Volume
+        </TabBtn>
       </div>
 
       {tab === 'templates' && <TemplatesPanel userTier={userTier} />}
       {tab === 'mine' && <MyWorkoutsPanel userId={user?.id} />}
       {tab === 'library' && <ExerciseLibraryPanel assessment={assessment} />}
+      {tab === 'volume' && <VolumePanel />}
     </div>
   )
 }
@@ -543,6 +572,7 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
   const [cat, setCat] = useState<Category>('All')
   const [q, setQ] = useState('')
   const [readyOnly, setReadyOnly] = useState(false)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   useEffect(() => {
     let active = true
@@ -553,7 +583,7 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
     // client-side using the user's assessment.
     supabase
       .from('unlocked_techniques_v')
-      .select('id, code, name, category, subcategory, sport, tier, hip_er_min, hip_ir_min, hip_abd_min, hip_flex_min, shoulder_er_min, shoulder_flex_min, ankle_df_min, lumbar_flex_min, lumbar_ext_min, cervical_lat_min, cervical_flex_min, cervical_ext_min')
+      .select('id, code, name, category, subcategory, sport, tier, hip_er_min, hip_ir_min, hip_abd_min, hip_flex_min, shoulder_er_min, shoulder_flex_min, ankle_df_min, lumbar_flex_min, lumbar_ext_min, cervical_lat_min, cervical_flex_min, cervical_ext_min, primary_muscle, secondary_muscles, stretch_emphasis, limiting_joint, rom_note')
       .eq('sport', 'bodybuilding')
       .order('category')
       .order('name')
@@ -571,6 +601,32 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
     () => items.map(it => ({ it, pct: computeReadiness(it, assessment) })),
     [items, assessment],
   )
+
+  // Find a same-muscle substitution with a LOWER stretch demand (and ideally
+  // no requirement on the limiting joint). This is the ROM differentiator:
+  // when a lifter can't reach the stretch, route them to a movement that hits
+  // the same muscle without the mobility tax.
+  const findSubstitution = useMemo(() => {
+    const stretchRank: Record<string, number> = { high: 3, medium: 2, low: 1 }
+    return (target: UnlockedTechnique): UnlockedTechnique | null => {
+      if (!target.primary_muscle) return null
+      const targetStretch = stretchRank[target.stretch_emphasis ?? 'medium'] ?? 2
+      const candidates = items
+        .filter(c =>
+          c.id !== target.id &&
+          c.primary_muscle === target.primary_muscle &&
+          // Lower stretch demand than the target
+          (stretchRank[c.stretch_emphasis ?? 'medium'] ?? 2) < targetStretch &&
+          // And readiness is green/neutral for the user
+          (computeReadiness(c, assessment) ?? 100) >= 90,
+        )
+        // Prefer the candidate that still keeps the most stretch (closest below)
+        .sort((a, b) =>
+          (stretchRank[b.stretch_emphasis ?? 'low'] ?? 1) - (stretchRank[a.stretch_emphasis ?? 'low'] ?? 1),
+        )
+      return candidates[0] ?? null
+    }
+  }, [items, assessment])
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase()
@@ -658,47 +714,263 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        {filtered.map(({ it, pct }) => (
-          <div
-            key={it.id}
-            className={cn(
-              'rounded-xl bg-miami-ink/70 border border-miami-violet/20 p-3',
-              readinessBorder(pct),
-            )}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <p className="text-sm font-medium text-miami-text leading-tight">{it.name}</p>
-              {pct != null ? (
-                <span
-                  className={cn(
-                    'text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded shrink-0',
-                    readinessBgClass(pct),
+        {filtered.map(({ it, pct }) => {
+          const stretch = it.stretch_emphasis ? STRETCH_LABEL[it.stretch_emphasis] : null
+          const isRed = pct != null && pct < 75
+          const isExpanded = expandedId === it.id
+          const sub = isRed ? findSubstitution(it) : null
+          const limiting = it.limiting_joint
+          const jointLabel = limiting ? (JOINT_LABEL[limiting] ?? limiting) : null
+          return (
+            <div
+              key={it.id}
+              className={cn(
+                'rounded-xl bg-miami-ink/70 border border-miami-violet/20 p-3 transition-shadow',
+                readinessBorder(pct),
+                isRed && 'cursor-pointer hover:shadow-[0_0_18px_-6px_rgba(255,45,120,0.5)]',
+              )}
+              onClick={() => { if (isRed) setExpandedId(isExpanded ? null : it.id) }}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-medium text-miami-text leading-tight">{it.name}</p>
+                {pct != null ? (
+                  <span
+                    className={cn(
+                      'text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded shrink-0',
+                      readinessBgClass(pct),
+                    )}
+                    title={readinessLabel(pct) ?? undefined}
+                  >
+                    {pct}%
+                  </span>
+                ) : it.tier && (
+                  <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-1.5 py-0.5 rounded shrink-0">
+                    {it.tier[0]}
+                  </span>
+                )}
+              </div>
+
+              {/* Muscle + stretch-emphasis badges (the hypertrophy layer) */}
+              <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                {it.primary_muscle && (
+                  <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-miami-violet/15 text-miami-text/80">
+                    {it.primary_muscle}
+                  </span>
+                )}
+                {stretch && (
+                  <span className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded', stretch.cls)}>
+                    {stretch.label}
+                  </span>
+                )}
+              </div>
+
+              <p className="text-[11px] text-miami-text/60 mt-1">
+                {it.category}{it.subcategory ? ` · ${it.subcategory}` : ''}
+                {pct != null && (
+                  <span className={cn('ml-1.5 font-semibold', readinessTextClass(pct))}>
+                    · {readinessLabel(pct)}
+                  </span>
+                )}
+              </p>
+
+              {/* ROM differentiator — only when readiness is red */}
+              {isRed && (
+                <div className="mt-2 flex items-center gap-1 text-[11px] font-semibold text-red-tier">
+                  <AlertTriangle size={12} />
+                  Reduced stretch stimulus
+                  <ChevronRight size={12} className={cn('ml-auto transition-transform', isExpanded && 'rotate-90')} />
+                </div>
+              )}
+
+              {isRed && isExpanded && (
+                <div className="mt-2 pt-2 border-t border-red-tier/20 space-y-2 text-[11px]" onClick={e => e.stopPropagation()}>
+                  <p className="text-miami-text/80 leading-snug">
+                    Your{jointLabel ? ` ${jointLabel}` : ' mobility'} limits the bottom of <span className="font-semibold text-miami-text">{it.name}</span>
+                    {it.stretch_emphasis === 'high' && <> — and this is a <span className="text-miami font-semibold">high-stretch</span> movement, so you lose the most growth-driving part of the rep.</>}
+                    {it.stretch_emphasis !== 'high' && <>, cutting the lengthened-position stimulus.</>}
+                  </p>
+                  {it.rom_note && (
+                    <p className="flex items-start gap-1 text-miami-violet">
+                      <Activity size={12} className="mt-0.5 shrink-0" />
+                      <span><span className="font-semibold">Mobility Rx:</span> {it.rom_note}</span>
+                    </p>
                   )}
-                  title={readinessLabel(pct) ?? undefined}
-                >
-                  {pct}%
-                </span>
-              ) : it.tier && (
-                <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-1.5 py-0.5 rounded shrink-0">
-                  {it.tier[0]}
-                </span>
+                  {sub ? (
+                    <p className="flex items-start gap-1 text-green-tier">
+                      <ArrowRightLeft size={12} className="mt-0.5 shrink-0" />
+                      <span><span className="font-semibold">Swap to:</span> {sub.name} — same {it.primary_muscle} target, hits it without the {jointLabel ?? 'mobility'} demand.</span>
+                    </p>
+                  ) : (
+                    <p className="flex items-start gap-1 text-miami-text/60">
+                      <ArrowRightLeft size={12} className="mt-0.5 shrink-0" />
+                      <span>Reduce range to a pain-free depth and load the partial — or work the mobility Rx first.</span>
+                    </p>
+                  )}
+                </div>
               )}
             </div>
-            <p className="text-[11px] text-miami-text/60 mt-0.5">
-              {it.category}{it.subcategory ? ` · ${it.subcategory}` : ''}
-              {pct != null && (
-                <span className={cn('ml-1.5 font-semibold', readinessTextClass(pct))}>
-                  · {readinessLabel(pct)}
-                </span>
-              )}
-            </p>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {filtered.length === 0 && (
         <p className="text-sm text-miami-text/60 text-center py-8">No exercises match your filters.</p>
       )}
+    </div>
+  )
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+//  Volume panel — weekly sets/muscle vs MEV/MAV/MRV landmarks
+//  This is the #1 unmet need in hypertrophy apps (per research): per-muscle
+//  weekly volume tracked against scientific landmarks.
+// ────────────────────────────────────────────────────────────────────────────
+
+interface VolumeLandmark {
+  muscle: string
+  mv: number
+  mev: number
+  mav_low: number
+  mav_high: number
+  mrv: number
+}
+
+type VolumeZone = 'under' | 'maintenance' | 'productive' | 'high' | 'overreaching'
+
+function classifyVolume(sets: number, lm: VolumeLandmark): { zone: VolumeZone; label: string; cls: string } {
+  if (sets < lm.mev)        return { zone: 'under',        label: 'Below growth',  cls: 'text-miami-text/50' }
+  if (sets < lm.mav_low)    return { zone: 'maintenance',  label: 'Maintenance',   cls: 'text-yellow-tier' }
+  if (sets <= lm.mav_high)  return { zone: 'productive',   label: 'Productive',    cls: 'text-green-tier' }
+  if (sets <= lm.mrv)       return { zone: 'high',         label: 'High',          cls: 'text-miami' }
+  return { zone: 'overreaching', label: 'Over MRV', cls: 'text-red-tier' }
+}
+
+function zoneBarColor(zone: VolumeZone): string {
+  switch (zone) {
+    case 'under':        return 'bg-miami-text/30'
+    case 'maintenance':  return 'bg-yellow-tier'
+    case 'productive':   return 'bg-green-tier'
+    case 'high':         return 'bg-miami'
+    case 'overreaching': return 'bg-red-tier'
+  }
+}
+
+function VolumePanel() {
+  const [landmarks, setLandmarks] = useState<VolumeLandmark[]>([])
+  const [volume, setVolume] = useState<Record<string, number>>({})
+  const [loading, setLoading] = useState(true)
+  const [days, setDays] = useState(7)
+
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    ;(async () => {
+      const [{ data: lm }, { data: vol }] = await Promise.all([
+        supabase.from('muscle_volume_landmarks').select('muscle, mv, mev, mav_low, mav_high, mrv'),
+        supabase.rpc('weekly_muscle_volume', { p_days: days }),
+      ])
+      if (!active) return
+      setLandmarks((lm as VolumeLandmark[]) ?? [])
+      const map: Record<string, number> = {}
+      for (const row of (vol as { muscle: string; working_sets: number }[]) ?? []) {
+        map[row.muscle] = Number(row.working_sets)
+      }
+      setVolume(map)
+      setLoading(false)
+    })()
+    return () => { active = false }
+  }, [days])
+
+  const rows = useMemo(() => {
+    return [...landmarks]
+      .map(lm => ({ lm, sets: volume[lm.muscle] ?? 0 }))
+      .sort((a, b) => b.sets - a.sets || a.lm.muscle.localeCompare(b.lm.muscle))
+  }, [landmarks, volume])
+
+  const totalSets = useMemo(() => Object.values(volume).reduce((s, v) => s + v, 0), [volume])
+
+  if (loading) return <Spinner />
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-miami-text/70">
+          <span className="font-bold text-miami-text">{totalSets}</span> working sets in the last {days} days
+        </p>
+        <div className="flex items-center gap-1">
+          {[7, 14].map(d => (
+            <button
+              key={d}
+              onClick={() => setDays(d)}
+              className={cn(
+                'text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors',
+                days === d ? 'bg-miami text-white' : 'bg-miami-violet/15 text-miami-text/80 hover:bg-miami-violet/30',
+              )}
+            >
+              {d}d
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap items-center gap-3 text-[11px] text-miami-text/70">
+        <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-3 rounded-sm bg-yellow-tier" /> Maintenance (MEV→MAV)</span>
+        <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-3 rounded-sm bg-green-tier" /> Productive (MAV)</span>
+        <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-3 rounded-sm bg-miami" /> High (→MRV)</span>
+        <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-3 rounded-sm bg-red-tier" /> Over MRV</span>
+      </div>
+
+      {totalSets === 0 && (
+        <div className="rounded-lg bg-miami-violet/10 border border-miami-violet/20 px-3 py-2 text-xs text-miami-text/70">
+          No working sets logged yet in this window. Log a workout and your weekly volume per muscle will populate here vs scientific MEV/MAV/MRV landmarks.
+        </div>
+      )}
+
+      <SectionCard>
+        <div className="space-y-3">
+          {rows.map(({ lm, sets }) => {
+            const c = classifyVolume(sets, lm)
+            // Scale the bar to MRV (with a little headroom).
+            const scaleMax = Math.max(lm.mrv * 1.1, sets)
+            const pct = scaleMax > 0 ? Math.min(100, (sets / scaleMax) * 100) : 0
+            const mevPct = scaleMax > 0 ? (lm.mev / scaleMax) * 100 : 0
+            const mavLowPct = scaleMax > 0 ? (lm.mav_low / scaleMax) * 100 : 0
+            const mavHighPct = scaleMax > 0 ? (lm.mav_high / scaleMax) * 100 : 0
+            const mrvPct = scaleMax > 0 ? (lm.mrv / scaleMax) * 100 : 0
+            return (
+              <div key={lm.muscle}>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="font-semibold text-miami-text">{lm.muscle}</span>
+                  <span className="tabular-nums">
+                    <span className="font-bold text-miami-text">{sets}</span>
+                    <span className="text-miami-text/40"> / {lm.mav_low}–{lm.mav_high} sets</span>
+                    <span className={cn('ml-2 font-semibold', c.cls)}>{c.label}</span>
+                  </span>
+                </div>
+                <div className="relative h-3 rounded-full bg-miami-bg overflow-hidden">
+                  {/* MAV productive band shading */}
+                  <div
+                    className="absolute inset-y-0 bg-green-tier/10"
+                    style={{ left: `${mavLowPct}%`, width: `${Math.max(0, mavHighPct - mavLowPct)}%` }}
+                  />
+                  {/* Actual volume fill */}
+                  <div className={cn('absolute inset-y-0 left-0 rounded-full', zoneBarColor(c.zone))} style={{ width: `${pct}%` }} />
+                  {/* Landmark tick marks */}
+                  {[mevPct, mavLowPct, mavHighPct, mrvPct].map((p, i) => (
+                    <div key={i} className="absolute inset-y-0 w-px bg-miami-text/30" style={{ left: `${p}%` }} />
+                  ))}
+                </div>
+                <div className="flex justify-between text-[9px] text-miami-text/40 mt-0.5 tabular-nums">
+                  <span>MEV {lm.mev}</span>
+                  <span>MAV {lm.mav_low}–{lm.mav_high}</span>
+                  <span>MRV {lm.mrv}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </SectionCard>
     </div>
   )
 }
