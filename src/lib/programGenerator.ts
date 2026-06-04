@@ -211,17 +211,16 @@ interface SessionSlot {
 
 function buildSchedule(split: SplitType, days: number): SessionSlot[] {
   const slots: SessionSlot[] = []
-  const tag = (i: number) => String.fromCharCode(65 + i) // A, B, C…
-
+  // Plain-language session focus — "Day N" lives in day_index; focus is the
+  // human-readable muscle focus (no A/B letters, no jargon).
   if (split === 'full_body') {
     for (let i = 0; i < days; i++) {
-      slots.push({ label: `Full Body ${i + 1}`, split_type: 'full_body', categories: ['Push', 'Pull', 'Lower', ...(i % 2 === 0 ? ['Core' as const] : [])] })
+      slots.push({ label: 'Full Body', split_type: 'full_body', categories: ['Push', 'Pull', 'Lower', ...(i % 2 === 0 ? ['Core' as const] : [])] })
     }
   } else if (split === 'upper_lower') {
-    let u = 0, l = 0
     for (let i = 0; i < days; i++) {
-      if (i % 2 === 0) slots.push({ label: `Upper ${tag(u++)}`, split_type: 'upper_lower', categories: ['Push', 'Pull', ...(i % 4 === 0 ? ['Core' as const] : [])] })
-      else slots.push({ label: `Lower ${tag(l++)}`, split_type: 'upper_lower', categories: ['Lower', 'Core'] })
+      if (i % 2 === 0) slots.push({ label: 'Upper Body', split_type: 'upper_lower', categories: ['Push', 'Pull', ...(i % 4 === 0 ? ['Core' as const] : [])] })
+      else slots.push({ label: 'Lower Body', split_type: 'upper_lower', categories: ['Lower', 'Core'] })
     }
   } else {
     // PPL — cycle Push, Pull, Legs
@@ -230,11 +229,9 @@ function buildSchedule(split: SplitType, days: number): SessionSlot[] {
       { name: 'Pull', cats: ['Pull'] },
       { name: 'Legs', cats: ['Lower', 'Core'] },
     ]
-    const counts: Record<string, number> = {}
     for (let i = 0; i < days; i++) {
       const c = cyc[i % 3]
-      counts[c.name] = (counts[c.name] ?? 0) + 1
-      slots.push({ label: `${c.name} ${tag(counts[c.name] - 1)}`, split_type: 'ppl', categories: c.cats })
+      slots.push({ label: c.name, split_type: 'ppl', categories: c.cats })
     }
   }
   return slots

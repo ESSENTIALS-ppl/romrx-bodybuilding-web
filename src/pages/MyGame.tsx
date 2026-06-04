@@ -238,7 +238,7 @@ export function MyGame() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-miami-light overflow-x-auto">
+      <div className="flex gap-1 border-b border-miami-light overflow-x-auto scrollbar-none">
         <TabBtn active={tab === 'generate'} onClick={() => setTab('generate')} icon={Wand2}>
           Generate
         </TabBtn>
@@ -500,6 +500,8 @@ function TemplatesPanel({ userTier }: { userTier: string | null }) {
 function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
   const [items, setItems] = useState<WorkoutTemplate[]>([])
   const [loading, setLoading] = useState(true)
+  const [expanded, setExpanded] = useState<string | null>(null)
+  const [exercises, setExercises] = useState<Record<string, WorkoutExercise[]>>({})
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -520,6 +522,32 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
     return () => { active = false }
   }, [userId])
 
+  async function loadExercises(workoutId: string) {
+    if (exercises[workoutId]) return
+    const { data } = await supabase
+      .from('workout_exercises')
+      .select('id, workout_id, position, exercise_name, sets, reps_min, reps_max, rest_seconds_min, rest_seconds_max, target_notes, technique_id')
+      .eq('workout_id', workoutId)
+      .order('position')
+    setExercises(prev => ({ ...prev, [workoutId]: (data as WorkoutExercise[]) ?? [] }))
+  }
+
+  function toggle(id: string) {
+    if (expanded === id) { setExpanded(null) }
+    else { setExpanded(id); loadExercises(id) }
+  }
+
+  // Group generated-program sessions together so a program reads as one block.
+  const groups = useMemo(() => {
+    const gen: WorkoutTemplate[] = []
+    const other: WorkoutTemplate[] = []
+    for (const w of items) {
+      if ((w.source_program ?? '').startsWith('generated:')) gen.push(w)
+      else other.push(w)
+    }
+    return { gen, other }
+  }, [items])
+
   if (loading) return <Spinner />
 
   if (items.length === 0) {
@@ -527,12 +555,9 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
       <EmptyState
         icon={Dumbbell}
         title="No workouts yet"
-        description="Add a template from the Templates tab to start your training plan."
+        description="Generate a ROM-tuned program in the Generate tab, or add a template from Templates."
         action={
-          <button
-            onClick={() => navigate('?')}
-            className="btn-primary text-sm"
-          >
+          <button onClick={() => navigate('?')} className="btn-primary text-sm">
             <Plus size={14} className="inline mr-1" /> Browse templates
           </button>
         }
@@ -540,26 +565,81 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
     )
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      {items.map(w => (
-        <div
-          key={w.id}
-          className={cn(
-            'rounded-2xl border border-miami-violet/20 bg-miami-ink/70 p-4 hover:shadow-[0_0_20px_-6px_rgba(255,45,120,0.45)] transition-shadow',
-            programTierBorder(w.tier),
-          )}
+  const renderCard = (w: WorkoutTemplate) => {
+    const isOpen = expanded === w.id
+    const ex = exercises[w.id]
+    return (
+      <div
+        key={w.id}
+        className={cn(
+          'rounded-2xl border border-miami-violet/20 bg-miami-ink/70 overflow-hidden transition-shadow',
+          isOpen && 'shadow-[0_0_20px_-6px_rgba(255,45,120,0.45)]',
+          programTierBorder(w.tier),
+        )}
+      >
+        <button
+          onClick={() => toggle(w.id)}
+          className="w-full text-left p-4 flex items-start justify-between gap-2 hover:bg-miami-violet/10 transition-colors"
         >
-          <div className="flex items-start justify-between gap-2 mb-1">
+          <div className="flex-1 min-w-0">
             <p className="font-semibold text-miami-text text-sm">{w.name}</p>
-            <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-2 py-0.5 rounded-full shrink-0">
-              {w.tier}
-            </span>
+            {w.description && <p className="text-xs text-miami-text/60 mt-1 line-clamp-2">{w.description}</p>}
           </div>
-          {w.day_label && <p className="text-xs text-miami-text/60">{w.day_label}</p>}
-          {w.description && <p className="text-xs text-miami-text/60 mt-1 line-clamp-2">{w.description}</p>}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-2 py-0.5 rounded-full">{w.tier}</span>
+            <ChevronRight size={16} className={cn('text-miami-text/60 transition-transform', isOpen && 'rotate-90')} />
+          </div>
+        </button>
+
+        {isOpen && (
+          <div className="bg-miami-violet/10 px-4 pb-4 pt-1 space-y-2">
+            {!ex && <Spinner />}
+            {ex && ex.length === 0 && <p className="text-xs text-miami-text/60 italic">No exercises in this workout.</p>}
+            {ex && ex.length > 0 && (
+              <ol className="space-y-1.5 text-sm">
+                {ex.map(e => (
+                  <li key={e.id} className="flex items-start gap-2">
+                    <span className="text-miami font-bold w-5 shrink-0">{e.position}.</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-miami-text">{e.exercise_name}</p>
+                      <p className="text-xs text-miami-text/60">
+                        {e.sets ?? '?'} × {e.reps_min ?? '?'}–{e.reps_max ?? '?'}
+                        {e.rest_seconds_min && e.rest_seconds_max ? ` · ${e.rest_seconds_min}–${e.rest_seconds_max}s rest` : ''}
+                        {e.target_notes ? ` · ${e.target_notes}` : ''}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <div className="pt-2 flex justify-end">
+              <a
+                href={`/dashboard/workout?w=${w.id}&name=${encodeURIComponent(w.name)}`}
+                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-miami text-white hover:bg-miami-dark transition-colors"
+              >
+                <Dumbbell size={12} /> Log this workout
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-5">
+      {groups.gen.length > 0 && (
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wide text-miami-text/50 mb-2">Your generated program</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{groups.gen.map(renderCard)}</div>
         </div>
-      ))}
+      )}
+      {groups.other.length > 0 && (
+        <div>
+          {groups.gen.length > 0 && <p className="text-xs font-bold uppercase tracking-wide text-miami-text/50 mb-2">Other workouts</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">{groups.other.map(renderCard)}</div>
+        </div>
+      )}
     </div>
   )
 }

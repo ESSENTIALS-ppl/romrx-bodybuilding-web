@@ -155,9 +155,9 @@ export function ProgramGenerator({
             user_id: user.id,
             sport: 'bodybuilding',
             tier: program.tier,
-            name: `${program.name} · ${s.day_label}`,
-            description: `Auto-generated · ${s.focus_muscles.join(', ')}`,
-            day_label: s.day_label,
+            name: `Day ${s.day_index + 1} · ${s.day_label}`,
+            description: `${program.name} · ${s.focus_muscles.join(', ')}`,
+            day_label: `Day ${s.day_index + 1} · ${s.day_label}`,
             split_type: s.split_type,
             is_template: false,
             source_program: program.program_key,
@@ -407,7 +407,7 @@ function SessionCard({
   return (
     <div className="rounded-2xl border border-miami-violet/20 bg-miami-ink/70 p-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-bold text-miami-text">{session.day_label}</p>
+        <p className="text-sm font-bold text-miami-text">Day {session.day_index + 1} <span className="text-miami-text/50 font-medium">· {session.day_label}</span></p>
         <span className="text-[10px] text-miami-text/50 tabular-nums">{totalSets} sets · {session.exercises.length} lifts</span>
       </div>
       {session.focus_muscles.length > 0 && (

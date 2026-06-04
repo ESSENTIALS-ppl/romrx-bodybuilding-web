@@ -261,3 +261,17 @@
 .bg-miami-bg .bg-gray-100       { background-color: rgba(180, 79, 232, 0.10) !important; }
 .bg-miami-bg .text-gray-400,
 .bg-miami-bg .text-gray-500     { color: rgba(240, 237, 232, 0.45) !important; }
+
+/* Hide horizontal scrollbar on tab strips while keeping scroll/swipe.
+   Covers both class names used across the app. */
+.scrollbar-none,
+.no-scrollbar {
+  -ms-overflow-style: none;     /* IE/Edge */
+  scrollbar-width: none;        /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none;                /* Chrome/Safari/Edge Chromium */
+  width: 0;
+  height: 0;
+}
