@@ -13,6 +13,13 @@ export default {
     'text-miami-teal', 'bg-miami-teal', 'text-miami-violet', 'bg-miami-violet', 'text-miami-gold', 'bg-miami-gold',
     // slate (General)
     'text-slate-700', 'bg-slate-700', 'text-slate-800', 'border-slate-200', 'bg-slate-100', 'hover:bg-slate-100', 'hover:text-slate-800',
+    // Traffic-light readiness tiers (applied via dynamic string lookup in
+    // MyGame.tsx readinessBorder/BgClass/TextClass + WorkoutLogger). Without
+    // these, JIT purges them and badges fall back to the violet theme.
+    'text-green-tier', 'bg-green-tier', 'bg-green-tier-bg', 'border-green-tier',
+    'text-yellow-tier', 'bg-yellow-tier', 'bg-yellow-tier-bg', 'border-yellow-tier',
+    'text-red-tier', 'bg-red-tier', 'bg-red-tier-bg', 'border-red-tier',
+    'bg-green-tier/10', 'hover:bg-green-tier/20',
   ],
   theme: {
     extend: {
