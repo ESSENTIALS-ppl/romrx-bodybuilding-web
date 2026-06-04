@@ -18,6 +18,8 @@ interface Exercise {
   subcategory: string | null
 }
 
+type SetType = 'straight' | 'superset' | 'dropset' | 'myorep'
+
 interface LoggedSet {
   id?: string
   set_index: number
@@ -25,10 +27,20 @@ interface LoggedSet {
   reps: number | null
   rpe: number | null
   rir: number | null      // Reps in reserve — preferred proximity-to-failure metric for hypertrophy
+  set_type: SetType
   is_warmup: boolean
   saved: boolean
   pr?: boolean
   e1rm?: number | null
+}
+
+// Set-type cycle + display metadata. Tap the chip to advance through types.
+const SET_TYPE_ORDER: SetType[] = ['straight', 'superset', 'dropset', 'myorep']
+const SET_TYPE_META: Record<SetType, { label: string; short: string; cls: string }> = {
+  straight: { label: 'Straight set', short: '—',  cls: 'bg-miami-violet/15 text-miami-text/50' },
+  superset: { label: 'Superset',     short: 'SS', cls: 'bg-miami/20 text-miami' },
+  dropset:  { label: 'Drop set',     short: 'DS', cls: 'bg-yellow-tier-bg text-yellow-tier' },
+  myorep:   { label: 'Myo-reps',     short: 'MR', cls: 'bg-miami-violet/25 text-miami-violet' },
 }
 
 interface ExerciseBlock {
@@ -115,23 +127,45 @@ export function WorkoutLogger() {
   const [restSeconds, setRestSeconds] = useState(180)
   const [showCalc, setShowCalc] = useState<number | null>(null)
   const [pickerSearch, setPickerSearch] = useState('')
+  // Active mesocycle → drives the default RIR target for new sets.
+  const [meso, setMeso] = useState<{ name: string; current_week: number; weeks: number } | null>(null)
 
-  // Load all BB techniques as exercise picker source
+  // Load all BB techniques as exercise picker source + the active mesocycle
   useEffect(() => {
     let alive = true
     ;(async () => {
-      const { data } = await supabase
-        .from('techniques')
-        .select('id, name, code, subcategory, sport')
-        .eq('sport', 'bodybuilding')
-        .order('subcategory', { ascending: true, nullsFirst: false })
-        .order('name')
+      const [{ data: techs }, { data: mesoRows }] = await Promise.all([
+        supabase
+          .from('techniques')
+          .select('id, name, code, subcategory, sport')
+          .eq('sport', 'bodybuilding')
+          .order('subcategory', { ascending: true, nullsFirst: false })
+          .order('name'),
+        supabase
+          .from('mesocycles')
+          .select('name, current_week, weeks')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(1),
+      ])
       if (!alive) return
-      setExercises((data ?? []) as Exercise[])
+      setExercises((techs ?? []) as Exercise[])
+      setMeso((mesoRows?.[0] as { name: string; current_week: number; weeks: number }) ?? null)
       setLoading(false)
     })()
     return () => { alive = false }
   }, [])
+
+  // Default RIR target derived from the active mesocycle week (mirrors
+  // MyGame's weekPlan): accumulation 3 → build 2 → overreach 1 → deload 4.
+  const targetRir = useMemo<number | null>(() => {
+    if (!meso) return null
+    if (meso.current_week === meso.weeks) return 4 // deload
+    const progress = (meso.current_week - 1) / Math.max(1, meso.weeks - 1)
+    if (progress < 0.34) return 3
+    if (progress < 0.67) return 2
+    return 1
+  }, [meso])
 
   const addExercise = async (ex: Exercise) => {
     // Load last 5 sessions for this exercise
@@ -143,7 +177,7 @@ export function WorkoutLogger() {
       ...b,
       {
         exercise: ex,
-        sets: [{ set_index: 1, weight_kg: null, reps: null, rpe: null, rir: null, is_warmup: false, saved: false }],
+        sets: [{ set_index: 1, weight_kg: null, reps: null, rpe: null, rir: targetRir, set_type: 'straight', is_warmup: false, saved: false }],
         history: (history ?? []) as ExerciseBlock['history'],
       },
     ])
@@ -164,7 +198,8 @@ export function WorkoutLogger() {
             weight_kg: last?.weight_kg ?? null,
             reps: last?.reps ?? null,
             rpe: null,
-            rir: null,
+            rir: targetRir,
+            set_type: last?.set_type ?? 'straight',
             is_warmup: false,
             saved: false,
           },
@@ -209,6 +244,7 @@ export function WorkoutLogger() {
       p_is_warmup: set.is_warmup,
       p_notes: null,
       p_technique_id: block.exercise.id,
+      p_set_type: set.set_type,
     })
     if (error) {
       console.error('log_set error', error)
@@ -267,6 +303,20 @@ export function WorkoutLogger() {
         }
       />
 
+      {meso && targetRir != null && (
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-miami-violet/25 bg-miami-violet/10 px-3 py-2 text-xs">
+          <span className="font-semibold text-miami">{meso.name}</span>
+          <span className="text-miami-text/60">Week {meso.current_week}/{meso.weeks}</span>
+          <span className="ml-auto inline-flex items-center gap-1.5">
+            <span className="text-miami-text/60">Target RIR</span>
+            <span className="font-bold text-miami-text bg-miami-violet/20 px-2 py-0.5 rounded">{targetRir}</span>
+            {meso.current_week === meso.weeks && (
+              <span className="font-semibold text-yellow-tier">· Deload</span>
+            )}
+          </span>
+        </div>
+      )}
+
       {blocks.length === 0 && (
         <SectionCard>
           <div className="text-center py-12">
@@ -316,6 +366,7 @@ export function WorkoutLogger() {
               <thead>
                 <tr className="text-[10px] uppercase tracking-wide text-miami-text/50">
                   <th className="text-left pb-2 w-8">#</th>
+                  <th className="text-left pb-2 w-12">Type</th>
                   <th className="text-left pb-2">Weight ({unit})</th>
                   <th className="text-left pb-2">Reps</th>
                   <th className="text-left pb-2" title="Reps in reserve — how many reps you left in the tank">RIR</th>
@@ -337,6 +388,24 @@ export function WorkoutLogger() {
                         title={s.is_warmup ? 'Warmup' : 'Working set'}
                       >
                         {s.is_warmup ? 'W' : s.set_index}
+                      </button>
+                    </td>
+                    <td className="py-2">
+                      <button
+                        onClick={() => {
+                          const idx = SET_TYPE_ORDER.indexOf(s.set_type)
+                          const nextType = SET_TYPE_ORDER[(idx + 1) % SET_TYPE_ORDER.length]
+                          updateSet(bi, si, { set_type: nextType, saved: false })
+                        }}
+                        disabled={s.saved}
+                        title={SET_TYPE_META[s.set_type].label + ' — tap to change'}
+                        className={cn(
+                          'px-1.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide min-w-[28px]',
+                          SET_TYPE_META[s.set_type].cls,
+                          s.saved && 'opacity-70',
+                        )}
+                      >
+                        {SET_TYPE_META[s.set_type].short}
                       </button>
                     </td>
                     <td className="py-2">
