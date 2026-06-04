@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { recordConsent } from '../lib/terms'
 import { Loader2, UserPlus } from 'lucide-react'
 
 type BBTier = 'beginner' | 'intermediate' | 'advanced'
@@ -67,6 +68,9 @@ export function Signup() {
         onboarding_status: 'pending_payment',
         is_active: false,
       }, { onConflict: 'user_id' })
+
+      // Record timestamped proof of agreement to the ROMRx LLC Terms of Service.
+      await recordConsent({ userId: data.user.id, signedName: fullName })
 
       navigate('/onboarding/assessment', { replace: true })
       return
@@ -157,9 +161,9 @@ export function Signup() {
             <span className="text-xs text-white/60 leading-relaxed">
               I have read and agree to the{' '}
               <a href="/legal" target="_blank" rel="noopener noreferrer" className="miami-link font-medium">
-                Terms of Service, Privacy Policy &amp; Refund Policy
+                ROMRx LLC Terms of Service, Privacy Policy &amp; Refund Policy
               </a>
-              , including the collection and anonymized use of my ROM data for research and product development. All sales are final.
+              , a company-wide agreement with ROMRx LLC (parent of ROMRxBodyBuilding, ROMRxBJJ, and other ROMRx products), including the collection and anonymized use of my ROM data for research and product development. All sales are final.
             </span>
           </label>
 

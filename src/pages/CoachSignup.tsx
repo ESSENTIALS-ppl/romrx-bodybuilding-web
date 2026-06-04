@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
+import { recordConsent } from '../lib/terms'
 import { Loader2, Users } from 'lucide-react'
 
-const BELTS = ['white', 'blue', 'purple', 'brown', 'black']
+const TIERS = ['beginner', 'intermediate', 'advanced'] as const
 const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
 
 export function CoachSignup() {
@@ -11,7 +12,7 @@ export function CoachSignup() {
   const [email, setEmail]         = useState('')
   const [password, setPassword]   = useState('')
   const [confirm, setConfirm]     = useState('')
-  const [belt, setBelt]           = useState('white')
+  const [tier, setTier]           = useState<typeof TIERS[number]>('intermediate')
   const [gym, setGym]             = useState('')
   const [role, setRole]           = useState<'instructor' | 'head_coach'>('instructor')
   const [loading, setLoading]         = useState(false)
@@ -34,7 +35,8 @@ export function CoachSignup() {
       options: {
         data: {
           full_name: fullName,
-          belt,
+          active_bb_tier: tier,
+          active_sport: 'bodybuilding',
           gym,
           role: 'coach',
           portal_role: 'coach',
@@ -50,12 +52,16 @@ export function CoachSignup() {
         id: data.user.id,
         email,
         full_name: fullName,
-        belt,
+        active_sport: 'bodybuilding',
+        active_bb_tier: tier,
         portal_role: 'coach',
         subscription_status: 'trialing',
         subscription_tier: 'coach',
-        platforms: ['bjj'],
+        platforms: ['bodybuilding'],
       }, { onConflict: 'id' })
+
+      // Record timestamped proof of agreement to the ROMRx LLC Terms of Service.
+      await recordConsent({ userId: data.user.id, signedName: fullName })
 
       // Notify Jim of new coach account creation (pre-payment)
       // Fire-and-forget — don't block checkout on this
@@ -133,10 +139,10 @@ export function CoachSignup() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-charcoal">Gym / Academy Name</label>
+            <label className="text-sm font-semibold text-charcoal">Gym / Facility Name</label>
             <input
               type="text" required value={gym} onChange={e => setGym(e.target.value)}
-              placeholder="Your academy name"
+              placeholder="Your gym or facility name"
               className="w-full px-4 py-2.5 rounded-xl border border-teal-light bg-surface text-sm focus:outline-none focus:border-teal transition-colors"
             />
           </div>
@@ -162,20 +168,20 @@ export function CoachSignup() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-semibold text-charcoal">Your Belt</label>
+            <label className="text-sm font-semibold text-charcoal">Coaching Tier</label>
             <div className="flex gap-2 flex-wrap">
-              {BELTS.map(b => (
+              {TIERS.map(t => (
                 <button
-                  key={b}
+                  key={t}
                   type="button"
-                  onClick={() => setBelt(b)}
+                  onClick={() => setTier(t)}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold capitalize transition-all border ${
-                    belt === b
+                    tier === t
                       ? 'bg-teal text-white border-teal'
                       : 'border-teal-light text-charcoal-light hover:border-teal/40'
                   }`}
                 >
-                  {b}
+                  {t}
                 </button>
               ))}
             </div>
@@ -206,9 +212,9 @@ export function CoachSignup() {
             <span className="text-xs text-charcoal-light leading-relaxed">
               I have read and agree to the{' '}
               <a href="/legal" target="_blank" rel="noopener noreferrer" className="text-teal underline font-medium">
-                Terms of Service, Privacy Policy &amp; Refund Policy
+                ROMRx LLC Terms of Service, Privacy Policy &amp; Refund Policy
               </a>
-              . All sales are final.
+              , a company-wide agreement with ROMRx LLC (parent of ROMRxBodyBuilding, ROMRxBJJ, and other ROMRx products). All sales are final.
             </span>
           </label>
 
