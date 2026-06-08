@@ -45,6 +45,9 @@ const ROTATION: Record<number, number> = {
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
+// Sessions targeted per assessment cycle (6 weeks of daily work, matches 42-day retest window)
+const CYCLE_TARGET = 42
+
 // ── Prescription library ───────────────────────────────────────────────────────
 const RX: Record<string, Prescription> = {
   hip_er: {
@@ -890,20 +893,38 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
   const [completedToday, setCompletedToday] = useState(false)
   // DB-authoritative session count (matches what coach sees)
   const [dbSessionCount, setDbSessionCount] = useState(0)
+  // Cycle window anchor, derived from the latest assessment in the DB (stable across devices)
+  const [cycleStartDate, setCycleStartDate] = useState<string | null>(null)
 
-  const cycleStart = log.cycleStart || assessedAt
-  const cycleStartDate = cycleStart.slice(0, 10)
-
-  // Load session count from DB on mount and keep in sync
+  // Anchor the cycle window to the user's LATEST assessment date from the DB.
+  // localStorage is NOT the source of truth for the numeric count — only for the "completed today" check.
   useEffect(() => {
     if (!userId) return
     supabase
+      .from('assessments')
+      .select('assessed_at')
+      .eq('user_id', userId)
+      .order('assessed_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        const anchor = data?.assessed_at ?? assessedAt
+        setCycleStartDate(anchor.slice(0, 10))
+      })
+  }, [userId, assessedAt])
+
+  // Stable count query: counts sessions in the current cycle window. Used on mount and after mark-complete.
+  const refreshCount = useCallback(async () => {
+    if (!userId || !cycleStartDate) return
+    const { count } = await supabase
       .from('protocol_sessions')
       .select('session_date', { count: 'exact' })
       .eq('user_id', userId)
       .gte('session_date', cycleStartDate)
-      .then(({ count }) => { if (count !== null) setDbSessionCount(count) })
+    if (count !== null) setDbSessionCount(count)
   }, [userId, cycleStartDate])
+
+  useEffect(() => { refreshCount() }, [refreshCount])
 
   useEffect(() => {
     const todayIso = new Date().toISOString().slice(0, 10)
@@ -922,25 +943,18 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
       return next
     })
     setCompletedToday(true)
-    // Log to DB (authoritative source for coach + athlete counts)
+    // Log to DB (authoritative source for coach + athlete counts), then re-read the count.
     supabase.from('protocol_sessions').upsert({
       user_id: userId,
       session_date: todayIso,
       protocol_day: protocolDay,
     }, { onConflict: 'user_id,session_date' }).then(({ error }) => {
-      if (!error) {
-        // Update display count from DB after successful write
-        setDbSessionCount(prev => {
-          // Only increment if this is a new day (upsert on same day = same count)
-          const todayCounted = log.sessions.includes(todayIso)
-          return todayCounted ? prev : prev + 1
-        })
-      }
+      if (!error) refreshCount()
     })
-  }, [storageKey, userId, todayPriorityIndex, log])
+  }, [storageKey, userId, todayPriorityIndex, refreshCount])
 
-  const sessionsThisCycle = dbSessionCount  // Use DB count (matches coach view)
-  const progressPct = Math.min(100, Math.round((sessionsThisCycle / 36) * 100))
+  const sessionsThisCycle = Math.min(dbSessionCount, CYCLE_TARGET)  // DB count, capped at target
+  const progressPct = Math.min(100, Math.round((sessionsThisCycle / CYCLE_TARGET) * 100))
 
   const now = new Date()
   const retestDate = new Date(new Date(assessedAt).getTime() + 42 * 24 * 60 * 60 * 1000)
@@ -965,7 +979,7 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
           </div>
           <div className="text-right shrink-0">
             <p className="text-[10px] text-charcoal-light uppercase tracking-wide">Session</p>
-            <p className="text-lg font-bold text-miami leading-tight">{sessionsThisCycle}<span className="text-sm font-normal text-charcoal-light">/36</span></p>
+            <p className="text-lg font-bold text-miami leading-tight">{sessionsThisCycle}<span className="text-sm font-normal text-charcoal-light">/{CYCLE_TARGET}</span></p>
           </div>
         </div>
 
