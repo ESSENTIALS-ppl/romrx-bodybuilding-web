@@ -7,9 +7,10 @@ import { supabase } from '../lib/supabase'
 import {
   Save, Loader2, ExternalLink, Mail, HelpCircle,
   LogOut, Trash2, ChevronRight, ClipboardList, TrendingUp,
-  UserCheck, UserX, School, KeyRound, CheckCircle2, Bell,
+  UserCheck, UserX, School, KeyRound, CheckCircle2, Bell, MessageSquarePlus,
 } from 'lucide-react'
 import { bbTierColor, bbTierLabel, cn } from '../lib/utils'
+import { FeedbackWidget } from '../components/FeedbackWidget'
 
 const BB_TIERS = ['beginner', 'intermediate', 'advanced'] as const
 type BBTier = typeof BB_TIERS[number]
@@ -874,6 +875,14 @@ function AthleteSettings() {
               <ChevronRight size={14} className="text-charcoal-light" />
             </a>
           </div>
+        </Section>
+
+        {/* ── FEEDBACK ── */}
+        <Section title="Feedback" icon={<MessageSquarePlus size={14} />}>
+          <p className="text-xs text-charcoal-light -mt-2">
+            Found a bug or have an idea? Tell us directly — it comes straight to the team.
+          </p>
+          <FeedbackWidget />
         </Section>
 
         {/* ── NOTIFICATIONS ── */}
