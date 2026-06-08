@@ -763,52 +763,14 @@ function RetestBanner({ assessedAt }: { assessedAt: string }) {
 }
 
 // ── Why Statement card ────────────────────────────────────────────────────────
-function WhyStatement() {
+function WhyStatement({ heading, body }: { heading: string; body: string }) {
   return (
     <div className="rounded-2xl border border-miami/40 p-5" style={{ backgroundColor: '#36454F' }}>
       <p className="text-[10px] font-bold uppercase tracking-widest text-miami mb-3">
-        WHY YOUR Rx IS BUILT THIS WAY
+        {heading}
       </p>
       <p className="text-sm text-white/90 leading-relaxed">
-        9 out of 10 lifters get hurt, and most of those injuries happen in practice, not competition. The people who keep showing up for decades all share the same thing: both sides of their body move the same way. When one side is tighter than the other, your injury risk jumps by up to 30%. Most people train until their body stops letting them. We built this so you become someone who never has to quit.
-      </p>
-      <p className="mt-3 text-[10px] text-miami leading-relaxed">
-        Research:{' '}
-        <a
-          href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6745816/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:opacity-80"
-        >
-          Petrisor et al. (OJSM 2019)
-        </a>
-        {' · '}
-        <a
-          href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5294948/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:opacity-80"
-        >
-          Lima et al. (2017)
-        </a>
-        {' · '}
-        <a
-          href="https://link.springer.com/10.1186/s13102-025-01465-z"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:opacity-80"
-        >
-          Zhou &amp; Liu (2025)
-        </a>
-        {' · '}
-        <a
-          href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10980866/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:opacity-80"
-        >
-          Konrad et al. (JSHS 2023)
-        </a>
+        {body}
       </p>
     </div>
   )
@@ -1191,8 +1153,13 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
+const DAILY_WHY = 'This is your minimum effective dose. Research is clear: short, consistent daily mobility work changes range of motion more than long sessions done occasionally. A few minutes a day, every day, is what actually moves your numbers. Do this and you\'re covered. Everything else is a bonus.'
+
+const FULL_WHY = 'Got more time, or want to attack a specific restriction? This is your complete prescription. Every movement from your assessment, organized by the limitations holding back your game. Use it as a deeper session when you can, or as a reference to understand the whole plan. The Daily keeps you progressing. The Full lets you go further.'
+
 export function MyProtocol() {
   const { user } = useAuth()
+  const [tab, setTab] = useState<'daily' | 'full'>('daily')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [assessment, setAssessment] = useState<Record<string, any> | null>(null)
   const [loading, setLoading]       = useState(true)
@@ -1248,36 +1215,60 @@ export function MyProtocol() {
       {/* 1. Page header */}
       <PageHeader title="My Protocol" subtitle={`Based on assessment · ${dateStr}`} />
 
-      {/* 2. Today card (hero) */}
-      {assessedAt && user && (
-        <TodayCard
-          ranked={ranked}
-          assessedAt={assessedAt}
-          userId={user.id}
-        />
-      )}
-
-      {/* 3. Why statement */}
-      <WhyStatement />
-
-      {/* 4. Retest status banner */}
+      {/* 2. Retest status banner (always visible, above the sub-tabs) */}
       {assessedAt && <RetestBanner assessedAt={assessedAt} />}
 
-      {/* 5. Full protocol (3 priority cards) */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <BookOpen size={14} className="text-miami shrink-0" />
-          <p className="text-xs font-bold uppercase tracking-wider text-charcoal-light">Full Protocol</p>
-        </div>
-        <div className="space-y-4">
-          {ranked.map((r, i) => (
-            <IssueCard key={r.def.key} ranked={r} rank={i + 1} />
-          ))}
-        </div>
+      {/* 3. Sub-tab switcher */}
+      <div className="flex gap-1 rounded-2xl bg-surface p-1">
+        {(['daily', 'full'] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={cn(
+              'flex-1 rounded-xl py-2.5 text-sm font-bold transition-colors',
+              tab === t ? 'bg-miami text-white shadow-sm' : 'text-charcoal-light hover:text-charcoal'
+            )}
+          >
+            {t === 'daily' ? 'Daily' : 'Full'}
+          </button>
+        ))}
       </div>
 
+      {/* 4. Daily tab */}
+      {tab === 'daily' && (
+        <>
+          <WhyStatement heading="WHY DAILY" body={DAILY_WHY} />
+          {assessedAt && user && (
+            <TodayCard
+              ranked={ranked}
+              assessedAt={assessedAt}
+              userId={user.id}
+            />
+          )}
+        </>
+      )}
+
+      {/* 5. Full tab */}
+      {tab === 'full' && (
+        <>
+          <WhyStatement heading="WHY FULL" body={FULL_WHY} />
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <BookOpen size={14} className="text-miami shrink-0" />
+              <p className="text-xs font-bold uppercase tracking-wider text-charcoal-light">Full Protocol</p>
+            </div>
+            <div className="space-y-4">
+              {ranked.map((r, i) => (
+                <IssueCard key={r.def.key} ranked={r} rank={i + 1} />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* 6. Bottom note (both tabs) */}
       <p className="text-center text-xs text-charcoal-light pb-2">
-        Protocol auto-updates with each new assessment. Retest every 4–6 weeks.
+        Protocol auto-updates with each new assessment. Retest every 6 weeks.
       </p>
     </div>
   )
