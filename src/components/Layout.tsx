@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import { useSport } from '../sports/SportProvider'
 import { cn } from '../lib/utils'
+import { FeedbackButton } from './FeedbackButton'
 import {
   Dumbbell,
   Layers,
@@ -196,6 +197,9 @@ export function Layout() {
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6">
         <Outlet />
       </main>
+
+      {/* App-wide floating feedback launcher (authenticated screens only) */}
+      <FeedbackButton />
     </div>
   )
 }
