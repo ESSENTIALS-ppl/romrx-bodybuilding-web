@@ -10,9 +10,17 @@ import { supabase } from '../lib/supabase'
 // so DB-side queries (e.g. unlocked_techniques_v) resolve correctly.
 const SITE_SPORT = 'bodybuilding'
 
+// Statuses that grant access to /dashboard/*. Mirrors BJJ's ProtectedRoute
+// (see incident 2026-07-02). Trial access is allowed because Stripe issues
+// 'trialing' only on a real Stripe trial with a payment method on file. The
+// BB Signup path now writes 'pending' (not 'trialing'), so client-side signup
+// can no longer bypass the paywall. Legacy pre-fix accounts are grandfathered
+// via users.grandfathered_at (set by the 2026-07-02 backfill).
+const PAID_STATUSES = new Set(['active', 'trialing'])
+
 export function ProtectedRoute() {
   const { session, user, loading } = useAuth()
-  const { profile } = useProfile(user?.id)
+  const { profile, loading: profileLoading } = useProfile(user?.id)
 
   // Auto-sync: if a user logs into this site but their active_sport isn't BB, fix it.
   useEffect(() => {
@@ -33,7 +41,7 @@ export function ProtectedRoute() {
     })
   }, [user?.id, profile?.active_sport, profile?.sports_enabled])
 
-  if (loading) {
+  if (loading || (session && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-miami-bg">
         <div className="w-8 h-8 border-4 border-miami border-t-transparent rounded-full animate-spin" />
@@ -47,6 +55,15 @@ export function ProtectedRoute() {
   if (hasAuthToken) return null
 
   if (!session) return <Navigate to="/login" replace />
+
+  // Paywall gate. Anyone whose subscription_status isn't in PAID_STATUSES
+  // gets routed to the assessment/checkout flow instead of the dashboard.
+  // grandfathered_at exempts users who signed up before the paywall was
+  // enforced on BB (see 2026-07-02 backfill).
+  const grandfathered = Boolean((profile as { grandfathered_at?: string | null } | null)?.grandfathered_at)
+  if (profile && !grandfathered && !PAID_STATUSES.has(profile.subscription_status)) {
+    return <Navigate to="/onboarding/results" replace />
+  }
 
   // Force BB context on this site — ignore profile.active_sport so a BJJ user landing here
   // immediately sees the BB dashboard instead of BJJ chrome.
