@@ -45,7 +45,11 @@ export function Signup() {
     }
 
     if (data.user) {
-      // Upsert user profile row — bodybuilding context, BB tier honored
+      // Upsert user profile row, bodybuilding context, BB tier honored.
+      // NOTE: subscription_status starts as 'pending'. ProtectedRoute will
+      // route the user through /onboarding/results (ROM assessment + Stripe
+      // checkout or ambassador code) before the dashboard opens. Same pattern
+      // as the BJJ signup path. See incident 2026-07-02 for background.
       await supabase.from('users').upsert({
         id: data.user.id,
         email,
@@ -53,7 +57,7 @@ export function Signup() {
         active_sport: 'bodybuilding',
         active_bb_tier: tier,
         portal_role: 'athlete',
-        subscription_status: 'trialing',
+        subscription_status: 'pending',
         subscription_tier: 'athlete',
         platforms: ['bodybuilding'],
       }, { onConflict: 'id' })

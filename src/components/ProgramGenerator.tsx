@@ -98,6 +98,13 @@ export function ProgramGenerator({
   }
 
   function runGenerate() {
+    // Belt-and-suspenders: the Generate button is already disabled when the
+    // assessment is empty, but block here too in case the wizard is ever
+    // reached through a different code path (deep-link, retained state, etc).
+    if (!assessment) {
+      setError('Complete your ROM assessment before generating a program.')
+      return
+    }
     const prefs: GeneratorPrefs = { split, days, emphasis, mesoWeek, mesoWeeks, experience: tier }
     const prog = generateProgram(prefs, library, landmarks, assessment)
     setProgram(prog)
@@ -194,7 +201,21 @@ export function ProgramGenerator({
 
   if (loading) return <Spinner />
 
-  const noAssessment = !assessment
+  // An assessment row can exist with every joint null (partial abandonment).
+  // A program is only meaningful once the user has actually measured joints,
+  // so require at least one non-null key joint before we let them Generate.
+  // See incident 2026-07-02: users with all-null assessments were getting
+  // programs with fabricated ROM-personalization annotations.
+  const KEY_JOINTS: Array<keyof Assessment> = [
+    'hip_er_l','hip_er_r','hip_ir_l','hip_ir_r','hip_abd_l','hip_abd_r',
+    'hip_flex_l','hip_flex_r','shoulder_er_l','shoulder_er_r',
+    'shoulder_flex_l','shoulder_flex_r','ankle_df_l','ankle_df_r',
+    'lumbar_flex','lumbar_ext',
+  ]
+  const assessmentComplete = Boolean(
+    assessment && KEY_JOINTS.some(k => (assessment[k] as number | null) != null),
+  )
+  const noAssessment = !assessmentComplete
 
   // ── Wizard ────────────────────────────────────────────────────────────────
   if (step === 'wizard') {
@@ -205,12 +226,19 @@ export function ProgramGenerator({
         >
           <p className="text-xs text-miami-text/70 mb-4">
             We auto-build a full week around your mobility — picking growth-driving, stretch-biased lifts you can actually load through range, then setting volume per muscle to your science-based MAV. You can tweak everything before saving.
-            {noAssessment && (
-              <span className="block mt-1 text-yellow-tier">
-                Complete your ROM assessment to unlock readiness-aware exercise selection. We'll still build a solid plan without it.
-              </span>
-            )}
           </p>
+
+          {noAssessment && (
+            <div className="rounded-lg bg-yellow-tier-bg border border-yellow-tier/40 px-3 py-2.5 mb-4 flex items-start gap-2">
+              <AlertTriangle size={14} className="text-yellow-tier mt-0.5 shrink-0" />
+              <div className="text-xs text-miami-text">
+                <p className="font-semibold text-yellow-tier">Complete your ROM assessment first</p>
+                <p className="text-miami-text/70 mt-0.5">
+                  Programs are built <span className="font-semibold text-miami-text">around your body</span>, which means we need your joint measurements before we can pick exercises and set volume. Head to <a href="/onboarding/assessment" className="text-miami font-semibold underline">My Assessment</a> to finish it, then come back.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Split */}
           <p className="text-[11px] font-bold uppercase tracking-wide text-miami-text/50 mb-1.5">Split</p>
@@ -278,9 +306,16 @@ export function ProgramGenerator({
 
           <button
             onClick={runGenerate}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-miami to-miami-violet text-white font-bold text-sm shadow-[0_0_20px_-4px_rgba(255,45,120,0.6)] hover:shadow-[0_0_28px_-4px_rgba(255,45,120,0.8)] transition-all flex items-center justify-center gap-2"
+            disabled={noAssessment}
+            className={cn(
+              'w-full py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2',
+              noAssessment
+                ? 'bg-miami-violet/15 text-miami-text/40 cursor-not-allowed'
+                : 'bg-gradient-to-r from-miami to-miami-violet text-white shadow-[0_0_20px_-4px_rgba(255,45,120,0.6)] hover:shadow-[0_0_28px_-4px_rgba(255,45,120,0.8)]',
+            )}
           >
-            <Sparkles size={15} /> Generate my program
+            <Sparkles size={15} />
+            {noAssessment ? 'Finish your assessment to unlock' : 'Generate my program'}
           </button>
         </SectionCard>
       </div>
