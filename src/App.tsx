@@ -40,6 +40,11 @@ export default function App() {
 
         {/* Protected dashboard routes under /dashboard/* */}
         <Route element={<ProtectedRoute />}>
+          {/* Bare /dashboard has no page of its own. Send it through the auth
+              guard (which redirects to /login when unauthenticated) and then
+              to the default athlete landing page. Without this, /dashboard
+              matched no route and rendered a blank screen. */}
+          <Route path="/dashboard" element={<Navigate to="/dashboard/my-body" replace />} />
           <Route element={<Layout />}>
             <Route path="/dashboard/my-body"     element={<MyBody />} />
             <Route path="/dashboard/my-game"     element={<MyGame />} />
