@@ -46,10 +46,11 @@ Deployed to Netlify at `romrxbodybuilding.com`. The site root rewrites to
 
 ## Sport mode
 
-This site sets `DEFAULT_SPORT_KEY = 'bodybuilding'` in `src/sports/registry.ts`.
-Users can still switch sports via `SportSwitcher` (which writes to
-`users.active_sport` in Supabase) — the registry only controls the **default**
-sport before the DB row arrives.
+This site sets `DEFAULT_SPORT_KEY = 'bodybuilding'` in `src/sports/registry.ts`
+and forces `SITE_SPORT = 'bodybuilding'` in `ProtectedRoute`. Sport is derived
+entirely from these local constants. This build never writes `users.active_sport`
+(a field shared with the BJJ and Base HQ apps); `SportSwitcher` switches local
+context only.
 
 - Coach portal: **hidden** (`has_coach_portal: false`) — Trainers are
   "in development" and shown only as a teaser on the marketing site.
