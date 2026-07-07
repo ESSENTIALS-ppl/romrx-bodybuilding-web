@@ -1,13 +1,12 @@
-import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import { SportProvider } from '../sports/SportProvider'
-import { supabase } from '../lib/supabase'
 
-// This is the romrxbodybuilding.com build — every authed page renders BB context,
-// regardless of what the user's profile says. We also push BB into their profile
-// so DB-side queries (e.g. unlocked_techniques_v) resolve correctly.
+// This is the romrxbodybuilding.com build. Every authed page renders BB context,
+// regardless of what the user's profile says. Sport is derived entirely from this
+// local constant; we never persist it to users.active_sport, which is a shared
+// field also read by the BJJ and Base HQ apps.
 const SITE_SPORT = 'bodybuilding'
 
 // Statuses that grant access to /dashboard/*. Mirrors BJJ's ProtectedRoute
@@ -21,25 +20,6 @@ const PAID_STATUSES = new Set(['active', 'trialing'])
 export function ProtectedRoute() {
   const { session, user, loading } = useAuth()
   const { profile, loading: profileLoading } = useProfile(user?.id)
-
-  // Auto-sync: if a user logs into this site but their active_sport isn't BB, fix it.
-  useEffect(() => {
-    if (!user?.id || !profile) return
-    const needsSwitch = profile.active_sport !== SITE_SPORT
-    const needsEnable = !(profile.sports_enabled ?? []).includes(SITE_SPORT)
-    if (!needsSwitch && !needsEnable) return
-
-    const updates: Record<string, unknown> = {}
-    if (needsSwitch) updates.active_sport = SITE_SPORT
-    if (needsEnable) {
-      updates.sports_enabled = Array.from(
-        new Set([...(profile.sports_enabled ?? []), SITE_SPORT]),
-      )
-    }
-    supabase.from('users').update(updates).eq('id', user.id).then(({ error }) => {
-      if (error) console.warn('Auto-switch to BB sport failed:', error.message)
-    })
-  }, [user?.id, profile?.active_sport, profile?.sports_enabled])
 
   if (loading || (session && profileLoading)) {
     return (

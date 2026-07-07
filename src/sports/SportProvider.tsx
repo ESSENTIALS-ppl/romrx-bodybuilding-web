@@ -9,7 +9,7 @@
  *   - activeSport:    current SportConfig (theme, labels, feature flags)
  *   - availableSports: SportConfigs the user has access to
  *   - allSports:      every active config in the DB
- *   - setActiveSport(slug):  updates DB + local state
+ *   - setActiveSport(slug):  updates local context only (never writes shared DB field)
  *   - loading:        true until first fetch completes
  */
 
@@ -109,17 +109,12 @@ export function SportProvider({
     root.dataset.sportAccent = activeSport.theme_accent
   }, [activeSport.slug, activeSport.theme_accent])
 
+  // Local-only sport switch. users.active_sport is a shared field (BJJ and Base
+  // HQ read it too), so this build never writes it. Switching updates local
+  // context only; branding/nav/logic derive sport from the local constant.
   async function setActiveSport(slug: string) {
     if (!userId) return
     setOptimisticSlug(slug)
-    const { error } = await supabase
-      .from('users')
-      .update({ active_sport: slug })
-      .eq('id', userId)
-    if (error) {
-      console.error('Failed to update active_sport:', error.message)
-      setOptimisticSlug(null)
-    }
   }
 
   const value: SportContextValue = {
