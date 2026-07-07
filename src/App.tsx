@@ -6,9 +6,7 @@ import { AuthCallback } from './pages/AuthCallback'
 import { AuthConfirm } from './pages/AuthConfirm'
 import { Signup } from './pages/Signup'
 import { Assessment } from './pages/Assessment'
-import { MyBody } from './pages/MyBody'
 import { MyGame } from './pages/MyGame'
-import { MyProtocol } from './pages/MyProtocol'
 import { WorkoutLogger } from './pages/WorkoutLogger'
 import { PRTracker } from './pages/PRTracker'
 import { BodyMetrics } from './pages/BodyMetrics'
@@ -44,11 +42,14 @@ export default function App() {
               guard (which redirects to /login when unauthenticated) and then
               to the default athlete landing page. Without this, /dashboard
               matched no route and rendered a blank screen. */}
-          <Route path="/dashboard" element={<Navigate to="/dashboard/my-body" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/dashboard/my-game" replace />} />
           <Route element={<Layout />}>
-            <Route path="/dashboard/my-body"     element={<MyBody />} />
+            {/* My Body + My Protocol are ROMRx Base-only now. In this sport app the
+                routes redirect to the default athlete landing so they cannot be
+                reached by direct URL. Page components are kept for Base reuse. */}
+            <Route path="/dashboard/my-body"     element={<Navigate to="/dashboard/my-game" replace />} />
             <Route path="/dashboard/my-game"     element={<MyGame />} />
-            <Route path="/dashboard/my-protocol" element={<MyProtocol />} />
+            <Route path="/dashboard/my-protocol" element={<Navigate to="/dashboard/my-game" replace />} />
             <Route path="/dashboard/workout"     element={<WorkoutLogger />} />
             <Route path="/dashboard/prs"         element={<PRTracker />} />
             <Route path="/dashboard/body"        element={<BodyMetrics />} />
@@ -64,10 +65,11 @@ export default function App() {
           </Route>
         </Route>
 
-        {/* Legacy redirects — old /my-body etc. -> /dashboard/my-body */}
-        <Route path="/my-body"     element={<Navigate to="/dashboard/my-body"     replace />} />
+        {/* Legacy redirects. My Body + My Protocol are Base-only in this sport
+            app, so their legacy paths land on the default athlete tab. */}
+        <Route path="/my-body"     element={<Navigate to="/dashboard/my-game"     replace />} />
         <Route path="/my-game"     element={<Navigate to="/dashboard/my-game"     replace />} />
-        <Route path="/my-protocol" element={<Navigate to="/dashboard/my-protocol" replace />} />
+        <Route path="/my-protocol" element={<Navigate to="/dashboard/my-game"     replace />} />
         <Route path="/chat"        element={<Navigate to="/dashboard/chat"        replace />} />
         <Route path="/settings"    element={<Navigate to="/dashboard/settings"    replace />} />
       </Routes>
