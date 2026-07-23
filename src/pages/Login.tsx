@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import { BASE_ASSESSMENT_URL } from '../lib/utils'
 import { Lock, Mail, Loader2, Eye, EyeOff } from 'lucide-react'
 
 export function Login() {
@@ -181,7 +182,7 @@ export function Login() {
 
         <p className="text-center text-xs text-white/50 mt-5">
           New athlete?{' '}
-          <Link to="/signup" className="miami-link">Create an account</Link>
+          <a href={BASE_ASSESSMENT_URL} className="miami-link">Create an account</a>
         </p>
         <p className="text-center text-xs text-white/25 mt-4 tracking-wider uppercase font-condensed">
           Know What Your Body Can Lift

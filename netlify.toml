@@ -41,15 +41,21 @@
   to     = "/index.html"
   status = 200
 
-[[redirects]]
-  from   = "/signup"
-  to     = "/index.html"
-  status = 200
-
+# Standalone athlete signup is retired. New athletes create their account in
+# ROMRx Base, so /signup redirects at the edge to the canonical Base explainer
+# page. Netlify preserves the original query string on the hop, and the target
+# is a different host so there is no redirect loop. /signup/coach is an exact
+# earlier match and is unaffected.
 [[redirects]]
   from   = "/signup/coach"
   to     = "/index.html"
   status = 200
+
+[[redirects]]
+  from   = "/signup"
+  to     = "https://romrx.io/bodybuilding"
+  status = 301
+  force  = true
 
 [[redirects]]
   from   = "/onboarding"

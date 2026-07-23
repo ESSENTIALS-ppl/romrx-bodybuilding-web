@@ -1,6 +1,11 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
+// Canonical ROMRx Base explainer page. All public new-athlete acquisition and
+// assessment entry points route here so that account creation happens in Base
+// rather than a standalone sport signup.
+export const BASE_ASSESSMENT_URL = 'https://romrx.io/bodybuilding'
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
