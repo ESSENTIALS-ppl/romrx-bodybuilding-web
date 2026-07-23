@@ -35,6 +35,13 @@
   status = 200
   force  = true
 
+# Hypertrophy article library (static SEO pages)
+[[redirects]]
+  from   = "/hypertrophy/sets-per-muscle-group-per-week"
+  to     = "/hypertrophy/sets-per-muscle-group-per-week.html"
+  status = 200
+  force  = true
+
 # React SPA routes
 [[redirects]]
   from   = "/login"
