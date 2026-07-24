@@ -72,6 +72,36 @@
   status = 200
   force  = true
 
+[[redirects]]
+  from   = "/natural-muscle-building-limit"
+  to     = "/natural-muscle-building-limit.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/how-to-bulk-without-getting-fat"
+  to     = "/how-to-bulk-without-getting-fat.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/best-diet-for-muscle-gain"
+  to     = "/best-diet-for-muscle-gain.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/best-supplements-for-muscle-growth"
+  to     = "/best-supplements-for-muscle-growth.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/gomad-diet-gallon-of-milk-a-day"
+  to     = "/gomad-diet-gallon-of-milk-a-day.html"
+  status = 200
+  force  = true
+
 # React SPA routes
 [[redirects]]
   from   = "/login"
