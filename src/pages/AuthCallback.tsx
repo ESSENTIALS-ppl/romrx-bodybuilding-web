@@ -2,9 +2,13 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-// Handles the magic link redirect from Supabase.
+// Handles the magic link / Base SSO redirect from Supabase.
 // Supabase appends access_token/refresh_token to the URL as a hash fragment.
-// This component waits for the session to be established, then redirects to the dashboard.
+// This component waits for the session to be established, then hands off to
+// /dashboard. ProtectedRoute owns entitlement/onboarding routing from there,
+// so a first-time user (no paid entitlement) lands on the onboarding/checkout
+// flow and an entitled user lands on the athlete dashboard. We deliberately do
+// not target the legacy /dashboard/my-body stub.
 export function AuthCallback() {
   const navigate = useNavigate()
 
@@ -12,7 +16,7 @@ export function AuthCallback() {
     // Give Supabase time to parse the URL hash and establish the session
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        navigate('/dashboard/my-body', { replace: true })
+        navigate('/dashboard', { replace: true })
       }
       // If no session after token processing, go to login
       if (event === 'INITIAL_SESSION' && !session) {
@@ -23,7 +27,7 @@ export function AuthCallback() {
     // Also try getting session immediately (handles cases where already processed)
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
-        navigate('/dashboard/my-body', { replace: true })
+        navigate('/dashboard', { replace: true })
       }
     })
 
