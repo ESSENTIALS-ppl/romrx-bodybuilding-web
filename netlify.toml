@@ -35,6 +35,19 @@
   status = 200
   force  = true
 
+# SEO articles
+[[redirects]]
+  from   = "/articles"
+  to     = "/articles.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/sets-per-muscle-group-per-week"
+  to     = "/sets-per-muscle-group-per-week.html"
+  status = 200
+  force  = true
+
 # React SPA routes
 [[redirects]]
   from   = "/login"
