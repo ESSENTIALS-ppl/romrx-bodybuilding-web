@@ -36,4 +36,18 @@
     <priority>0.3</priority>
   </url>
 
+  <url>
+    <loc>https://romrxbodybuilding.com/articles</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://romrxbodybuilding.com/sets-per-muscle-group-per-week</loc>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
