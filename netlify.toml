@@ -48,6 +48,30 @@
   status = 200
   force  = true
 
+[[redirects]]
+  from   = "/full-body-vs-upper-lower-split"
+  to     = "/full-body-vs-upper-lower-split.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/build-muscle-in-a-caloric-deficit"
+  to     = "/build-muscle-in-a-caloric-deficit.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/creatine-loading-phase"
+  to     = "/creatine-loading-phase.html"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/does-creatine-cause-hair-loss"
+  to     = "/does-creatine-cause-hair-loss.html"
+  status = 200
+  force  = true
+
 # React SPA routes
 [[redirects]]
   from   = "/login"
