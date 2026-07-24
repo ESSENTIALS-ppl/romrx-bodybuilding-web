@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { OnboardingGuard } from './components/OnboardingGuard'
 import { Layout } from './components/Layout'
 import { Login } from './pages/Login'
 import { AuthCallback } from './pages/AuthCallback'
@@ -29,8 +30,13 @@ export default function App() {
         <Route path="/signup/coach"     element={<CoachSignup />} />
         <Route path="/auth/callback"   element={<AuthCallback />} />
         <Route path="/auth/confirm"    element={<AuthConfirm />} />
-        <Route path="/onboarding/assessment" element={<Assessment />} />
-        <Route path="/onboarding/results"    element={<ResultsPreview />} />
+        {/* Onboarding is public-facing but gated: unauthenticated visitors are
+            sent to ROMRx Base (new-athlete acquisition lives there), while a
+            valid session keeps assessment/retest/results access. */}
+        <Route element={<OnboardingGuard />}>
+          <Route path="/onboarding/assessment" element={<Assessment />} />
+          <Route path="/onboarding/results"    element={<ResultsPreview />} />
+        </Route>
         <Route path="/unsubscribe"     element={<Unsubscribe />} />
 
         {/* / is handled by Netlify rewrite to marketing.html — this catches any edge case */}
