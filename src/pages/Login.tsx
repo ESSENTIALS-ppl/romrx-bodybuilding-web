@@ -18,7 +18,10 @@ export function Login() {
   const [cooldown, setCooldown]   = useState(0)
 
   useEffect(() => {
-    if (session) navigate('/dashboard/my-body', { replace: true })
+    // Already-authenticated visitors hand off to /dashboard; ProtectedRoute
+    // routes by entitlement / onboarding state rather than the legacy
+    // /dashboard/my-body stub.
+    if (session) navigate('/dashboard', { replace: true })
   }, [session, navigate])
 
   useEffect(() => {

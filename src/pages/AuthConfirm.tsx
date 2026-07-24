@@ -18,7 +18,10 @@ export function AuthConfirm() {
             console.error('Auth confirm error:', error?.message)
             navigate('/login?error=link_expired', { replace: true })
           } else {
-            navigate('/dashboard/my-body', { replace: true })
+            // Hand off to /dashboard; ProtectedRoute routes by entitlement /
+            // onboarding state (first-time users go to onboarding, not the
+            // legacy /dashboard/my-body stub).
+            navigate('/dashboard', { replace: true })
           }
         })
     } else {

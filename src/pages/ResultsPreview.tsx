@@ -99,7 +99,9 @@ export function ResultsPreview() {
         .maybeSingle()
 
       if (userRow?.subscription_status === 'active' || userRow?.subscription_status === 'trialing') {
-        navigate('/dashboard/my-body', { replace: true })
+        // Entitled user: hand off to /dashboard so ProtectedRoute lands them on
+        // the athlete dashboard, not the legacy /dashboard/my-body stub.
+        navigate('/dashboard', { replace: true })
         return
       }
 

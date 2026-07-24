@@ -6,6 +6,27 @@ import { twMerge } from 'tailwind-merge'
 // rather than a standalone sport signup.
 export const BASE_ASSESSMENT_URL = 'https://romrx.io/bodybuilding'
 
+// Campaign/attribution params that are safe to forward to Base when redirecting
+// a retired /signup hit. Anything not on this list is dropped so arbitrary or
+// sensitive params are not carried across to another host.
+const SAFE_CAMPAIGN_PARAMS = new Set([
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+  'ref', 'gclid', 'fbclid', 'msclkid',
+])
+
+// Build the Base URL, forwarding only the allowlisted campaign params from the
+// given query string. The destination host is fixed, so there is no open
+// redirect risk.
+export function baseAssessmentUrl(search: string): string {
+  const incoming = new URLSearchParams(search)
+  const kept = new URLSearchParams()
+  for (const [key, value] of incoming) {
+    if (SAFE_CAMPAIGN_PARAMS.has(key.toLowerCase())) kept.append(key, value)
+  }
+  const query = kept.toString()
+  return query ? `${BASE_ASSESSMENT_URL}?${query}` : BASE_ASSESSMENT_URL
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
