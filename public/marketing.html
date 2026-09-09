@@ -1,1 +1,176 @@
-PLACEHOLDER_LOAD_FROM_FILE
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROMRxBodyBuilding™ | Performance Intelligence for Bodybuilders</title>
+  <meta name="description" content="The first ROM-based training system built for bodybuilders. 274+ exercises rated, 14 joints assessed, 3 tiers from beginner to advanced. No guessing. No injuries from ignorance. Just data.">
+  <meta property="og:title" content="ROMRxBodyBuilding™ | Performance Intelligence for Bodybuilders">
+  <meta property="og:description" content="Know what your body can lift. The first ROM-based training system built for bodybuilders.">
+  <meta property="og:url" content="https://romrxbodybuilding.com">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://romrxbodybuilding.com">
+
+  <!-- Open Graph image -->
+  <meta property="og:image" content="https://romrxbodybuilding.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="ROMRxBodyBuilding">
+  <!-- Twitter / X card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ROMRxBodyBuilding™ | Performance Intelligence for Bodybuilders">
+  <meta name="twitter:description" content="Know what your body can lift. The first ROM-based training system built for bodybuilders.">
+  <meta name="twitter:image" content="https://romrxbodybuilding.com/og-image.png">
+  <!-- Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+  <meta name="apple-mobile-web-app-title" content="ROMRxBB">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#FF2D78">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23070711' width='100' height='100' rx='12'/><text x='50' y='72' font-size='60' font-weight='bold' fill='%23FF2D78' text-anchor='middle'>R</text></svg>">
+
+  <style>
+    /* ============================================================
+       ROMRxBodyBuilding - Marketing / Hero
+       Miami Vice × Golden Era BB × Rockstar / GTA
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #070711;
+      --bg2:         #0A0A18;
+      --hot-pink:    #FF2D78;
+      --pink-glow:   rgba(255,45,120,0.6);
+      --teal:        #00F5E4;
+      --teal-glow:   rgba(0,245,228,0.5);
+      --violet:      #B44FE8;
+      --orange:      #FF6B35;
+      --gold:        #FFD700;
+      --gold-warm:   #F5A623;
+      --text:        #F0EDE8;
+      --text-muted:  rgba(240,237,232,0.55);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== BACKGROUND SCENE ===== */
+    .scene { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+    .grid-floor {
+      position: absolute; bottom: -10%; left: 50%;
+      transform: translateX(-50%) perspective(600px) rotateX(65deg);
+      width: 200%; height: 70%;
+      background-image:
+        linear-gradient(var(--teal) 1px, transparent 1px),
+        linear-gradient(90deg, var(--teal) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.08;
+      transform-origin: bottom center;
+    }
+    .horizon {
+      position: absolute; bottom: 30%; left: 50%;
+      transform: translateX(-50%);
+      width: 120%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--hot-pink), var(--teal), transparent);
+      opacity: 0.4; filter: blur(2px);
+      box-shadow: 0 0 40px 8px var(--hot-pink), 0 0 80px 16px var(--teal);
+    }
+    .glow-blob { position: absolute; border-radius: 50%; filter: blur(100px); pointer-events: none; }
+    .blob-pink { width: 600px; height: 400px; background: var(--hot-pink); opacity: 0.08; top: 0; right: -10%; }
+    .blob-teal { width: 500px; height: 500px; background: var(--teal);     opacity: 0.06; bottom: 10%; left: -5%; }
+    .blob-gold { width: 400px; height: 300px; background: var(--gold);     opacity: 0.05; top: 30%; left: 50%; transform: translateX(-50%); }
+    .scanlines {
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.12) 2px, rgba(0,0,0,0.12) 4px);
+      pointer-events: none; z-index: 1;
+    }
+
+    /* ===== TOP NAV ===== */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 32px;
+      background: linear-gradient(180deg, rgba(7,7,17,0.95) 0%, transparent 100%);
+    }
+    .top-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 2px; color: var(--text);
+    }
+    .top-logo span { color: var(--hot-pink); }
+    .top-nav-links { display: flex; gap: 24px; align-items: center; }
+    .top-nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--text-muted); letter-spacing: 1.5px;
+      text-transform: uppercase; transition: color 0.2s;
+    }
+    .top-nav-links a:hover { color: var(--teal); }
+    .cta-pill {
+      background: var(--hot-pink); color: #fff !important;
+      padding: 8px 18px; border-radius: 4px;
+      box-shadow: 0 0 12px rgba(255,45,120,0.4);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .cta-pill:hover { background: #e01f65; box-shadow: 0 0 20px var(--pink-glow); color: #fff !important; }
+
+    /* ===== PAGE ===== */
+    .page {
+      position: relative; z-index: 2;
+      padding: 100px 24px 80px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* ===== HERO ===== */
+    .hero-content { text-align: center; max-width: 960px; margin: 0 auto; }
+
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: rgba(0,245,228,0.08);
+      border: 1px solid rgba(0,245,228,0.4);
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 36px;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal); box-shadow: 0 0 10px var(--teal);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    .headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 14vw, 11rem);
+      line-height: 0.92; letter-spacing: 2px;
+    }
+    .headline .line-1 { display: block; color: var(--text); }
+    .headline .line-2 {
+      display: block;
+      background: linear-gradient(135deg, var(--hot-pink) 0%, var(--orange) 50%, var(--gold-warm) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(255,45,120,0.5));
+    }
+    .headline .line-3 {
+      display: block; color: var(--teal);
+      text-shadow: 0 0 40px var(--teal-glow), 0 0 80px rgba(0,245,228,0.2);
+    }
+
+    .subline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1rem, 2.
