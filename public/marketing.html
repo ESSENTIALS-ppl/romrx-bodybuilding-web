@@ -173,4 +173,400 @@
 
     .subline {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(1rem, 2.
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      font-weight: 400; letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 24px 0 8px;
+    }
+    .subline span { color: var(--gold); }
+
+    .neon-divider {
+      width: 120px; height: 2px;
+      background: linear-gradient(90deg, var(--hot-pink), var(--teal));
+      margin: 28px auto 32px;
+      box-shadow: 0 0 12px var(--pink-glow), 0 0 24px var(--teal-glow);
+    }
+
+    .premise {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 620px; margin: 0 auto 48px;
+      line-height: 1.75;
+    }
+    .premise strong { color: var(--text); font-weight: 600; }
+
+    /* ===== PRIMARY CTAs (replaces waitlist - app is live) ===== */
+    .cta-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      justify-content: center;
+      margin: 8px auto 28px;
+    }
+    .btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.25rem; letter-spacing: 2.5px;
+      padding: 16px 36px; border: none; border-radius: 4px;
+      cursor: pointer; transition: all 0.2s;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+    }
+    .btn-primary {
+      background: var(--hot-pink); color: #fff;
+      box-shadow: 0 0 20px rgba(255,45,120,0.35);
+    }
+    .btn-primary:hover {
+      background: #e01f65;
+      box-shadow: 0 0 32px var(--pink-glow), 0 0 64px rgba(255,45,120,0.2);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: transparent; color: var(--teal);
+      border: 1px solid var(--teal);
+      box-shadow: 0 0 12px rgba(0,245,228,0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(0,245,228,0.08);
+      box-shadow: 0 0 24px var(--teal-glow);
+    }
+
+    /* ===== FEATURE PILLS ===== */
+    .feature-pills {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 10px;
+      margin: 40px 0 52px;
+    }
+    .pill {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 7px 18px; border-radius: 3px; border: 1px solid;
+    }
+    .pill-pink  { color: var(--hot-pink); border-color: rgba(255,45,120,0.35); background: rgba(255,45,120,0.07); }
+    .pill-teal  { color: var(--teal);     border-color: rgba(0,245,228,0.3);   background: rgba(0,245,228,0.05); }
+    .pill-gold  { color: var(--gold);     border-color: rgba(255,215,0,0.3);   background: rgba(255,215,0,0.05); }
+    .pill-violet{ color: var(--violet);   border-color: rgba(180,79,232,0.3);  background: rgba(180,79,232,0.05); }
+
+    /* ===== TIER STRIP ===== */
+    .tier-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-top: 48px; max-width: 900px; width: 100%;
+    }
+    .tier-card {
+      padding: 24px 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      text-align: left;
+    }
+    .tier-card .tier-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.4rem; letter-spacing: 2px;
+      display: block; line-height: 1; margin-bottom: 4px;
+    }
+    .tier-card .tier-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.85rem; letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 16px;
+    }
+    .tier-card .tier-desc { font-size: 0.92rem; color: rgba(240,237,232,0.7); line-height: 1.55; }
+    .tier-card.beg { border-color: rgba(0,245,228,0.25); }
+    .tier-card.beg .tier-num { color: var(--teal); text-shadow: 0 0 16px var(--teal-glow); }
+    .tier-card.int { border-color: rgba(255,215,0,0.25); }
+    .tier-card.int .tier-num { color: var(--gold); text-shadow: 0 0 16px rgba(255,215,0,0.4); }
+    .tier-card.adv { border-color: rgba(255,45,120,0.3); }
+    .tier-card.adv .tier-num { color: var(--hot-pink); text-shadow: 0 0 16px var(--pink-glow); }
+
+    /* ===== STATS STRIP ===== */
+    .stats-strip {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      margin-top: 64px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 36px;
+      width: 100%; max-width: 760px;
+    }
+    .stat-block {
+      text-align: center; padding: 0 12px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem; letter-spacing: 2px;
+      display: block; line-height: 1; margin-bottom: 4px;
+    }
+    .stat-num.pink { color: var(--hot-pink); text-shadow: 0 0 20px var(--pink-glow); }
+    .stat-num.teal { color: var(--teal);     text-shadow: 0 0 20px var(--teal-glow); }
+    .stat-num.gold { color: var(--gold);     text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+    .stat-num.violet { color: var(--violet); text-shadow: 0 0 20px rgba(180,79,232,0.5); }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ===== SCIENCE STATEMENT ===== */
+    .science-statement {
+      margin-top: 40px;
+      padding: 20px 32px;
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 4px;
+      background: rgba(255,215,0,0.04);
+      max-width: 760px;
+      text-align: center;
+    }
+    .science-statement p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.05rem; font-weight: 600;
+      letter-spacing: 1px;
+      color: rgba(240,237,232,0.75);
+      line-height: 1.5;
+    }
+    .science-statement p strong { color: var(--gold); }
+
+    /* ===== ROLES SECTION ===== */
+    .roles {
+      max-width: 1100px; width: 100%;
+      margin: 80px auto 0;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .role-card {
+      padding: 32px 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      position: relative;
+    }
+    .role-card .role-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 3px;
+      position: absolute; top: 18px; right: 18px;
+    }
+    .role-card.athletes .role-tag { color: var(--teal); background: rgba(0,245,228,0.1); border: 1px solid rgba(0,245,228,0.3); }
+    .role-card.trainers .role-tag { color: var(--gold); background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); }
+    .role-card.gyms .role-tag { color: var(--violet); background: rgba(180,79,232,0.1); border: 1px solid rgba(180,79,232,0.3); }
+    .role-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem; letter-spacing: 1.5px;
+      margin-bottom: 12px;
+    }
+    .role-card.athletes h3 { color: var(--teal); }
+    .role-card.trainers h3 { color: var(--gold); }
+    .role-card.gyms h3 { color: var(--violet); }
+    .role-card p {
+      font-size: 0.95rem; color: rgba(240,237,232,0.7);
+      line-height: 1.6; margin-bottom: 18px;
+    }
+    .role-card a.role-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.88rem; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      border-bottom: 1px solid currentColor; padding-bottom: 2px;
+    }
+    .role-card.athletes a.role-cta { color: var(--teal); }
+    .role-card.trainers a.role-cta { color: var(--gold); }
+    .role-card.gyms a.role-cta { color: var(--violet); }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      position: relative; z-index: 2;
+      text-align: center;
+      padding: 60px 24px 40px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      margin-top: 100px;
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem; letter-spacing: 3px;
+      color: rgba(240,237,232,0.3); margin-bottom: 8px;
+    }
+    .footer-logo span { color: rgba(255,45,120,0.5); }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 10px; flex-wrap: wrap; }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: rgba(240,237,232,0.25);
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--teal); }
+    .footer-copy {
+      font-size: 0.7rem;
+      color: rgba(240,237,232,0.15);
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== MOBILE ===== */
+    @media (max-width: 800px) {
+      .top-nav-links { gap: 14px; }
+      .top-nav-links a { font-size: 0.78rem; }
+      .roles { grid-template-columns: 1fr; }
+      .tier-strip { grid-template-columns: 1fr; }
+      .stats-strip { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .stat-block:nth-child(2) { border-right: none; }
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-content > * { opacity: 0; animation: fadeUp 0.7s ease forwards; }
+    .live-badge   { animation-delay: 0.05s; }
+    .headline     { animation-delay: 0.2s; }
+    .subline      { animation-delay: 0.35s; }
+    .neon-divider { animation-delay: 0.45s; }
+    .premise      { animation-delay: 0.5s; }
+    .cta-row      { animation-delay: 0.6s; }
+    .feature-pills{ animation-delay: 0.7s; }
+    .tier-strip   { animation-delay: 0.8s; }
+    .stats-strip  { animation-delay: 0.85s; }
+    .science-statement { animation-delay: 0.9s; }
+  </style>
+</head>
+<body>
+
+  <div class="scene" aria-hidden="true">
+    <div class="glow-blob blob-pink"></div>
+    <div class="glow-blob blob-teal"></div>
+    <div class="glow-blob blob-gold"></div>
+    <div class="grid-floor"></div>
+    <div class="horizon"></div>
+    <div class="scanlines"></div>
+  </div>
+
+  <header class="top-bar">
+    <a href="/" class="top-logo">ROMRx<span>BB</span></a>
+    <nav class="top-nav-links">
+      <a href="/athletes">Athletes</a>
+      <a href="/trainers">Trainers</a>
+      <a href="/gyms">Gyms</a>
+      <a href="/login">Sign in</a>
+      <a href="https://romrx.io/bodybuilding" class="cta-pill">Get Started</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <div class="hero-content">
+
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Now Live - Free Profile Included
+      </div>
+
+      <h1 class="headline">
+        <span class="line-1">KNOW WHAT</span>
+        <span class="line-2">YOUR BODY</span>
+        <span class="line-3">CAN LIFT.</span>
+      </h1>
+
+      <p class="subline">
+        The first ROM-based training system <span>built for bodybuilders</span>
+      </p>
+
+      <div class="neon-divider"></div>
+
+      <p class="premise">
+        Your range of motion is the hidden ceiling on your muscle growth.
+        <strong>ROMRxBodyBuilding</strong> maps 274+ exercises to your exact joint angles
+        and tells you which lifts your body is ready to load, which need modification,
+        and which to skip entirely until your mobility catches up.
+        <strong>No guessing. No injuries from ignorance. Just data.</strong>
+      </p>
+
+      <div class="cta-row">
+        <a href="https://romrx.io/bodybuilding" class="btn btn-primary">Start Free &rarr;</a>
+        <a href="/login" class="btn btn-secondary">Sign In</a>
+      </div>
+
+      <div class="feature-pills">
+        <span class="pill pill-pink">274+ Exercises Rated</span>
+        <span class="pill pill-teal">14 Joints Assessed</span>
+        <span class="pill pill-gold">11 Template Workouts</span>
+        <span class="pill pill-violet">RomBot AI Coach</span>
+        <span class="pill pill-pink">Tiered Progression</span>
+        <span class="pill pill-teal">6-Week Reassessment</span>
+        <span class="pill pill-gold">Free Profile</span>
+        <span class="pill pill-violet">Zero Wearables</span>
+      </div>
+
+      <div class="tier-strip">
+        <div class="tier-card beg">
+          <span class="tier-num">88</span>
+          <span class="tier-label">Beginner</span>
+          <p class="tier-desc">Foundational ROM. Safe entry lifts for every muscle group. Build your base before unlocking heavier loads.</p>
+        </div>
+        <div class="tier-card int">
+          <span class="tier-num">117</span>
+          <span class="tier-label">Intermediate</span>
+          <p class="tier-desc">Compound progressions and accessory variety. 205 total lifts available once your ROM clears intermediate thresholds.</p>
+        </div>
+        <div class="tier-card adv">
+          <span class="tier-num">69</span>
+          <span class="tier-label">Advanced</span>
+          <p class="tier-desc">Specialty patterns, advanced angles, max-tension variants. Full 274-lift library at your disposal.</p>
+        </div>
+      </div>
+
+      <div class="stats-strip">
+        <div class="stat-block">
+          <span class="stat-num pink">274</span>
+          <span class="stat-label">Exercises Rated</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num teal">14</span>
+          <span class="stat-label">Joints Assessed</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num gold">15</span>
+          <span class="stat-label">Min to Full Profile</span>
+        </div>
+        <div class="stat-block">
+          <span class="stat-num violet">11</span>
+          <span class="stat-label">Template Workouts</span>
+        </div>
+      </div>
+
+      <div class="science-statement">
+        <p><strong>~150+ individual ROM data points</strong> sourced from peer-reviewed journals including JSCR, BJSM, and IJSPT, and leading biomechanics textbooks. Every threshold is evidence-based, not estimated.</p>
+      </div>
+
+      <!-- ROLE CARDS -->
+      <div class="roles">
+        <div class="role-card athletes">
+          <span class="role-tag">Available</span>
+          <h3>For Athletes</h3>
+          <p>Assess your ROM in 15 minutes. Get a personalized library of lifts your body is ready for, plus tiered template workouts you can run today.</p>
+          <a href="/athletes" class="role-cta">Learn more &rarr;</a>
+        </div>
+        <div class="role-card trainers">
+          <span class="role-tag">In Development</span>
+          <h3>For Trainers</h3>
+          <p>Manage clients, prescribe ROM-aware programs, and reassess every 6 weeks. Coach portal coming alongside our trainer pilot cohort.</p>
+          <a href="/trainers" class="role-cta">Get notified &rarr;</a>
+        </div>
+        <div class="role-card gyms">
+          <span class="role-tag">Coming Soon</span>
+          <h3>For Gyms</h3>
+          <p>Equip every member with a Gym Readiness Profile. Reduce injuries, raise retention, and turn ROM into a tracked KPI.</p>
+          <a href="/gyms" class="role-cta">Join waitlist &rarr;</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-logo">ROMRx<span>BodyBuilding</span>&trade;</div>
+    <div class="footer-links">
+      <a href="/athletes">Athletes</a>
+      <a href="/trainers">Trainers</a>
+      <a href="/gyms">Gyms</a>
+      <a href="/legal">Legal</a>
+      <a href="https://romrx.io" target="_blank">romrx.io</a>
+      <a href="https://romrxbjj.com" target="_blank">ROMRxBJJ</a>
+      <a href="mailto:info@romrx.io">Contact</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 ROMRx LLC &middot; romrxbodybuilding.com</p>
+  </footer>
+
+</body>
+</html>
