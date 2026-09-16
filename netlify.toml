@@ -22,6 +22,12 @@
   status = 301
   force  = true
 
+[[redirects]]
+  from   = "/legal.html"
+  to     = "https://romrx.io/legal"
+  status = 301
+  force  = true
+
 # Marketing sub-pages
 [[redirects]]
   from   = "/athletes"
