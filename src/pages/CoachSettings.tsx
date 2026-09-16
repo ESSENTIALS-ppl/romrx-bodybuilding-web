@@ -327,10 +327,10 @@ export function CoachSettings() {
             </a>
           </div>
           <div className="pt-2 border-t border-teal-light flex gap-4">
-            <a href="/legal" target="_blank" className="text-xs text-charcoal-light hover:text-teal transition-colors flex items-center gap-1">
+            <a href="https://romrx.io/legal" target="_blank" className="text-xs text-charcoal-light hover:text-teal transition-colors flex items-center gap-1">
               <ExternalLink size={11} /> Terms of Service
             </a>
-            <a href="/legal" target="_blank" className="text-xs text-charcoal-light hover:text-teal transition-colors flex items-center gap-1">
+            <a href="https://romrx.io/legal" target="_blank" className="text-xs text-charcoal-light hover:text-teal transition-colors flex items-center gap-1">
               <ExternalLink size={11} /> Privacy Policy
             </a>
           </div>
