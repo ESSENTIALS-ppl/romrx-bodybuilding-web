@@ -862,7 +862,7 @@ function AthleteSettings() {
               <ChevronRight size={14} className="text-charcoal-light" />
             </a>
             <a
-              href="/legal"
+              href="https://romrx.io/legal"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
@@ -870,7 +870,7 @@ function AthleteSettings() {
               <ExternalLink size={15} className="text-miami shrink-0" />
               <span className="flex-1">
                 Terms of Service &amp; Privacy Policy
-                <span className="block text-xs text-charcoal-light font-normal mt-0.5">romrxbodybuilding.com/legal</span>
+                <span className="block text-xs text-charcoal-light font-normal mt-0.5">romrx.io/legal</span>
               </span>
               <ChevronRight size={14} className="text-charcoal-light" />
             </a>

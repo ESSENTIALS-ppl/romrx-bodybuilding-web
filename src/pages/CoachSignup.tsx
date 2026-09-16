@@ -212,7 +212,7 @@ export function CoachSignup() {
               className="mt-0.5 h-4 w-4 rounded border-teal-light accent-teal shrink-0 cursor-pointer" />
             <span className="text-xs text-charcoal-light leading-relaxed">
               I have read and agree to the{' '}
-              <a href="/legal" target="_blank" rel="noopener noreferrer" className="text-teal underline font-medium">
+              <a href="https://romrx.io/legal" target="_blank" rel="noopener noreferrer" className="text-teal underline font-medium">
                 ROMRx LLC Terms of Service, Privacy Policy &amp; Refund Policy
               </a>
               , a company-wide agreement with ROMRx LLC (parent of ROMRxBodyBuilding, ROMRxBJJ, and other ROMRx products). All sales are final.

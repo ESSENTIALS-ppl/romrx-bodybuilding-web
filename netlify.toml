@@ -9,11 +9,17 @@
   status = 200
   force  = true
 
-# Legal page
+# Canonical legal lives on romrx.io (company-wide SSOT)
 [[redirects]]
   from   = "/legal"
-  to     = "/legal.html"
-  status = 200
+  to     = "https://romrx.io/legal"
+  status = 301
+  force  = true
+
+[[redirects]]
+  from   = "/legal/"
+  to     = "https://romrx.io/legal"
+  status = 301
   force  = true
 
 # Marketing sub-pages
