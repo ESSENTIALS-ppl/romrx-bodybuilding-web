@@ -59,10 +59,11 @@ function computePRS(a: Assessment): number {
 }
 
 function getPRSTier(s: number) {
-  // Locked Base bands: 1 Needs focus / 2 Building / 3 Steady
-  if (s >= 70) return { label: 'Steady',      color: 'text-miami',        bg: 'bg-miami-light' }
-  if (s >= 40) return { label: 'Building',    color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
-  return              { label: 'Needs focus', color: 'text-red-tier',    bg: 'bg-red-tier-bg' }
+  if (s >= 85) return { label: 'ELITE',      color: 'text-miami',        bg: 'bg-miami-light' }
+  if (s >= 70) return { label: 'STRONG',     color: 'text-miami',        bg: 'bg-miami-light' }
+  if (s >= 55) return { label: 'DEVELOPING', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
+  if (s >= 40) return { label: 'RESTRICTED', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
+  return              { label: 'AT RISK',    color: 'text-red-tier',    bg: 'bg-red-tier-bg' }
 }
 
 // ── Section wrapper ───────────────────────────────────────────────────────────
@@ -233,7 +234,7 @@ function AthleteSettings() {
         setPushReminders(data.push_reminders ?? false)
         setReminderTime(data.reminder_time ?? '08:00')
       } else {
-        // First load - upsert defaults
+        // First load — upsert defaults
         await supabase.from('notification_preferences').upsert(
           {
             user_id: user!.id,
@@ -294,7 +295,7 @@ function AthleteSettings() {
         return
       }
       const registration = await navigator.serviceWorker.ready
-      // VAPID public key - replace with your actual key from vapidkeys.com
+      // VAPID public key — replace with your actual key from vapidkeys.com
       const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY ?? ''
       if (!VAPID_PUBLIC_KEY) {
         setPushMsg({ type: 'err', text: 'VAPID public key not configured. Set VITE_VAPID_PUBLIC_KEY in .env.' })
@@ -319,7 +320,7 @@ function AthleteSettings() {
     }
   }
 
-  // ── Save profile (SECURITY DEFINER RPC - bypasses RLS) ──
+  // ── Save profile (SECURITY DEFINER RPC — bypasses RLS) ──
   const handleSaveProfile = async () => {
     if (!user) return
     setSaving(true)
@@ -337,7 +338,7 @@ function AthleteSettings() {
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
 
-    // Belt changed + user has an assessment - recompute technique eligibility
+    // Belt changed + user has an assessment — recompute technique eligibility
     if (belt !== originalBelt && assessment) {
       setRecomputing(true)
       try {
@@ -879,7 +880,7 @@ function AthleteSettings() {
         {/* ── FEEDBACK ── */}
         <Section title="Feedback" icon={<MessageSquarePlus size={14} />}>
           <p className="text-xs text-charcoal-light -mt-2">
-            Found a bug or have an idea? Tell us directly - it comes straight to the team.
+            Found a bug or have an idea? Tell us directly — it comes straight to the team.
           </p>
           <FeedbackWidget />
         </Section>
@@ -928,7 +929,7 @@ function AthleteSettings() {
                   </button>
                 </div>
 
-                {/* Reminder time picker - shown when email reminders on */}
+                {/* Reminder time picker — shown when email reminders on */}
                 {emailReminders && (
                   <div className="flex items-center gap-3 pl-1">
                     <label className="text-xs text-charcoal-light font-semibold uppercase tracking-wide whitespace-nowrap">
