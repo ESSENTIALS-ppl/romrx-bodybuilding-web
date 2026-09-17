@@ -7,9 +7,10 @@ import { EmptyState } from '../components/EmptyState'
 import { Spinner } from '../components/Spinner'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { cn, bbTierColor, bbTierLabel, formatJoint } from '../lib/utils'
+import { bandScoreFromAggregate, bandFull, BAND_DESC } from '../lib/mobilityBands'
 import { AlertTriangle, Activity, TrendingUp } from 'lucide-react'
 
-// ── Position Readiness Score ──────────────────────────────────────────────────
+// ── Mobility band (aggregate from joint thresholds) ─────────────────────────────
 const PRS_BILATERAL = [
   { l: 'hip_er_l',       r: 'hip_er_r',        riskBelow: 40,  normalMin: 40  },
   { l: 'hip_ir_l',       r: 'hip_ir_r',        riskBelow: 30,  normalMin: 30  },
@@ -52,11 +53,10 @@ function computePRS(a: Assessment): number {
 }
 
 function getPRSTier(s: number) {
-  if (s >= 85) return { label: 'ELITE',      color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
-  if (s >= 70) return { label: 'STRONG',     color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
-  if (s >= 55) return { label: 'DEVELOPING', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
-  if (s >= 40) return { label: 'RESTRICTED', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
-  return              { label: 'AT RISK',    color: 'text-red-tier',   bg: 'bg-red-tier-bg',     ring: 'border-red-tier/40' }
+  const band = bandScoreFromAggregate(s)
+  if (band === 3) return { label: bandFull(3), color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40', desc: BAND_DESC[3] }
+  if (band === 2) return { label: bandFull(2), color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40', desc: BAND_DESC[2] }
+  return              { label: bandFull(1), color: 'text-red-tier',   bg: 'bg-red-tier-bg',     ring: 'border-red-tier/40', desc: BAND_DESC[1] }
 }
 
 const OPTIMAL: Record<string, number> = {
@@ -130,7 +130,7 @@ export function MyBody() {
     <EmptyState
       icon={Activity}
       title="No assessment on file"
-      description="Complete your ROM self-assessment to see your body map, joint breakdown, and technique readiness."
+      description="Complete your ROM self-assessment to see your body map, joint breakdown, and mobility bands."
       action={<a href="/dashboard/settings" className="btn-primary text-sm">Get started</a>}
     />
   )
@@ -149,7 +149,7 @@ export function MyBody() {
         badgeColor={bbTierColor(bbTier)}
       />
 
-      {/* Movement Readiness Score */}
+      {/* Mobility band */}
       <div className={cn('flex items-center gap-4 rounded-2xl border p-4', tier.bg, tier.ring.replace('border-', 'border ').replace('/40', ''))}>
         <div className={cn('w-16 h-16 rounded-full border-2 flex flex-col items-center justify-center shrink-0', tier.ring)}>
           <span className={cn('font-display font-bold text-2xl leading-none', tier.color)}>{prs}</span>
@@ -158,7 +158,7 @@ export function MyBody() {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <TrendingUp size={13} className={tier.color} />
-            <span className={cn('text-xs font-bold uppercase tracking-wider', tier.color)}>Movement Readiness Score</span>
+            <span className={cn('text-xs font-bold tracking-wider', tier.color)}>Mobility band</span>
           </div>
           <p className={cn('text-lg font-bold leading-tight', tier.color)}>{tier.label}</p>
           <p className="text-xs text-charcoal-light mt-0.5">Retest every 6 weeks to track progress</p>

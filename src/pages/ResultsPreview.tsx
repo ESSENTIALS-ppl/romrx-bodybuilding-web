@@ -59,11 +59,10 @@ function computePRS(assessment: Record<string, any>): number {
 }
 
 function getPRSTier(score: number): { label: string; color: string; bg: string; desc: string } {
-  if (score >= 85) return { label: 'ELITE',       color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
-  if (score >= 70) return { label: 'STRONG',      color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Good mobility foundation. A few gaps to address.' }
-  if (score >= 55) return { label: 'DEVELOPING',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'ROM limitations are affecting your lifting readiness.' }
-  if (score >= 40) return { label: 'RESTRICTED',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Significant mobility restrictions. Prioritize your protocol.' }
-  return                  { label: 'AT RISK',     color: 'text-red-400',   bg: 'bg-red-500/20',    desc: 'Multiple AT RISK joints. Prioritize injury prevention immediately.' }
+  // Locked Base bands: 1 Needs focus / 2 Building / 3 Steady (progress-needed tone)
+  if (score >= 70) return { label: 'Steady',      color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Solid mobility foundation. Keep training and retest regularly.' }
+  if (score >= 40) return { label: 'Building',    color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Progress needed on key joints. Stay consistent with your plan.' }
+  return                  { label: 'Needs focus', color: 'text-red-400',   bg: 'bg-red-500/20',    desc: 'Priority joints need work. Small daily progress moves you up.' }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -165,7 +164,7 @@ export function ResultsPreview() {
         {/* Header */}
         <div className="text-center">
           <h1 className="font-display font-bold text-miami-text text-2xl">Your Results Are In</h1>
-          <p className="text-sm text-miami-text/60 mt-1">Know What Your Body Can Lift — by ROMRxBB</p>
+          <p className="text-sm text-miami-text/60 mt-1">Know What Your Body Can Lift - by ROMRxBB</p>
         </div>
 
         {/* PRS Score Card */}
@@ -206,7 +205,7 @@ export function ResultsPreview() {
           </div>
         )}
 
-        {/* Teaser — locked content */}
+        {/* Teaser - locked content */}
         <div className="bg-miami-ink rounded-2xl border border-miami/20 p-5 space-y-3 relative overflow-hidden">
           <div className="absolute inset-0 bg-miami-bg/60 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
             <div className="text-center space-y-2">
@@ -215,14 +214,14 @@ export function ResultsPreview() {
               <p className="text-xs text-miami-text/60">132 technique ratings, full protocol, ROMBot</p>
             </div>
           </div>
-          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game — Technique Readiness</p>
+          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game - Technique Readiness</p>
           <div className="flex gap-2">
             <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">?? GREEN</span>
             <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">?? YELLOW</span>
             <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">?? RED</span>
           </div>
           <div className="space-y-2">
-            {['My Protocol — Top 3 Priority Joints', 'My Game — Offense + Defense Flow', 'ROMBot — Ask anything about your data'].map(item => (
+            {['My Protocol - Top 3 Priority Joints', 'My Game - Offense + Defense Flow', 'ROMBot - Ask anything about your data'].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <CheckCircle size={14} className="text-miami/40" />
                 <span className="text-sm text-miami-text/40 blur-sm select-none">{item}</span>
@@ -239,7 +238,7 @@ export function ResultsPreview() {
           className="w-full py-4 bg-gold text-charcoal font-display font-bold text-base rounded-2xl hover:bg-gold-hover transition-colors flex items-center justify-center gap-2"
         >
           {paying ? 'Setting up payment...' : <>
-            <Unlock size={18} /> Unlock My Full Dashboard — $149/yr
+            <Unlock size={18} /> Unlock My Full Dashboard - $149/yr
           </>}
         </button>
         <p className="text-center text-xs text-miami-text/30">
