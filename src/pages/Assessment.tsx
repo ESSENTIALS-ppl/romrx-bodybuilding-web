@@ -14,7 +14,7 @@ interface Field {
   unit?: string
   normalLow: number
   normalHigh: number
-  riskBelow: number  // Needs focus (band 1) threshold
+  riskBelow: number  // AT RISK threshold
 }
 
 interface Step {
@@ -56,7 +56,7 @@ const STEPS: Step[] = [
     mistake: 'Your thigh rotates instead of just your shin.',
     mistakeFix: 'Press one hand gently on your thigh to hold it still. Only the lower leg moves.',
     videoUrl: 'https://www.youtube.com/watch?v=HKYVJHnrReU',
-    videoLabel: 'Hip IR & ER - Seated Shin Method (John Hancock OTD)',
+    videoLabel: 'Hip IR & ER — Seated Shin Method (John Hancock OTD)',
     fields: [
       { key: 'hip_er_l', label: 'Left', unit: '°', normalLow: 40, normalHigh: 60, riskBelow: 40 },
       { key: 'hip_er_r', label: 'Right', unit: '°', normalLow: 40, normalHigh: 60, riskBelow: 40 },
@@ -104,7 +104,7 @@ const STEPS: Step[] = [
     mistake: 'Your shoulder shrugs up or your elbow drops below shoulder height.',
     mistakeFix: 'Keep your shoulder pressed down and your elbow at the same height the whole time. From the elbow to the shoulder, the arm only rotates - it does not lift up or drop down.',
     videoUrl: 'https://www.youtube.com/watch?v=ucw-RsD5sEE',
-    videoLabel: 'Shoulder ER Self-Assessment - Seated Method (Athletes\' Potential)',
+    videoLabel: 'Shoulder ER Self-Assessment — Seated Method (Athletes\' Potential)',
     fields: [
       { key: 'shoulder_er_l', label: 'Left', unit: '°', normalLow: 60, normalHigh: 90, riskBelow: 60 },
       { key: 'shoulder_er_r', label: 'Right', unit: '°', normalLow: 60, normalHigh: 90, riskBelow: 60 },
@@ -113,7 +113,7 @@ const STEPS: Step[] = [
   {
     id: 'shoulder_flex',
     title: 'Shoulder Flexion',
-    whyMatters: 'Overhead press, snatch, jerk, even pullovers - locked-out arms only if the joint allows it.',
+    whyMatters: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
     tool: 'iPhone: Measure → Level  ·  Android: Simple Inclinometer  ·  Standing',
     position: [
       'Stand upright with room overhead and your arm hanging relaxed at your side.',
@@ -231,7 +231,7 @@ const STEPS: Step[] = [
   {
     id: 'lumbar',
     title: 'Lumbar Flexion + Extension',
-    whyMatters: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings - low extension is what loads your discs.',
+    whyMatters: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings — low extension is what loads your discs.',
     tool: 'iPhone: Measure → Level  ·  Android: Simple Inclinometer  ·  Standing + Floor',
     position: [
       'Flexion is standing. Extension is on the floor face down.',
@@ -245,7 +245,7 @@ const STEPS: Step[] = [
     mistake: 'Rounding the back to get lower on flexion, or letting your hips lift off the floor during the cobra.',
     mistakeFix: 'For flexion, the stretch in the back of your legs is your true stopping point. For extension, your hips stay flat on the floor the entire time - only your chest rises.',
     videoUrl: 'https://www.youtube.com/watch?v=FlNXMZ_cUGM',
-    videoLabel: 'Lumbar Flexion & Extension - Phone Inclinometer Method (Dr. Bryan PT)',
+    videoLabel: 'Lumbar Flexion & Extension — Phone Inclinometer Method (Dr. Bryan PT)',
     fields: [
       { key: 'lumbar_flex', label: 'Flexion', unit: '°', normalLow: 40, normalHigh: 80, riskBelow: 40 },
       { key: 'lumbar_ext', label: 'Extension', unit: '°', normalLow: 20, normalHigh: 30, riskBelow: 15 },
@@ -271,7 +271,7 @@ const STEPS: Step[] = [
     mistake: 'Your heel lifts off the floor as your knee drives forward.',
     mistakeFix: 'Keep your eye on your heel the whole time. If it lifts even slightly, that rep does not count. Adjust your foot closer to the wall and try again.',
     videoUrl: 'https://www.youtube.com/watch?v=u3NbKOXl75k',
-    videoLabel: 'Knee-to-Wall Ankle Test - Exact Solo Method (Aleks Physio)',
+    videoLabel: 'Knee-to-Wall Ankle Test — Exact Solo Method (Aleks Physio)',
     fields: [
       { key: 'ankle_df_l', label: 'Left', unit: 'cm', normalLow: 10, normalHigh: 20, riskBelow: 10 },
       { key: 'ankle_df_r', label: 'Right', unit: 'cm', normalLow: 10, normalHigh: 20, riskBelow: 10 },
@@ -306,14 +306,14 @@ function MeasureInput({ field, value, onChange }: {
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <label className="text-sm font-semibold text-miami-text">{field.label}</label>
-        <span className="text-xs text-miami-text/60">Normal: {field.normalLow}-{field.normalHigh}{field.unit}</span>
+        <span className="text-xs text-miami-text/60">Normal: {field.normalLow}–{field.normalHigh}{field.unit}</span>
       </div>
       <div className="flex items-center gap-3">
         <input
           type="number" min="0" max="360" step="0.5"
           value={value}
           onChange={e => onChange(field.key, e.target.value)}
-          placeholder=" - "
+          placeholder="—"
           className={cn(
             'w-24 px-3 py-2.5 rounded-xl border text-sm text-center font-mono font-bold transition-all focus:outline-none',
             score === 'risk'       ? 'border-red-500 bg-red-500/15 text-red-400 focus:border-red-400' :
@@ -325,17 +325,17 @@ function MeasureInput({ field, value, onChange }: {
         <span className="text-sm text-miami-text/60">{field.unit}</span>
         {score === 'risk' && (
           <span className="flex items-center gap-1 text-xs font-bold text-red-400 bg-red-500/20 border border-red-500/40 px-2 py-0.5 rounded-full">
-            <AlertTriangle size={10} /> Focus
+            <AlertTriangle size={10} /> AT RISK
           </span>
         )}
         {score === 'functional' && (
           <span className="flex items-center gap-1 text-xs font-bold text-green-400 bg-green-500/20 border border-green-500/40 px-2 py-0.5 rounded-full">
-            <CheckCircle2 size={10} /> Steady
+            <CheckCircle2 size={10} /> FUNCTIONAL
           </span>
         )}
         {score === 'yellow' && (
           <span className="flex items-center gap-1 text-xs font-bold text-yellow-400 bg-yellow-500/20 border border-yellow-500/40 px-2 py-0.5 rounded-full">
-            Building
+            ⚠ LOW
           </span>
         )}
       </div>
@@ -369,7 +369,7 @@ export function Assessment() {
   }
 
   const submit = async () => {
-    if (!session) { setError('Session expired - please sign in again.'); return }
+    if (!session) { setError('Session expired — please sign in again.'); return }
     setLoading(true); setError('')
     const payload: Record<string, number | null> = {}
     for (const [k, v] of Object.entries(values)) {
@@ -432,7 +432,7 @@ export function Assessment() {
           </div>
 
           <button onClick={() => setPhase('measure')} className="btn-primary w-full flex items-center justify-center gap-2 text-base py-3">
-            I'm ready - Start assessment <ChevronRight size={18} />
+            I'm ready — Start assessment <ChevronRight size={18} />
           </button>
           <p className="text-center text-xs text-miami-text/60">You can skip any measurement you can't do and retest later.</p>
         </div>
