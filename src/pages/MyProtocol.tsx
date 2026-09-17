@@ -615,7 +615,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'shoulder_flex', label: 'Shoulder Flexion',
-    bjjWhy: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
+    bjjWhy: 'Overhead press, snatch, jerk, even pullovers - locked-out arms only if the joint allows it.',
     leftKey: 'shoulder_flex_l', rightKey: 'shoulder_flex_r',
     normalMin: 140, normalMax: 180, riskBelow: 120, unit: '°', rxKey: 'shoulder_flex',
   },
@@ -639,13 +639,13 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'cervical_ext', label: 'Cervical Extension',
-    bjjWhy: 'Deadlift lockout and overhead pressing — extension keeps a neutral, braced neck under the bar.',
+    bjjWhy: 'Deadlift lockout and overhead pressing - extension keeps a neutral, braced neck under the bar.',
     singleKey: 'cervical_ext',
     normalMin: 55, normalMax: 70, riskBelow: 40, unit: '°', rxKey: 'cervical_ext',
   },
   {
     key: 'lumbar', label: 'Lumbar Spine',
-    bjjWhy: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings — low extension is what loads your discs.',
+    bjjWhy: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings - low extension is what loads your discs.',
     singleKey: 'lumbar_flex',
     normalMin: 40, normalMax: 80, riskBelow: 40, unit: '°', rxKey: 'lumbar',
   },
@@ -859,7 +859,7 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
   const [cycleStartDate, setCycleStartDate] = useState<string | null>(null)
 
   // Anchor the cycle window to the user's LATEST assessment date from the DB.
-  // localStorage is NOT the source of truth for the numeric count — only for the "completed today" check.
+  // localStorage is NOT the source of truth for the numeric count - only for the "completed today" check.
   useEffect(() => {
     if (!userId) return
     supabase
@@ -1084,8 +1084,8 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
                 {rankLabel}
               </span>
               {atRisk && (
-                <span className="flex items-center gap-0.5 text-[10px] font-bold text-red-tier bg-red-tier-bg px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  <AlertTriangle size={9} /> AT RISK
+                <span className="flex items-center gap-0.5 text-[10px] font-bold text-red-tier bg-red-tier-bg px-2 py-0.5 rounded-full tracking-wider">
+                  <AlertTriangle size={9} /> Focus
                 </span>
               )}
             </div>
@@ -1136,7 +1136,7 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
           )}
           <div className="bg-surface rounded-xl px-3 py-1.5">
             <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Normal</p>
-            <p className="text-xs font-semibold text-charcoal">{def.normalMin}–{def.normalMax}{def.unit}</p>
+            <p className="text-xs font-semibold text-charcoal">{def.normalMin}-{def.normalMax}{def.unit}</p>
           </div>
         </div>
       </button>
