@@ -874,6 +874,19 @@ function AthleteSettings() {
               </span>
               <ChevronRight size={14} className="text-charcoal-light" />
             </a>
+            <a
+              href="https://romrx.io/legal#do-not-sell"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-teal-light text-sm font-medium text-charcoal hover:bg-teal-light transition-colors"
+            >
+              <ExternalLink size={15} className="text-teal shrink-0" />
+              <span className="flex-1">
+                Do Not Sell or Share My Personal Information
+                <span className="block text-xs text-charcoal-light font-normal mt-0.5">romrx.io/legal#do-not-sell</span>
+              </span>
+              <ChevronRight size={14} className="text-charcoal-light" />
+            </a>
           </div>
         </Section>
 
