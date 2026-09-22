@@ -3,11 +3,11 @@ import { supabase } from './supabase'
 // Bump this string whenever the /legal Terms of Service are materially updated.
 // It is stored on each consent row so we have a timestamped record of exactly
 // which version of the ROMRx LLC agreement a user accepted.
-export const TERMS_VERSION = '2026-09-16'
+export const TERMS_VERSION = '2026-09-21'
 
 // The medical waiver / assumption-of-risk language lives in the same /legal
 // document (Sections 5 & 6), so it shares the Terms version.
-export const MEDICAL_WAIVER_VERSION = '2026-09-16'
+export const MEDICAL_WAIVER_VERSION = '2026-09-21'
 
 /**
  * Records a user's acceptance of the ROMRx LLC Terms of Service, Privacy Policy,
