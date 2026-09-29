@@ -8,6 +8,11 @@ import { ownedBaseUrl } from '../lib/utils'
 const TIERS = ['beginner', 'intermediate', 'advanced'] as const
 const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
 
+// Grant GO 2026-09-29: new coach checkouts are paused (launch is Base only).
+// The backend (create-checkout-session v32) also refuses coach sessions.
+// Existing coaches are unaffected: sign in, dashboard and billing portal still work.
+const COACH_CHECKOUT_OPEN = false
+
 export function CoachSignup() {
   const [fullName, setFullName]   = useState('')
   const [email, setEmail]         = useState('')
@@ -22,6 +27,7 @@ export function CoachSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!COACH_CHECKOUT_OPEN) return
     setError('')
     if (!fullName.trim()) { setError('Full name is required.'); return }
     if (!gym.trim()) { setError('Gym / Academy name is required.'); return }
@@ -102,6 +108,8 @@ export function CoachSignup() {
     setLoading(false)
     setError('Something went wrong. Please try again.')
   }
+
+  if (!COACH_CHECKOUT_OPEN) return <CoachSignupPaused />
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-10">
@@ -238,6 +246,42 @@ export function CoachSignup() {
             $349/year · Includes unlimited athlete roster · Cancel anytime
           </p>
         </form>
+
+        <p className="text-center text-sm text-charcoal-light">
+          Are you an athlete?{' '}
+          <a href={ownedBaseUrl('coach_signup_cta')} className="text-teal font-semibold hover:underline">
+            Athlete signup here
+          </a>
+        </p>
+        <p className="text-center text-sm text-charcoal-light">
+          Already have an account?{' '}
+          <Link to="/login" className="text-teal font-semibold hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/** Shown while new coach checkouts are paused. Reuses the site's existing "Not open during beta." wording (/trainers). */
+function CoachSignupPaused() {
+  return (
+    <div className="min-h-screen bg-surface flex items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-teal-light rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Users size={22} className="text-teal" />
+          </div>
+          <h1 className="font-display font-bold text-teal text-2xl">Coach accounts</h1>
+          <p className="text-sm text-charcoal-light mt-2">Not open during beta.</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-teal-light p-6 shadow-sm text-center">
+          <a href="/trainers" className="btn-primary w-full inline-flex items-center justify-center gap-2 text-base py-3">
+            See the trainers page
+          </a>
+        </div>
 
         <p className="text-center text-sm text-charcoal-light">
           Are you an athlete?{' '}
