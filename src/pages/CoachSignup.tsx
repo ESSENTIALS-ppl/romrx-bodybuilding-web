@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 import { recordConsent } from '../lib/terms'
 import { Loader2, Users } from 'lucide-react'
-import { BASE_ASSESSMENT_URL } from '../lib/utils'
+import { ownedBaseUrl } from '../lib/utils'
 
 const TIERS = ['beginner', 'intermediate', 'advanced'] as const
 const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
@@ -241,7 +241,7 @@ export function CoachSignup() {
 
         <p className="text-center text-sm text-charcoal-light">
           Are you an athlete?{' '}
-          <a href={BASE_ASSESSMENT_URL} className="text-teal font-semibold hover:underline">
+          <a href={ownedBaseUrl('coach_signup_cta')} className="text-teal font-semibold hover:underline">
             Athlete signup here
           </a>
         </p>
