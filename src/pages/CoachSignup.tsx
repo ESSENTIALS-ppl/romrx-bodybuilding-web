@@ -223,7 +223,7 @@ export function CoachSignup() {
               <a href="https://romrx.io/legal" target="_blank" rel="noopener noreferrer" className="text-teal underline font-medium">
                 ROMRx LLC Terms of Service, Privacy Policy &amp; Refund Policy
               </a>
-              , a company-wide agreement with ROMRx LLC (parent of ROMRxBodyBuilding, ROMRxBJJ, and other ROMRx products). All sales are final.
+              , a company-wide agreement with ROMRx LLC (parent of ROMRxBodyBuilding, ROMRxBJJ, and other ROMRx products). Cancel anytime in Settings. Canceling ends your access right away and stops future charges. After a charge, all sales are final, except where the law requires a refund.
             </span>
           </label>
 
