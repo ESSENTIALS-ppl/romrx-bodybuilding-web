@@ -6,6 +6,18 @@ import { twMerge } from 'tailwind-merge'
 // rather than a standalone sport signup.
 export const BASE_ASSESSMENT_URL = 'https://romrx.io/bodybuilding'
 
+
+// Owned-site UTM tags on clickable links to the Base page (Growth, 2026-09-29).
+// utm_term is the link placement. Redirects that forward an incoming query
+// (/signup edge rule, the Base URL builder) stay untagged so a visitor's
+// original campaign params are what reach romrx.io.
+const OWNED_SITE_UTM =
+  'utm_campaign=ROMRx_Base_Beta_2026&utm_source=owned&utm_medium=site&utm_content=20260929_owned_romrxbb_site_utm'
+
+export function ownedBaseUrl(placement: string): string {
+  return `${BASE_ASSESSMENT_URL}?${OWNED_SITE_UTM}&utm_term=${encodeURIComponent(placement)}`
+}
+
 // Campaign/attribution params that are safe to forward to Base when redirecting
 // a retired /signup hit. Anything not on this list is dropped so arbitrary or
 // sensitive params are not carried across to another host.
