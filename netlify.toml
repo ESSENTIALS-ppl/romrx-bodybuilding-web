@@ -186,3 +186,17 @@
   from   = "/settings"
   to     = "/index.html"
   status = 200
+
+# Marketing unsubscribe -> HQ SPA (preserves query string)
+[[redirects]]
+  from   = "/unsubscribe"
+  to     = "https://romrx.io/app/unsubscribe"
+  status = 301
+  force  = true
+
+[[redirects]]
+  from   = "/unsubscribe/"
+  to     = "https://romrx.io/app/unsubscribe"
+  status = 301
+  force  = true
+
