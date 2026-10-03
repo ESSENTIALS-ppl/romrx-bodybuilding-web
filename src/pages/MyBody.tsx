@@ -169,7 +169,7 @@ export function MyBody() {
         <div className="flex items-start gap-3 bg-red-tier-bg border border-red-200 rounded-2xl p-4">
           <AlertTriangle size={18} className="text-red-tier mt-0.5 shrink-0" />
           <div>
-            <p className="text-sm font-semibold text-red-tier">Movement red flags detected</p>
+            <p className="text-sm font-semibold text-red-tier">Notes from your assessment</p>
             <p className="text-xs text-red-tier/80 mt-0.5 leading-relaxed">
               {assessment.red_flag_reasons?.join(' · ')}
             </p>

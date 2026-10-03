@@ -65,7 +65,7 @@ const STEPS: Step[] = [
   {
     id: 'hip_ir',
     title: 'Hip Internal Rotation',
-    whyMatters: 'Protects your knees in squats and lunges. Low IR is a top driver of knee valgus under load.',
+    whyMatters: 'Used in squats and lunges.',
     tool: '✓ Same chair, same phone placement - only the foot direction changes.',
     position: [
       'Stay in the same chair. Do NOT move your position.',
@@ -89,7 +89,7 @@ const STEPS: Step[] = [
   {
     id: 'shoulder_er',
     title: 'Shoulder External Rotation',
-    whyMatters: 'Your shoulder safety zone for benching, OHP, and behind-the-neck work. Low ER = high injury risk.',
+    whyMatters: 'Used in benching, overhead press and behind-the-neck work.',
     tool: 'iPhone: Measure → Level  ·  Android: Simple Inclinometer  ·  Seated in chair',
     position: [
       'Sit upright. Raise one arm straight out to the side at shoulder height, like a T. Bend your elbow to 90°.',
@@ -158,7 +158,7 @@ const STEPS: Step[] = [
   {
     id: 'cervical_flex_ext',
     title: 'Cervical Flexion + Extension',
-    whyMatters: 'Chin-to-chest and looking up protect your neck during shrugs, deadlift lockout, and overhead pressing.',
+    whyMatters: 'Used in chin-to-chest and looking up during shrugs, deadlift lockout and overhead pressing.',
     tool: 'iPhone: Measure → Level  ·  Android: Simple Inclinometer  ·  Seated in chair',
     position: [
       'Sit upright in a chair. Feet flat. Back straight.',
@@ -231,7 +231,7 @@ const STEPS: Step[] = [
   {
     id: 'lumbar',
     title: 'Lumbar Flexion + Extension',
-    whyMatters: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings — low extension is what loads your discs.',
+    whyMatters: 'Used in hip hinge lifts: deadlifts, RDLs and good-mornings.',
     tool: 'iPhone: Measure → Level  ·  Android: Simple Inclinometer  ·  Standing + Floor',
     position: [
       'Flexion is standing. Extension is on the floor face down.',
@@ -256,7 +256,7 @@ const STEPS: Step[] = [
   {
     id: 'ankle_df',
     title: 'Ankle Dorsiflexion',
-    whyMatters: 'Depth and stability in squats and lunges. Stiff ankles = forward shin = quads chew it, knees take it.',
+    whyMatters: 'Used in squat and lunge depth.',
     tool: 'Tape measure or ruler  ·  Standing knee-to-wall test (measure in centimeters)',
     position: [
       'Remove your shoes. Stand barefoot facing a wall with a tape measure on the floor pointing straight out from the wall.',

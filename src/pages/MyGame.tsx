@@ -23,6 +23,12 @@ import { ProgramGenerator } from '../components/ProgramGenerator'
 //  Types
 // ────────────────────────────────────────────────────────────────────────────
 
+// Seed rows carry an import note like "Template workout from Beginner_Hypertrophy.md". Not user copy: hide it.
+function cleanDescription(d: string | null): string | null {
+  if (!d) return null
+  return /^Template workout from .+\.md$/i.test(d.trim()) ? null : d
+}
+
 interface WorkoutTemplate {
   id: string
   sport: string
@@ -426,8 +432,8 @@ function TemplatesPanel({ userTier }: { userTier: string | null }) {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-miami-text truncate">{t.day_label}</p>
-                        {t.description && (
-                          <p className="text-xs text-miami-text/60 mt-0.5 truncate">{t.description}</p>
+                        {cleanDescription(t.description) && (
+                          <p className="text-xs text-miami-text/60 mt-0.5 truncate">{cleanDescription(t.description)}</p>
                         )}
                       </div>
                       <ChevronRight
@@ -605,7 +611,7 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
         >
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-miami-text text-sm">{w.name}</p>
-            {w.description && <p className="text-xs text-miami-text/60 mt-1 line-clamp-2">{w.description}</p>}
+            {cleanDescription(w.description) && <p className="text-xs text-miami-text/60 mt-1 line-clamp-2">{cleanDescription(w.description)}</p>}
             {logged[w.id] && (
               <p className="text-xs text-miami-text/60 mt-1 tabular-nums">
                 {logged[w.id].sets} {logged[w.id].sets === 1 ? 'set' : 'sets'} · {Math.round(logged[w.id].volumeLb).toLocaleString()} lb volume
