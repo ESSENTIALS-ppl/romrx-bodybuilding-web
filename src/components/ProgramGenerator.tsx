@@ -16,7 +16,7 @@ import { useAuth } from '../hooks/useAuth'
 import type { Assessment } from '../hooks/useProfile'
 import { SectionCard } from './SectionCard'
 import { Spinner } from './Spinner'
-import { cn } from '../lib/utils'
+import { cn, BASE_RETEST_URL } from '../lib/utils'
 import {
   Wand2, Trash2, Plus, Minus, ArrowRightLeft, AlertTriangle,
   Check, RefreshCw, Sparkles, Save, Activity,
@@ -234,7 +234,7 @@ export function ProgramGenerator({
               <div className="text-xs text-miami-text">
                 <p className="font-semibold text-yellow-tier">Complete your ROM assessment first</p>
                 <p className="text-miami-text/70 mt-0.5">
-                  Programs are built <span className="font-semibold text-miami-text">around your body</span>, which means we need your joint measurements before we can pick exercises and set volume. Head to <a href="/onboarding/assessment" className="text-miami font-semibold underline">My Assessment</a> to finish it, then come back.
+                  Programs are built <span className="font-semibold text-miami-text">around your body</span>, which means we need your joint measurements before we can pick exercises and set volume. Head to <a href={BASE_RETEST_URL} className="text-miami font-semibold underline">My Assessment</a> to finish it, then come back.
                 </p>
               </div>
             </div>

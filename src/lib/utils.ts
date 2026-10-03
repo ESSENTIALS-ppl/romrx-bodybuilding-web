@@ -6,6 +6,17 @@ import { twMerge } from 'tailwind-merge'
 // rather than a standalone sport signup.
 export const BASE_ASSESSMENT_URL = 'https://romrx.io/bodybuilding'
 
+// Where a signed-in athlete goes to take or retake the ROM assessment. Base is the
+// only app that assesses ROM. Sessions do NOT carry from this domain to romrx.io
+// (separate origin, separate storage), so we land on Base My Body: Base's own
+// login gate runs first, then a user with no assessment is routed to Base's
+// assessment and a user with one sees Retest there.
+export const BASE_RETEST_URL = 'https://romrx.io/app/dashboard/my-body'
+
+export function goToBaseAssessment(): void {
+  window.location.assign(BASE_RETEST_URL)
+}
+
 
 // Owned-site UTM tags on clickable links to the Base page (Growth, 2026-09-29).
 // utm_term is the link placement. Redirects that forward an incoming query

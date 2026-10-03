@@ -6,7 +6,8 @@ import { Login } from './pages/Login'
 import { AuthCallback } from './pages/AuthCallback'
 import { AuthConfirm } from './pages/AuthConfirm'
 import { Signup } from './pages/Signup'
-import { Assessment } from './pages/Assessment'
+import { BaseAssessmentRedirect } from './components/BaseAssessmentRedirect'
+// TODO(rollback): import { Assessment } from './pages/Assessment' (wizard retired, file kept unrouted)
 import { MyGame } from './pages/MyGame'
 import { WorkoutLogger } from './pages/WorkoutLogger'
 import { PRTracker } from './pages/PRTracker'
@@ -33,8 +34,12 @@ export default function App() {
         {/* Onboarding is public-facing but gated: unauthenticated visitors are
             sent to ROMRx Base (new-athlete acquisition lives there), while a
             valid session keeps assessment/retest/results access. */}
+        {/* Sport assessment wizard RETIRED (Oct 2026): Base is the only app that assesses ROM.
+            TODO(rollback): to restore the wizard, delete the BaseAssessmentRedirect route below and
+            put `<Route path="/onboarding/assessment" element={<Assessment />} />` back inside
+            OnboardingGuard (and re-add the Assessment import). pages/Assessment.tsx is kept unrouted. */}
+        <Route path="/onboarding/assessment" element={<BaseAssessmentRedirect />} />
         <Route element={<OnboardingGuard />}>
-          <Route path="/onboarding/assessment" element={<Assessment />} />
           <Route path="/onboarding/results"    element={<ResultsPreview />} />
         </Route>
         <Route path="/unsubscribe"     element={<Unsubscribe />} />
