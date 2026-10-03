@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/pack-charge-date.test.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test:pack-date": "node scripts/pack-charge-date.test.mjs",
     "test:utm": "node scripts/utm-forward.test.mjs",
     "test:coach-pause": "node scripts/coach-checkout-paused.test.mjs"
   },
