@@ -60,9 +60,9 @@ function computePRS(assessment: Record<string, any>): number {
 
 function getPRSTier(score: number): { label: string; color: string; bg: string; desc: string } {
   if (score >= 85) return { label: 'ELITE',       color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
-  if (score >= 70) return { label: 'STRONG',      color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Good mobility foundation. A few gaps to address.' }
-  if (score >= 55) return { label: 'DEVELOPING',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'ROM limitations are affecting your lifting readiness.' }
-  if (score >= 40) return { label: 'RESTRICTED',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Significant mobility restrictions. Prioritize your protocol.' }
+  if (score >= 70) return { label: 'NEAR TARGET', color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Good mobility foundation. A few gaps to address.' }
+  if (score >= 55) return { label: 'BELOW TARGET', color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'ROM limitations are affecting your lifting readiness.' }
+  if (score >= 40) return { label: 'WELL BELOW TARGET', color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Significant mobility restrictions. Prioritize your protocol.' }
   return                  { label: 'AT RISK',     color: 'text-red-400',   bg: 'bg-red-500/20',    desc: 'Several joints are in the AT RISK range. Your full dashboard has your plan.' }
 }
 
