@@ -165,7 +165,7 @@ export function ResultsPreview() {
         {/* Header */}
         <div className="text-center">
           <h1 className="font-display font-bold text-miami-text text-2xl">Your Results Are In</h1>
-          <p className="text-sm text-miami-text/60 mt-1">Know What Your Body Can Lift — by ROMRxBB</p>
+          <p className="text-sm text-miami-text/60 mt-1">See how your range matches your lifts. By ROMRxBB</p>
         </div>
 
         {/* PRS Score Card */}
