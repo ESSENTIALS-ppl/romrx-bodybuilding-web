@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 import { Spinner } from '../components/Spinner'
 import { AlertTriangle, CheckCircle, Unlock, TrendingUp } from 'lucide-react'
-import { cn } from '../lib/utils'
+import { cn, goToBaseAssessment } from '../lib/utils'
 
 const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
 
@@ -149,7 +149,7 @@ export function ResultsPreview() {
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
       <div className="text-center max-w-sm space-y-4">
         <p className="text-charcoal font-semibold">No assessment found.</p>
-        <button onClick={() => navigate('/onboarding/assessment')} className="btn-primary">Take Assessment</button>
+        <button onClick={() => goToBaseAssessment()} className="btn-primary">Take Assessment</button>
       </div>
     </div>
   )

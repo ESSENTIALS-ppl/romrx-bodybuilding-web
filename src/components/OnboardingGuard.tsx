@@ -3,8 +3,8 @@ import { Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { BASE_ASSESSMENT_URL } from '../lib/utils'
 
-// Auth gate for the public-facing onboarding routes (/onboarding/assessment and
-// /onboarding/results). These pages used to render for anyone, so an
+// Auth gate for the onboarding results/paywall route (/onboarding/results; the wizard
+// route /onboarding/assessment is retired and redirects to Base, see BaseAssessmentRedirect). These pages used to render for anyone, so an
 // unauthenticated visitor hitting the URL directly could load the full
 // assessment without ever going through ROMRx Base. New-athlete acquisition
 // must happen in Base, so an unauthenticated visitor is sent there. A visitor
