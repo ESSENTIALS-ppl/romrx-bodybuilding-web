@@ -189,12 +189,12 @@ const STEPS: Step[] = [
       'Tap to zero with your leg flat on the ground.',
     ],
     howTo: [
-      'Keep your knee completely straight. Raise your leg as high as you can without bending the knee.',
-      'Keep the phone aligned with your thigh as it rises. Stop just before your low back starts to lift off the floor. Read the number.',
+      'Bend the knee of the leg you are testing and bring that knee toward your chest as far as it comfortably goes. Keep your other leg flat on the floor.',
+      'Keep the phone aligned with your thigh as the knee comes up. Stop just before your low back lifts off the floor or your other leg starts to bend up. Read the number.',
       'Record it. Lower the leg slowly. Re-zero. Repeat on the other side.',
     ],
-    mistake: 'Bending the knee as the leg rises, or going so high that the low back arches off the floor.',
-    mistakeFix: 'Your leg stays completely straight the whole time. Stop before your low back lifts - once it arches, you have gone past your true range.',
+    mistake: 'Letting the low back lift off the floor, or letting the other leg bend up, as you pull the knee in.',
+    mistakeFix: 'Keep your other leg flat and your low back on the floor. Stop when either one starts to move - that is your true range.',
     videoUrl: 'https://www.youtube.com/watch?v=tdYjpTQ0AQY',
     videoLabel: 'Hip Flexion Self-Assessment (The Ready State)',
     fields: [
