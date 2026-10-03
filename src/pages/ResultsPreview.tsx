@@ -60,10 +60,10 @@ function computePRS(assessment: Record<string, any>): number {
 
 function getPRSTier(score: number): { label: string; color: string; bg: string; desc: string } {
   if (score >= 85) return { label: 'ELITE',       color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Exceptional ROM profile. Train hard and retest regularly.' }
-  if (score >= 70) return { label: 'STRONG',      color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Good mobility foundation. A few gaps to address.' }
-  if (score >= 55) return { label: 'DEVELOPING',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'ROM limitations are affecting your lifting readiness.' }
-  if (score >= 40) return { label: 'RESTRICTED',  color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Significant mobility restrictions. Prioritize your protocol.' }
-  return                  { label: 'AT RISK',     color: 'text-red-400',   bg: 'bg-red-500/20',    desc: 'Multiple AT RISK joints. Prioritize injury prevention immediately.' }
+  if (score >= 70) return { label: 'NEAR TARGET', color: 'text-green-400', bg: 'bg-green-500/20',  desc: 'Good mobility foundation. A few gaps to address.' }
+  if (score >= 55) return { label: 'BELOW TARGET', color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'ROM limitations are affecting your lifting readiness.' }
+  if (score >= 40) return { label: 'WELL BELOW TARGET', color: 'text-yellow-400',bg: 'bg-yellow-500/20', desc: 'Significant mobility restrictions. Prioritize your protocol.' }
+  return                  { label: 'AT RISK',     color: 'text-red-400',   bg: 'bg-red-500/20',    desc: 'Several joints are in the AT RISK range. Your full dashboard has your plan.' }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -165,7 +165,7 @@ export function ResultsPreview() {
         {/* Header */}
         <div className="text-center">
           <h1 className="font-display font-bold text-miami-text text-2xl">Your Results Are In</h1>
-          <p className="text-sm text-miami-text/60 mt-1">Know What Your Body Can Lift — by ROMRxBB</p>
+          <p className="text-sm text-miami-text/60 mt-1">See how your range matches your lifts. By ROMRxBB</p>
         </div>
 
         {/* PRS Score Card */}
@@ -182,6 +182,7 @@ export function ResultsPreview() {
             {tier.label}
           </div>
           <p className="text-sm text-miami-text/70 leading-relaxed">{tier.desc}</p>
+          <p className="text-xs text-miami-text/40 mt-3 leading-relaxed">AT RISK means your measured range is well below the target for these lifts. ELITE means you are at or above the targets. Neither is a medical finding, and neither predicts injury.</p>
         </div>
 
         {/* Top asymmetries */}
@@ -202,7 +203,7 @@ export function ResultsPreview() {
                 </div>
               </div>
             ))}
-            <p className="text-xs text-miami-text/40 pt-1">Asymmetry is the #1 predictor of injury under heavy load. Fix it before it fixes you.</p>
+            <p className="text-xs text-miami-text/40 pt-1">Left and right sides that differ by a lot are shown above. Your full dashboard has more.</p>
           </div>
         )}
 
@@ -212,17 +213,18 @@ export function ResultsPreview() {
             <div className="text-center space-y-2">
               <Unlock size={28} className="text-gold mx-auto" />
               <p className="text-sm font-bold text-miami-text">Unlock Your Full Dashboard</p>
-              <p className="text-xs text-miami-text/60">132 technique ratings, full protocol, ROMBot</p>
+              <p className="text-xs text-miami-text/60">lift ratings, full protocol, ROMBot</p>
             </div>
           </div>
-          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game — Technique Readiness</p>
+          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game - Lift Readiness</p>
           <div className="flex gap-2">
-            <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">?? GREEN</span>
-            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">?? YELLOW</span>
-            <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">?? RED</span>
+            <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">GREEN</span>
+            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">YELLOW</span>
+            <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">RED</span>
           </div>
+          <p className="text-xs text-miami-text/40">Readiness colors compare your range of motion to what a lift needs. They are not medical clearance and do not say whether a move is safe for you.</p>
           <div className="space-y-2">
-            {['My Protocol — Top 3 Priority Joints', 'My Game — Offense + Defense Flow', 'ROMBot — Ask anything about your data'].map(item => (
+            {['My Protocol - Top 3 Priority Joints', 'My Game - Exercise Library + Program Generator', 'ROMBot - Ask about your ROM results'].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <CheckCircle size={14} className="text-miami/40" />
                 <span className="text-sm text-miami-text/40 blur-sm select-none">{item}</span>
@@ -239,11 +241,14 @@ export function ResultsPreview() {
           className="w-full py-4 bg-gold text-charcoal font-display font-bold text-base rounded-2xl hover:bg-gold-hover transition-colors flex items-center justify-center gap-2"
         >
           {paying ? 'Setting up payment...' : <>
-            <Unlock size={18} /> Unlock My Full Dashboard — $149/yr
+            <Unlock size={18} /> Get Base + ROMRxBodybuilding ($209/yr)
           </>}
         </button>
+        <p className="text-center text-xs text-miami-text/50">
+          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.
+        </p>
         <p className="text-center text-xs text-miami-text/30">
-          Cancel anytime · Promo codes accepted at checkout · Results saved permanently
+          Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
         </p>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { localMonthDay } from '../lib/dates'
 import { useAuth } from '../hooks/useAuth'
 import { PageHeader } from '../components/PageHeader'
 import { SectionCard } from '../components/SectionCard'
@@ -204,7 +205,7 @@ export function PRTracker() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={history.map(h => ({
-                date: h.performed_at.slice(5, 10),
+                date: localMonthDay(h.performed_at),
                 e1rm: convertWeight(h.estimated_1rm_kg),
                 weight: convertWeight(h.weight_kg),
                 reps: h.reps,

@@ -188,7 +188,7 @@ export function Login() {
           <a href={ownedBaseUrl('login_cta')} className="miami-link">Create an account</a>
         </p>
         <p className="text-center text-xs text-white/25 mt-4 tracking-wider uppercase font-condensed">
-          Know What Your Body Can Lift
+          See how your range matches your lifts
         </p>
       </div>
     </div>
