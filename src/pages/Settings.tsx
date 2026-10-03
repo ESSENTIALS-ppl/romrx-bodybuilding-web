@@ -60,9 +60,9 @@ function computePRS(a: Assessment): number {
 
 function getPRSTier(s: number) {
   if (s >= 85) return { label: 'ELITE',      color: 'text-miami',        bg: 'bg-miami-light' }
-  if (s >= 70) return { label: 'STRONG',     color: 'text-miami',        bg: 'bg-miami-light' }
-  if (s >= 55) return { label: 'DEVELOPING', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
-  if (s >= 40) return { label: 'RESTRICTED', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
+  if (s >= 70) return { label: 'NEAR TARGET', color: 'text-miami',        bg: 'bg-miami-light' }
+  if (s >= 55) return { label: 'BELOW TARGET', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
+  if (s >= 40) return { label: 'WELL BELOW TARGET', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg' }
   return              { label: 'AT RISK',    color: 'text-red-tier',    bg: 'bg-red-tier-bg' }
 }
 
@@ -733,7 +733,7 @@ function AthleteSettings() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm text-charcoal-light">Plan</p>
-              <span className="text-xs bg-miami-light text-miami font-semibold px-3 py-1 rounded-xl text-right capitalize">
+              <span className={cn('text-xs bg-miami-light text-miami font-semibold px-3 py-1 rounded-xl text-right', profile?.subscription_tier && profile.subscription_tier !== 'free' && 'capitalize')}>
                 {!profile?.subscription_tier || profile.subscription_tier === 'free' ? 'Free through December 31, 2026. Then $60/yr from January 1, 2027, renews yearly until you cancel. Canceling ends your access right away.' : profile.subscription_tier}
               </span>
             </div>
