@@ -6,6 +6,18 @@ import { twMerge } from 'tailwind-merge'
 // rather than a standalone sport signup.
 export const BASE_ASSESSMENT_URL = 'https://romrx.io/bodybuilding'
 
+// Wizard retirement (DRAFT, needs Jim's go): the standalone ROM wizard on this
+// site is retired. First assessments and retests happen in Base (romrx.io/app),
+// where the assessment saves to the same account. ROM reads on this site still
+// come from the shared assessments table. NOTE: sessions do not carry from this
+// origin to romrx.io (Base keeps its own login on that origin; the only SSO
+// hand-off is Base -> sport site), so a signed-out Base visitor logs in there.
+export const BASE_RETEST_URL = 'https://romrx.io/app/onboarding/assessment'
+
+export function goToBaseRetest(): void {
+  window.location.assign(BASE_RETEST_URL)
+}
+
 
 // Owned-site UTM tags on clickable links to the Base page (Growth, 2026-09-29).
 // utm_term is the link placement. Redirects that forward an incoming query

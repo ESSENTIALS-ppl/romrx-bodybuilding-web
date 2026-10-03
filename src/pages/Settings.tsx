@@ -9,7 +9,7 @@ import {
   LogOut, Trash2, ChevronRight, ClipboardList, TrendingUp,
   UserCheck, UserX, School, KeyRound, CheckCircle2, Bell, MessageSquarePlus,
 } from 'lucide-react'
-import { bbTierColor, bbTierLabel, cn } from '../lib/utils'
+import { bbTierColor, bbTierLabel, cn, BASE_RETEST_URL } from '../lib/utils'
 import { FeedbackWidget } from '../components/FeedbackWidget'
 
 const BB_TIERS = ['beginner', 'intermediate', 'advanced'] as const
@@ -784,7 +784,7 @@ function AthleteSettings() {
         <Section title="Assessment History">
           <div className="flex items-center justify-between -mt-2 mb-1">
             <p className="text-xs text-charcoal-light">Your past ROM snapshots</p>
-            <a href="/onboarding/assessment" className="text-xs font-semibold text-miami hover:underline">
+            <a href={BASE_RETEST_URL} className="text-xs font-semibold text-miami hover:underline">
               + New Assessment
             </a>
           </div>
@@ -797,7 +797,7 @@ function AthleteSettings() {
             <div className="text-center py-6">
               <ClipboardList size={28} className="mx-auto text-charcoal-light mb-2" />
               <p className="text-sm text-charcoal-light mb-2">No assessments on file yet.</p>
-              <a href="/onboarding/assessment" className="inline-block text-sm font-semibold text-miami hover:underline">
+              <a href={BASE_RETEST_URL} className="inline-block text-sm font-semibold text-miami hover:underline">
                 Take your first assessment
               </a>
             </div>
@@ -828,7 +828,7 @@ function AthleteSettings() {
                         </span>
                       )}
                       <a
-                        href="/onboarding/assessment"
+                        href={BASE_RETEST_URL}
                         className="flex items-center gap-1 text-xs font-semibold text-miami hover:underline"
                       >
                         <TrendingUp size={12} />

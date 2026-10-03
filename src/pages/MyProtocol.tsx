@@ -1,12 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import { localDateISO } from '../lib/dates'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { PageHeader } from '../components/PageHeader'
-import { cn } from '../lib/utils'
+import { cn, goToBaseRetest } from '../lib/utils'
 import {
   AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Circle,
   ClipboardList, Dumbbell, Flame, PersonStanding,
@@ -701,7 +700,6 @@ function scoreJoints(assessment: Record<string, any>): ScoredJoint[] {
 
 // ── Retest status banner ──────────────────────────────────────────────────────
 function RetestBanner({ assessedAt }: { assessedAt: string }) {
-  const navigate = useNavigate()
   const now = new Date()
   const assessed = new Date(assessedAt)
   const daysSince = Math.floor((now.getTime() - assessed.getTime()) / (1000 * 60 * 60 * 24))
@@ -747,7 +745,7 @@ function RetestBanner({ assessedAt }: { assessedAt: string }) {
 
   return (
     <button
-      onClick={() => navigate('/onboarding/assessment')}
+      onClick={() => goToBaseRetest()}
       className={cn(
         'w-full flex items-start gap-3 rounded-2xl border px-4 py-3.5 text-left transition-opacity hover:opacity-80',
         styles[status]
