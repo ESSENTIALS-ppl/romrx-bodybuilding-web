@@ -322,8 +322,8 @@ export function CoachSettings() {
           <div>
             <p className="text-sm font-semibold text-charcoal">Need help?</p>
             <p className="text-xs text-charcoal-light mt-1">Email us at any time and we will respond within 24 hours.</p>
-            <a href="mailto:ROMRxBB@gmail.com" className="inline-block mt-2 text-sm text-teal hover:underline font-medium">
-              ROMRxBB@gmail.com
+            <a href="mailto:hello@romrx.io" className="inline-block mt-2 text-sm text-teal hover:underline font-medium">
+              hello@romrx.io
             </a>
           </div>
           <div className="pt-2 border-t border-teal-light flex gap-4">

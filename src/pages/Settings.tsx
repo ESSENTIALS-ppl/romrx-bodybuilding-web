@@ -733,8 +733,8 @@ function AthleteSettings() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm text-charcoal-light">Plan</p>
-              <span className="text-xs bg-miami-light text-miami font-semibold px-3 py-1 rounded-full capitalize">
-                {profile?.subscription_tier ?? 'free'}
+              <span className="text-xs bg-miami-light text-miami font-semibold px-3 py-1 rounded-xl text-right capitalize">
+                {!profile?.subscription_tier || profile.subscription_tier === 'free' ? 'Free through December 31, 2026. Billing starts January 1, 2027.' : profile.subscription_tier}
               </span>
             </div>
 
@@ -843,18 +843,18 @@ function AthleteSettings() {
         <Section title="Support">
           <div className="space-y-2 -mt-1">
             <a
-              href="mailto:ROMRxBB@gmail.com"
+              href="mailto:hello@romrx.io"
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
             >
               <Mail size={15} className="text-miami shrink-0" />
               <span className="flex-1">
                 Email us
-                <span className="block text-xs text-charcoal-light font-normal mt-0.5">ROMRxBB@gmail.com</span>
+                <span className="block text-xs text-charcoal-light font-normal mt-0.5">hello@romrx.io</span>
               </span>
               <ChevronRight size={14} className="text-charcoal-light" />
             </a>
             <a
-              href="mailto:ROMRxBB@gmail.com?subject=ROMRxBB%20Question"
+              href="mailto:hello@romrx.io?subject=ROMRx%20Bodybuilding%20Question"
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
             >
               <HelpCircle size={15} className="text-miami shrink-0" />
