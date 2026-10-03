@@ -759,6 +759,7 @@ function ExerciseLibraryPanel({ userId }: { userId: string | undefined }) {
           {readyOnly ? '✓ Ready only' : 'Ready only'}
         </button>
       </div>
+      <p className="text-[11px] text-miami-text/50 -mt-2">Based on your range of motion only. Not medical advice.</p>
 
       <p className="text-xs text-miami-text/60">
         {filtered.length} of {items.length} exercises shown
