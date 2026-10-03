@@ -409,7 +409,12 @@ export function generateProgram(
       const exCount = Math.min(2, Math.max(1, Math.round(sessionSets / 3.5)))
       const picks = pickExercisesForMuscle(muscle, library, assessment, exCount, usedIds)
       if (picks.length === 0) {
-        notes.push(`No unlocked ${muscle} exercises available — skipped in ${sessions[sIdx].day_label}.`)
+        const inLibrary = library.filter(e => e.primary_muscle === muscle).length
+        notes.push(
+          inLibrary > 0
+            ? `Your library has only ${inLibrary} ${muscle} exercise${inLibrary === 1 ? '' : 's'}, already used earlier in the week, so none was added to ${sessions[sIdx].day_label}.`
+            : `No unlocked ${muscle} exercises available, skipped in ${sessions[sIdx].day_label}.`,
+        )
         continue
       }
 
