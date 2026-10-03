@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { localShortDate } from '../lib/dates'
 import { PageHeader } from '../components/PageHeader'
 import { SectionCard } from '../components/SectionCard'
 import { Spinner } from '../components/Spinner'
@@ -117,8 +118,11 @@ export function WorkoutLogger() {
   const [params] = useSearchParams()
 
   const [loading, setLoading] = useState(true)
-  const [workoutId] = useState<string>(params.get('w') ?? `manual-${Date.now()}`)
-  const [workoutName] = useState<string>(params.get('name') ?? 'Workout')
+  // F-04: the old default 'manual-<ts>' is not a uuid, so every log_set failed with 22P02. A real
+  // workouts row is created lazily on the first save (see ensureWorkout) when no ?w= id was passed.
+  const [workoutId, setWorkoutId] = useState<string | null>(params.get('w'))
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [workoutName] = useState<string>(params.get('name') || `Workout ${localShortDate()}`)
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [blocks, setBlocks] = useState<ExerciseBlock[]>([])
   const [showExercisePicker, setShowExercisePicker] = useState(false)
@@ -225,16 +229,46 @@ export function WorkoutLogger() {
     })
   }
 
+  // Create (once) the real workouts row that sets hang off. RLS allows the owner to insert non-template rows.
+  const ensureWorkout = async (): Promise<string | null> => {
+    if (workoutId) return workoutId
+    const { data: auth } = await supabase.auth.getUser()
+    const uid = auth.user?.id
+    if (!uid) return null
+    const { data, error } = await supabase
+      .from('workouts')
+      .insert({ user_id: uid, sport: 'bodybuilding', name: workoutName, is_template: false, source_program: 'manual' })
+      .select('id')
+      .single()
+    if (error || !data) {
+      console.error('create workout error', error)
+      return null
+    }
+    setWorkoutId(data.id as string)
+    return data.id as string
+  }
+
   const saveSet = async (bi: number, si: number) => {
     const block = blocks[bi]
     const set = block.sets[si]
-    if (set.weight_kg == null || set.reps == null) return
+    if (set.weight_kg == null || set.reps == null) {
+      setSaveError('Enter weight and reps before saving this set.')
+      return
+    }
+    setSaveError(null)
+
+    const wid = await ensureWorkout()
+    if (!wid) {
+      setSaveError('Could not start this workout, so the set was not saved. Check your connection and try again.')
+      return
+    }
 
     const weightKg = unit === 'lb' ? set.weight_kg * 0.453592 : set.weight_kg
 
     const { data, error } = await supabase.rpc('log_set', {
-      p_workout_id: workoutId,
-      p_exercise_id: block.exercise.id,
+      p_workout_id: wid,
+      // exercise_id references workout_exercises (a template row), not techniques; the lift is identified by technique + name.
+      p_exercise_id: null,
       p_exercise_name: block.exercise.name,
       p_set_index: set.set_index,
       p_weight_kg: weightKg,
@@ -246,8 +280,9 @@ export function WorkoutLogger() {
       p_technique_id: block.exercise.id,
       p_set_type: set.set_type,
     })
-    if (error) {
+    if (error || !data) {
       console.error('log_set error', error)
+      setSaveError('Your set was not saved. Please try again. If it keeps happening, email hello@romrx.io.')
       return
     }
     const result = data as { set_id: string; pr: boolean; estimated_1rm_kg: number }
@@ -284,7 +319,7 @@ export function WorkoutLogger() {
     <div className="space-y-4 max-w-4xl">
       <PageHeader
         title={workoutName}
-        subtitle={`${blocks.length} exercises · ${totalSets} working sets · ${Math.round(unit === 'lb' ? totalVolume / 0.453592 : totalVolume).toLocaleString()} ${unit} volume`}
+        subtitle={`${blocks.length} ${blocks.length === 1 ? 'exercise' : 'exercises'} · ${totalSets} working sets · ${Math.round(unit === 'lb' ? totalVolume / 0.453592 : totalVolume).toLocaleString()} ${unit} volume`}
         action={
           <div className="flex gap-2">
             <button
@@ -302,6 +337,12 @@ export function WorkoutLogger() {
           </div>
         }
       />
+      {saveError && (
+        <div role="alert" className="flex items-start justify-between gap-3 rounded-lg border border-red-tier/40 bg-red-tier-bg px-3 py-2 text-sm text-red-tier">
+          <span>{saveError}</span>
+          <button onClick={() => setSaveError(null)} className="text-xs font-bold uppercase tracking-wide" aria-label="Dismiss">Dismiss</button>
+        </div>
+      )}
 
       {meso && targetRir != null && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-miami-violet/25 bg-miami-violet/10 px-3 py-2 text-xs">

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
+import { localDateISO } from '../lib/dates'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { PageHeader } from '../components/PageHeader'
@@ -889,12 +890,12 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
   useEffect(() => { refreshCount() }, [refreshCount])
 
   useEffect(() => {
-    const todayIso = new Date().toISOString().slice(0, 10)
+    const todayIso = localDateISO()
     setCompletedToday(log.sessions.includes(todayIso))
   }, [log])
 
   const handleMarkComplete = useCallback(() => {
-    const todayIso = new Date().toISOString().slice(0, 10)
+    const todayIso = localDateISO()
     const protocolDay = `P${todayPriorityIndex + 1}`
     setLog(prev => {
       const sessions = prev.sessions.includes(todayIso)
