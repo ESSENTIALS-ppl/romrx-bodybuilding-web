@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { Spinner } from '../components/Spinner'
 import { AlertTriangle, CheckCircle, Unlock, TrendingUp } from 'lucide-react'
 import { cn } from '../lib/utils'
 
-const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
+// F-03: the old button posted {plan:'athlete'} to create-checkout-session, which only accepts
+// mode base|unlock|coach, so it always errored. The Add-sport flow in the main app already handles
+// both cases (Base active: $149 pack checkout; no Base: Base + pack, sent to login first).
+const UNLOCK_URL = 'https://romrx.io/app/unlock/bodybuilding'
 
 // ── PRS scoring algorithm ─────────────────────────────────────────────────────
 const BILATERAL_JOINTS = [
@@ -80,13 +83,12 @@ function getTopAsymmetries(assessment: Record<string, any>): Array<{ joint: stri
 }
 
 export function ResultsPreview() {
-  const { user, session } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [assessment, setAssessment] = useState<Record<string, any> | null>(null)
   const [loading, setLoading]       = useState(true)
-  const [paying, setPaying]         = useState(false)
-  const [error, setError]           = useState('')
+  const [baseActive, setBaseActive] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -94,7 +96,7 @@ export function ResultsPreview() {
       // Check if already paid
       const { data: userRow } = await supabase
         .from('users')
-        .select('subscription_status')
+        .select('subscription_status, base_status')
         .eq('id', user.id)
         .maybeSingle()
 
@@ -104,6 +106,8 @@ export function ResultsPreview() {
         navigate('/dashboard', { replace: true })
         return
       }
+
+      setBaseActive(userRow?.base_status === 'active')
 
       // Load latest assessment
       const { data } = await supabase
@@ -118,30 +122,6 @@ export function ResultsPreview() {
       setLoading(false)
     })()
   }, [user, navigate])
-
-  const handleUnlock = async () => {
-    if (!session) return
-    setPaying(true)
-    setError('')
-    try {
-      const res = await fetch(CHECKOUT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': SUPABASE_ANON,
-        },
-        body: JSON.stringify({ email: user?.email, plan: 'athlete' }),
-      })
-      const { url, error: err } = await res.json()
-      if (url) { window.location.href = url; return }
-      setError(err ?? 'Payment setup failed. Please try again.')
-    } catch (e) {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setPaying(false)
-    }
-  }
 
   if (loading) return <Spinner />
 
@@ -202,7 +182,7 @@ export function ResultsPreview() {
                 </div>
               </div>
             ))}
-            <p className="text-xs text-miami-text/40 pt-1">Asymmetry is the #1 predictor of injury under heavy load. Fix it before it fixes you.</p>
+            <p className="text-xs text-miami-text/40 pt-1">Big left/right gaps are worth a closer look before you load heavy. Your full dashboard shows what to do next.</p>
           </div>
         )}
 
@@ -212,17 +192,17 @@ export function ResultsPreview() {
             <div className="text-center space-y-2">
               <Unlock size={28} className="text-gold mx-auto" />
               <p className="text-sm font-bold text-miami-text">Unlock Your Full Dashboard</p>
-              <p className="text-xs text-miami-text/60">132 technique ratings, full protocol, ROMBot</p>
+              <p className="text-xs text-miami-text/60">Exercise readiness ratings, full protocol, ROMBot</p>
             </div>
           </div>
           <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game — Technique Readiness</p>
           <div className="flex gap-2">
-            <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">?? GREEN</span>
-            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">?? YELLOW</span>
-            <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">?? RED</span>
+            <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">🟢 GREEN</span>
+            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">🟡 YELLOW</span>
+            <span className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-full font-bold">🔴 RED</span>
           </div>
           <div className="space-y-2">
-            {['My Protocol — Top 3 Priority Joints', 'My Game — Offense + Defense Flow', 'ROMBot — Ask anything about your data'].map(item => (
+            {['My Protocol — Top 3 Priority Joints', 'My Game — Exercise Library + Program Generator', 'ROMBot — Ask anything about your data'].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <CheckCircle size={14} className="text-miami/40" />
                 <span className="text-sm text-miami-text/40 blur-sm select-none">{item}</span>
@@ -232,16 +212,17 @@ export function ResultsPreview() {
         </div>
 
         {/* CTA */}
-        {error && <p className="text-xs text-center text-red-400 bg-red-500/20 rounded-xl px-3 py-2">{error}</p>}
-        <button
-          onClick={handleUnlock}
-          disabled={paying}
+        <p className="text-center text-sm text-miami-text/70">
+          {baseActive
+            ? 'ROMRxBodybuilding is a $149/yr add-on to your Base.'
+            : 'Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr.'}
+        </p>
+        <a
+          href={UNLOCK_URL}
           className="w-full py-4 bg-gold text-charcoal font-display font-bold text-base rounded-2xl hover:bg-gold-hover transition-colors flex items-center justify-center gap-2"
         >
-          {paying ? 'Setting up payment...' : <>
-            <Unlock size={18} /> Unlock My Full Dashboard — $149/yr
-          </>}
-        </button>
+          <Unlock size={18} /> {baseActive ? 'Add ROMRxBodybuilding ($149/yr)' : 'Get Base + ROMRxBodybuilding ($209/yr)'}
+        </a>
         <p className="text-center text-xs text-miami-text/30">
           Cancel anytime · Promo codes accepted at checkout · Results saved permanently
         </p>
