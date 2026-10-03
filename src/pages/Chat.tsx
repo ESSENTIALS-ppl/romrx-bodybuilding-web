@@ -103,7 +103,7 @@ export function Chat() {
       const name = (profile?.full_name ?? 'there').split(' ')[0]
       const coachWelcome = isCoach
         ? `Hey ${name} \u2014 I'm ROMBot, your team intelligence assistant.\n\nI can see your athletes' ROM scores and training tiers. Ask me anything about your roster.\n\nNote: ROMBot provides educational information only and is not medical advice.`
-        : `Hey ${name} \u2014 I'm ROMBot, your hypertrophy coach.\n\nI can see your training program, your weekly volume per muscle vs your MEV/MAV/MRV landmarks, your mesocycle week, and your ROM readiness. Ask me anything:\n\u2022 "Is my chest volume in the right range this week?"\n\u2022 "What should I add to grow my back?"\n\u2022 "Which lifts give me the best stretch for my mobility?"\n\u2022 "Set me up a mesocycle."\n\nNote: ROMBot provides educational information only and is not medical advice. Consult a healthcare professional before changing your training if you have pain or injury.`
+        : `Hey ${name} \u2014 I'm ROMBot, your hypertrophy coach.\n\nI can see your ROM readiness (GREEN / YELLOW / RED) and your mobility priorities. Ask me anything:\n\u2022 "Which lifts give me the best stretch for my mobility?"\n\u2022 "Which joints should I work on first?"\n\u2022 "What should I add to grow my back?"\n\nNote: ROMBot provides educational information only and is not medical advice. Consult a healthcare professional before changing your training if you have pain or injury.`
       setMessages([{ role: 'assistant', content: coachWelcome }])
     }
   }, [user, profile, profileLoading, messages.length, isCoach])
