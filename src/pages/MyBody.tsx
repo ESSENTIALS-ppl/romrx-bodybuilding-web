@@ -53,9 +53,9 @@ function computePRS(a: Assessment): number {
 
 function getPRSTier(s: number) {
   if (s >= 85) return { label: 'ELITE',      color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
-  if (s >= 70) return { label: 'STRONG',     color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
-  if (s >= 55) return { label: 'DEVELOPING', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
-  if (s >= 40) return { label: 'RESTRICTED', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
+  if (s >= 70) return { label: 'NEAR TARGET', color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
+  if (s >= 55) return { label: 'BELOW TARGET', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
+  if (s >= 40) return { label: 'WELL BELOW TARGET', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
   return              { label: 'AT RISK',    color: 'text-red-tier',   bg: 'bg-red-tier-bg',     ring: 'border-red-tier/40' }
 }
 
