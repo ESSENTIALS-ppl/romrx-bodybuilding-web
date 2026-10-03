@@ -20,7 +20,7 @@
 //  workouts + workout_exercises.
 // ────────────────────────────────────────────────────────────────────────────
 
-import type { Assessment } from '../hooks/useProfile'
+import type { MoveStatusMap, MoveTier } from './moveStatus'
 
 // ── Shared types (kept structurally compatible with MyGame.UnlockedTechnique) ─
 
@@ -81,7 +81,7 @@ export interface PlannedExercise {
   rest_min: number
   rest_max: number
   stretch_emphasis: string | null
-  readiness: number | null      // computed ROM readiness pct (null = no ROM req)
+  readiness: MoveTier | null    // server per-move color (null = not computed); GREY = no rule or not measured
   swapped_from: string | null   // original exercise name if ROM-swapped
   rom_note: string | null
   note: string | null           // human-readable selection note
@@ -125,46 +125,9 @@ const PULL_MUSCLES = ['Back', 'Biceps', 'Rear Delts', 'Traps']
 const LOWER_MUSCLES = ['Quads', 'Hamstrings', 'Glutes', 'Calves']
 const CORE_MUSCLES = ['Abs']
 
-// ── ROM readiness (mirrors MyGame.computeReadiness) ──────────────────────────
+// ── ROM readiness: read from the server rule via technique_eligibility (see moveStatus.ts) ──
 
-function bestBilateral(l: number | null, r: number | null): number | null {
-  if (l == null && r == null) return null
-  return Math.max(l ?? 0, r ?? 0)
-}
-
-const JOINT_MAP: ReadonlyArray<{
-  pick: (a: Assessment) => number | null
-  minKey: keyof GenExercise
-}> = [
-  { pick: a => bestBilateral(a.hip_er_l, a.hip_er_r), minKey: 'hip_er_min' },
-  { pick: a => bestBilateral(a.hip_ir_l, a.hip_ir_r), minKey: 'hip_ir_min' },
-  { pick: a => bestBilateral(a.hip_abd_l, a.hip_abd_r), minKey: 'hip_abd_min' },
-  { pick: a => bestBilateral(a.hip_flex_l, a.hip_flex_r), minKey: 'hip_flex_min' },
-  { pick: a => bestBilateral(a.shoulder_er_l, a.shoulder_er_r), minKey: 'shoulder_er_min' },
-  { pick: a => bestBilateral(a.shoulder_flex_l, a.shoulder_flex_r), minKey: 'shoulder_flex_min' },
-  { pick: a => bestBilateral(a.ankle_df_l, a.ankle_df_r), minKey: 'ankle_df_min' },
-  { pick: a => a.lumbar_flex, minKey: 'lumbar_flex_min' },
-  { pick: a => a.lumbar_ext, minKey: 'lumbar_ext_min' },
-  { pick: a => bestBilateral(a.cervical_lat_l, a.cervical_lat_r), minKey: 'cervical_lat_min' },
-  { pick: a => a.cervical_flex, minKey: 'cervical_flex_min' },
-  { pick: a => a.cervical_ext, minKey: 'cervical_ext_min' },
-]
-
-export function computeReadiness(tech: GenExercise, a: Assessment | null): number | null {
-  if (!a) return null
-  let worst = 100
-  let hadAny = false
-  for (const { pick, minKey } of JOINT_MAP) {
-    const required = tech[minKey] as number | null
-    if (required == null || required <= 0) continue
-    hadAny = true
-    const userValue = pick(a)
-    if (userValue == null || userValue <= 0) return 0
-    const pct = Math.min(100, Math.round((userValue / required) * 100))
-    if (pct < worst) worst = pct
-  }
-  return hadAny ? worst : null
-}
+const statusOf = (e: GenExercise, statuses: MoveStatusMap): MoveTier | null => statuses.get(e.code)?.tier ?? null
 
 const STRETCH_RANK: Record<string, number> = { high: 3, medium: 2, low: 1 }
 
@@ -257,19 +220,19 @@ function repRange(category: string | null): { min: number; max: number; restMin:
 function pickExercisesForMuscle(
   muscle: string,
   library: GenExercise[],
-  assessment: Assessment | null,
+  statuses: MoveStatusMap,
   count: number,
   usedIds: Set<string>,
 ): PlannedExercise[] {
   const candidates = library
     .filter(e => e.primary_muscle === muscle)
-    .map(e => ({ e, readiness: computeReadiness(e, assessment) }))
+    .map(e => ({ e, readiness: statusOf(e, statuses) }))
 
   // Rank: prefer GREEN (>=90 or null), then higher stretch emphasis (growth),
   // then unused. Reds are deprioritized but kept as last resort if needed.
   const ranked = candidates.sort((a, b) => {
-    const aGreen = (a.readiness ?? 100) >= 90 ? 1 : 0
-    const bGreen = (b.readiness ?? 100) >= 90 ? 1 : 0
+    const aGreen = a.readiness === 'GREEN' ? 1 : 0
+    const bGreen = b.readiness === 'GREEN' ? 1 : 0
     if (aGreen !== bGreen) return bGreen - aGreen
     const aStretch = STRETCH_RANK[a.e.stretch_emphasis ?? 'medium'] ?? 2
     const bStretch = STRETCH_RANK[b.e.stretch_emphasis ?? 'medium'] ?? 2
@@ -284,7 +247,7 @@ function pickExercisesForMuscle(
         c.id !== target.id &&
         c.primary_muscle === target.primary_muscle &&
         (STRETCH_RANK[c.stretch_emphasis ?? 'medium'] ?? 2) < targetStretch &&
-        (computeReadiness(c, assessment) ?? 100) >= 90 &&
+        statusOf(c, statuses) === 'GREEN' &&
         !usedIds.has(c.id),
       )
       .sort((a, b) => (STRETCH_RANK[b.stretch_emphasis ?? 'low'] ?? 1) - (STRETCH_RANK[a.stretch_emphasis ?? 'low'] ?? 1))[0] ?? null
@@ -298,7 +261,7 @@ function pickExercisesForMuscle(
     let chosen = e
     let swappedFrom: string | null = null
     let note: string | null = null
-    const isRed = readiness != null && readiness < 75
+    const isRed = readiness === 'RED'
 
     if (isRed) {
       const swap = findSwap(e)
@@ -327,7 +290,7 @@ function pickExercisesForMuscle(
       rest_min: rr.restMin,
       rest_max: rr.restMax,
       stretch_emphasis: chosen.stretch_emphasis,
-      readiness: computeReadiness(chosen, assessment),
+      readiness: statusOf(chosen, statuses),
       swapped_from: swappedFrom,
       rom_note: chosen.rom_note,
       note,
@@ -342,7 +305,7 @@ export function generateProgram(
   prefs: GeneratorPrefs,
   library: GenExercise[],
   landmarks: VolumeLandmark[],
-  assessment: Assessment | null,
+  statuses: MoveStatusMap,
 ): GeneratedProgram {
   const notes: string[] = []
   const lmByMuscle: Record<string, VolumeLandmark> = {}
@@ -407,7 +370,7 @@ export function generateProgram(
       // # of exercises for this muscle this session: 1 exercise per ~3-4 sets,
       // min 1, max 2 (keeps sessions tight; isolation muscles get 1).
       const exCount = Math.min(2, Math.max(1, Math.round(sessionSets / 3.5)))
-      const picks = pickExercisesForMuscle(muscle, library, assessment, exCount, usedIds)
+      const picks = pickExercisesForMuscle(muscle, library, statuses, exCount, usedIds)
       if (picks.length === 0) {
         notes.push(`No unlocked ${muscle} exercises available — skipped in ${sessions[sIdx].day_label}.`)
         continue
