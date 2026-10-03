@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { localDateISO } from '../lib/dates'
 import { useAuth } from '../hooks/useAuth'
 import { PageHeader } from '../components/PageHeader'
 import { SectionCard } from '../components/SectionCard'
@@ -35,11 +36,7 @@ interface PhotoRow {
 }
 
 // Local calendar date (not UTC): at 8 PM ET toISOString() already reads tomorrow.
-const TODAY = () => {
-  const d = new Date()
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-}
+const TODAY = () => localDateISO()
 
 export function BodyMetrics() {
   const { user } = useAuth()

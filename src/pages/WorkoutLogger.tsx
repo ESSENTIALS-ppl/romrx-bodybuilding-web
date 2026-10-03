@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { localShortDate } from '../lib/dates'
 import { PageHeader } from '../components/PageHeader'
 import { SectionCard } from '../components/SectionCard'
 import { Spinner } from '../components/Spinner'
@@ -121,7 +122,7 @@ export function WorkoutLogger() {
   // workouts row is created lazily on the first save (see ensureWorkout) when no ?w= id was passed.
   const [workoutId, setWorkoutId] = useState<string | null>(params.get('w'))
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [workoutName] = useState<string>(params.get('name') ?? 'Workout')
+  const [workoutName] = useState<string>(params.get('name') || `Workout ${localShortDate()}`)
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [blocks, setBlocks] = useState<ExerciseBlock[]>([])
   const [showExercisePicker, setShowExercisePicker] = useState(false)
@@ -236,7 +237,7 @@ export function WorkoutLogger() {
     if (!uid) return null
     const { data, error } = await supabase
       .from('workouts')
-      .insert({ user_id: uid, sport: 'bodybuilding', name: workoutName || 'Workout', is_template: false, source_program: 'manual' })
+      .insert({ user_id: uid, sport: 'bodybuilding', name: workoutName, is_template: false, source_program: 'manual' })
       .select('id')
       .single()
     if (error || !data) {
