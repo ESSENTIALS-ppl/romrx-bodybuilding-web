@@ -11,6 +11,7 @@
 // ────────────────────────────────────────────────────────────────────────────
 
 import { useEffect, useMemo, useState } from 'react'
+import { fetchMoveStatuses, tierText, TIER_WORD, type MoveStatusMap } from '../lib/moveStatus'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import type { Assessment } from '../hooks/useProfile'
@@ -49,6 +50,7 @@ export function ProgramGenerator({
   const { user } = useAuth()
   const [step, setStep] = useState<'wizard' | 'draft'>('wizard')
   const [library, setLibrary] = useState<GenExercise[]>([])
+  const [statuses, setStatuses] = useState<MoveStatusMap>(new Map())
   const [landmarks, setLandmarks] = useState<VolumeLandmark[]>([])
   const [loading, setLoading] = useState(true)
   const [tier, setTier] = useState<'beginner' | 'intermediate' | 'advanced'>('intermediate')
@@ -83,6 +85,10 @@ export function ProgramGenerator({
       ])
       if (!active) return
       setLibrary((lib as GenExercise[]) ?? [])
+      if (user?.id) {
+        const st = await fetchMoveStatuses(user.id)
+        if (active) setStatuses(st)
+      }
       setLandmarks((lm as VolumeLandmark[]) ?? [])
       const t = (prof as { active_bb_tier?: string } | null)?.active_bb_tier
       if (t === 'beginner' || t === 'intermediate' || t === 'advanced') setTier(t)
@@ -106,7 +112,7 @@ export function ProgramGenerator({
       return
     }
     const prefs: GeneratorPrefs = { split, days, emphasis, mesoWeek, mesoWeeks, experience: tier }
-    const prog = generateProgram(prefs, library, landmarks, assessment)
+    const prog = generateProgram(prefs, library, landmarks, statuses)
     setProgram(prog)
     setStep('draft')
     setSaved(false)
@@ -454,7 +460,7 @@ function SessionCard({
       )}
       <div className="space-y-2">
         {session.exercises.map((e, exIdx) => {
-          const isRed = e.readiness != null && e.readiness < 75
+          const isRed = e.readiness === 'RED'
           return (
             <div key={exIdx} className="rounded-lg bg-miami-bg/40 border border-miami-violet/15 px-2.5 py-2">
               <div className="flex items-start gap-2">
@@ -463,8 +469,8 @@ function SessionCard({
                   <p className="text-[10px] text-miami-text/55 mt-0.5">
                     {e.primary_muscle} · {e.reps_min}–{e.reps_max} reps
                     {e.readiness != null && (
-                      <span className={cn('ml-1 font-semibold', e.readiness >= 90 ? 'text-green-tier' : e.readiness >= 75 ? 'text-yellow-tier' : 'text-red-tier')}>
-                        · {e.readiness}% ready
+                      <span className={cn('ml-1 font-semibold', tierText(e.readiness))}>
+                        · {TIER_WORD[e.readiness]}
                       </span>
                     )}
                   </p>

@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import { useProfile, type Assessment } from '../hooks/useProfile'
+import { useProfile } from '../hooks/useProfile'
 import { PageHeader } from '../components/PageHeader'
 import { SectionCard } from '../components/SectionCard'
 import { EmptyState } from '../components/EmptyState'
@@ -18,6 +18,10 @@ import {
   Plus, Search, Filter, Sparkles, AlertTriangle, BarChart3, ArrowRightLeft, Activity, Wand2,
 } from 'lucide-react'
 import { ProgramGenerator } from '../components/ProgramGenerator'
+import {
+  fetchMoveStatuses, tierBorder, tierChip, TIER_WORD, GREY_REASON_WORD, jointName,
+  type MoveStatusMap,
+} from '../lib/moveStatus'
 
 // ────────────────────────────────────────────────────────────────────────────
 //  Types
@@ -104,86 +108,8 @@ const STRETCH_LABEL: Record<string, { label: string; cls: string }> = {
   low:    { label: 'Peak / short', cls: 'bg-miami-violet/10 text-miami-text/60' },
 }
 
-// Each tuple: (assessment best-side value getter, technique min column)
-const JOINT_MAP: ReadonlyArray<{
-  pick: (a: Assessment) => number | null
-  minKey: keyof UnlockedTechnique
-}> = [
-  { pick: a => bestBilateral(a.hip_er_l, a.hip_er_r),                 minKey: 'hip_er_min' },
-  { pick: a => bestBilateral(a.hip_ir_l, a.hip_ir_r),                 minKey: 'hip_ir_min' },
-  { pick: a => bestBilateral(a.hip_abd_l, a.hip_abd_r),               minKey: 'hip_abd_min' },
-  { pick: a => bestBilateral(a.hip_flex_l, a.hip_flex_r),             minKey: 'hip_flex_min' },
-  { pick: a => bestBilateral(a.shoulder_er_l, a.shoulder_er_r),       minKey: 'shoulder_er_min' },
-  { pick: a => bestBilateral(a.shoulder_flex_l, a.shoulder_flex_r),   minKey: 'shoulder_flex_min' },
-  { pick: a => bestBilateral(a.ankle_df_l, a.ankle_df_r),             minKey: 'ankle_df_min' },
-  { pick: a => a.lumbar_flex,                                         minKey: 'lumbar_flex_min' },
-  { pick: a => a.lumbar_ext,                                          minKey: 'lumbar_ext_min' },
-  { pick: a => bestBilateral(a.cervical_lat_l, a.cervical_lat_r),     minKey: 'cervical_lat_min' },
-  { pick: a => a.cervical_flex,                                       minKey: 'cervical_flex_min' },
-  { pick: a => a.cervical_ext,                                        minKey: 'cervical_ext_min' },
-]
-
-function bestBilateral(l: number | null, r: number | null): number | null {
-  if (l == null && r == null) return null
-  return Math.max(l ?? 0, r ?? 0)
-}
-
-/**
- * Compute readiness % for one technique vs the user's assessment.
- * Overall readiness = MIN(joint%) across all joints with a *_min requirement.
- * Returns null when the technique has no ROM requirements (treat as universally ready).
- */
-function computeReadiness(tech: UnlockedTechnique, a: Assessment | null): number | null {
-  if (!a) return null
-  let worst = 100
-  let hadAny = false
-  for (const { pick, minKey } of JOINT_MAP) {
-    const required = tech[minKey] as number | null
-    if (required == null || required <= 0) continue
-    hadAny = true
-    const userValue = pick(a)
-    if (userValue == null || userValue <= 0) {
-      // No data on this joint — treat as severe limitation.
-      return 0
-    }
-    const pct = Math.min(100, Math.round((userValue / required) * 100))
-    if (pct < worst) worst = pct
-  }
-  return hadAny ? worst : null
-}
-
-/**
- * Traffic-light border based on readiness pct.
- * ≥ 90 → green (ready), 75-89 → yellow (caution), < 75 → red (work mobility first).
- * null → neutral violet hairline.
- */
-function readinessBorder(pct: number | null): string {
-  if (pct == null) return 'border-l-4 border-miami-violet/40'
-  if (pct >= 90)   return 'border-l-4 border-green-tier'
-  if (pct >= 75)   return 'border-l-4 border-yellow-tier'
-  return 'border-l-4 border-red-tier'
-}
-
-function readinessLabel(pct: number | null): string | null {
-  if (pct == null) return null
-  if (pct >= 90) return 'Ready'
-  if (pct >= 75) return 'Caution'
-  return 'Mobility first'
-}
-
-function readinessTextClass(pct: number | null): string {
-  if (pct == null) return 'text-miami-text/50'
-  if (pct >= 90) return 'text-green-tier'
-  if (pct >= 75) return 'text-yellow-tier'
-  return 'text-red-tier'
-}
-
-function readinessBgClass(pct: number | null): string {
-  if (pct == null) return 'bg-miami-violet/15 text-miami-text/70'
-  if (pct >= 90) return 'bg-green-tier-bg text-green-tier'
-  if (pct >= 75) return 'bg-yellow-tier-bg text-yellow-tier'
-  return 'bg-red-tier-bg text-red-tier'
-}
+// Readiness colors come from the server rule (technique_eligibility via lib/moveStatus.ts).
+// No client-side best-side math, no 90/75 bands, no percentage.
 
 // ────────────────────────────────────────────────────────────────────────────
 //  Helpers
@@ -269,7 +195,7 @@ export function MyGame() {
       {tab === 'mesocycle' && <MesocyclePanel />}
       {tab === 'templates' && <TemplatesPanel userTier={userTier} />}
       {tab === 'mine' && <MyWorkoutsPanel userId={user?.id} />}
-      {tab === 'library' && <ExerciseLibraryPanel assessment={assessment} />}
+      {tab === 'library' && <ExerciseLibraryPanel userId={user?.id} />}
       {tab === 'volume' && <VolumePanel />}
     </div>
   )
@@ -684,7 +610,8 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
 const BB_CATEGORIES = ['Push', 'Pull', 'Lower', 'Core'] as const
 type Category = typeof BB_CATEGORIES[number] | 'All'
 
-function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null }) {
+function ExerciseLibraryPanel({ userId }: { userId: string | undefined }) {
+  const [statuses, setStatuses] = useState<MoveStatusMap>(new Map())
   const [items, setItems] = useState<UnlockedTechnique[]>([])
   const [loading, setLoading] = useState(true)
   const [cat, setCat] = useState<Category>('All')
@@ -713,11 +640,17 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
     return () => { active = false }
   }, [])
 
-  // Decorate items with their readiness pct (computed once when items or
-  // assessment changes), then filter.
+  useEffect(() => {
+    let active = true
+    if (!userId) return
+    fetchMoveStatuses(userId).then(m => { if (active) setStatuses(m) })
+    return () => { active = false }
+  }, [userId])
+
+  // Decorate items with the server's per-move result, then filter.
   const decorated = useMemo(
-    () => items.map(it => ({ it, pct: computeReadiness(it, assessment) })),
-    [items, assessment],
+    () => items.map(it => ({ it, st: statuses.get(it.code) ?? null })),
+    [items, statuses],
   )
 
   // Find a same-muscle substitution with a LOWER stretch demand (and ideally
@@ -735,8 +668,8 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
           c.primary_muscle === target.primary_muscle &&
           // Lower stretch demand than the target
           (stretchRank[c.stretch_emphasis ?? 'medium'] ?? 2) < targetStretch &&
-          // And readiness is green/neutral for the user
-          (computeReadiness(c, assessment) ?? 100) >= 90,
+          // And the server rates it GREEN for the user
+          statuses.get(c.code)?.tier === 'GREEN',
         )
         // Prefer the candidate that still keeps the most stretch (closest below)
         .sort((a, b) =>
@@ -744,14 +677,14 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
         )
       return candidates[0] ?? null
     }
-  }, [items, assessment])
+  }, [items, statuses])
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase()
-    return decorated.filter(({ it, pct }) => {
+    return decorated.filter(({ it, st }) => {
       if (cat !== 'All' && it.category !== cat) return false
       if (needle && !it.name.toLowerCase().includes(needle)) return false
-      if (readyOnly && (pct == null || pct < 90)) return false
+      if (readyOnly && st?.tier !== 'GREEN') return false
       return true
     })
   }, [decorated, cat, q, readyOnly])
@@ -802,13 +735,16 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
       <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3 text-miami-text/70">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-3 rounded-sm bg-green-tier" /> Ready (≥90%)
+            <span className="inline-block w-2.5 h-3 rounded-sm bg-green-tier" /> Ready
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-3 rounded-sm bg-yellow-tier" /> Caution (75–89%)
+            <span className="inline-block w-2.5 h-3 rounded-sm bg-yellow-tier" /> Caution
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-3 rounded-sm bg-red-tier" /> Mobility first (&lt;75%)
+            <span className="inline-block w-2.5 h-3 rounded-sm bg-red-tier" /> Mobility first
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-2.5 h-3 rounded-sm bg-miami-violet/40" /> Not rated
           </span>
         </div>
         <button
@@ -826,15 +762,15 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
 
       <p className="text-xs text-miami-text/60">
         {filtered.length} of {items.length} exercises shown
-        {!assessment && (
+        {statuses.size === 0 && (
           <span className="ml-2 text-yellow-tier">· Complete your assessment to unlock readiness colors</span>
         )}
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        {filtered.map(({ it, pct }) => {
+        {filtered.map(({ it, st }) => {
           const stretch = it.stretch_emphasis ? STRETCH_LABEL[it.stretch_emphasis] : null
-          const isRed = pct != null && pct < 75
+          const isRed = st?.tier === 'RED'
           const isExpanded = expandedId === it.id
           const sub = isRed ? findSubstitution(it) : null
           const limiting = it.limiting_joint
@@ -844,28 +780,22 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
               key={it.id}
               className={cn(
                 'rounded-xl bg-miami-ink/70 border border-miami-violet/20 p-3 transition-shadow',
-                readinessBorder(pct),
+                tierBorder(st?.tier ?? null),
                 isRed && 'cursor-pointer hover:shadow-[0_0_18px_-6px_rgba(255,45,120,0.5)]',
               )}
               onClick={() => { if (isRed) setExpandedId(isExpanded ? null : it.id) }}
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-medium text-miami-text leading-tight">{it.name}</p>
-                {pct != null ? (
-                  <span
-                    className={cn(
-                      'text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded shrink-0',
-                      readinessBgClass(pct),
-                    )}
-                    title={readinessLabel(pct) ?? undefined}
-                  >
-                    {pct}%
-                  </span>
-                ) : it.tier && (
-                  <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-1.5 py-0.5 rounded shrink-0">
-                    {it.tier[0]}
-                  </span>
-                )}
+                <span
+                  className={cn(
+                    'text-[10px] uppercase tracking-wide font-bold px-1.5 py-0.5 rounded shrink-0',
+                    tierChip(st?.tier ?? null),
+                  )}
+                  title={st?.tier === 'GREY' && st.reason ? GREY_REASON_WORD[st.reason] : undefined}
+                >
+                  {TIER_WORD[st?.tier ?? 'GREY']}
+                </span>
               </div>
 
               {/* Muscle + stretch-emphasis badges (the hypertrophy layer) */}
@@ -884,12 +814,21 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
 
               <p className="text-[11px] text-miami-text/60 mt-1">
                 {it.category}{it.subcategory ? ` · ${it.subcategory}` : ''}
-                {pct != null && (
-                  <span className={cn('ml-1.5 font-semibold', readinessTextClass(pct))}>
-                    · {readinessLabel(pct)}
-                  </span>
-                )}
               </p>
+
+              {/* Per-joint G/Y/R against THIS move's requirement (names and colors only) */}
+              {st && st.joints.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1.5" aria-label="Joint requirements for this exercise">
+                  {st.joints.map(j => (
+                    <span key={j.joint} className={cn('text-[10px] font-semibold px-1.5 py-0.5 rounded capitalize', tierChip(j.status))}>
+                      {jointName(j.joint)}: {TIER_WORD[j.status]}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {st?.tier === 'GREY' && st.reason && (
+                <p className="text-[10px] text-miami-text/55 mt-1">{GREY_REASON_WORD[st.reason]}</p>
+              )}
 
               {/* ROM differentiator — only when readiness is red */}
               {isRed && (
