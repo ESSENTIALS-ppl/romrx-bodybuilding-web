@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
+import { localDateISO } from '../lib/dates'
 import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { PageHeader } from '../components/PageHeader'
@@ -591,7 +592,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'hip_ir', label: 'Hip Internal Rotation',
-    bjjWhy: 'Protects your knees in squats and lunges. Low IR is a top driver of knee valgus under load.',
+    bjjWhy: 'Used in squats and lunges.',
     leftKey: 'hip_ir_l', rightKey: 'hip_ir_r',
     normalMin: 30, normalMax: 45, riskBelow: 30, unit: '°', rxKey: 'hip_ir',
   },
@@ -609,7 +610,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'shoulder_er', label: 'Shoulder External Rotation',
-    bjjWhy: 'Your shoulder safety zone for benching, OHP, and behind-the-neck work. Low ER = high injury risk.',
+    bjjWhy: 'Used in benching, overhead press and behind-the-neck work.',
     leftKey: 'shoulder_er_l', rightKey: 'shoulder_er_r',
     normalMin: 60, normalMax: 90, riskBelow: 60, unit: '°', rxKey: 'shoulder_er',
   },
@@ -621,7 +622,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'ankle_df', label: 'Ankle Dorsiflexion',
-    bjjWhy: 'Depth and stability in squats and lunges. Stiff ankles = forward shin = quads chew it, knees take it.',
+    bjjWhy: 'Used in squat and lunge depth.',
     leftKey: 'ankle_df_l', rightKey: 'ankle_df_r',
     normalMin: 10, normalMax: 20, riskBelow: 10, unit: 'cm', rxKey: 'ankle_df',
   },
@@ -633,7 +634,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'cervical_flex', label: 'Cervical Flexion',
-    bjjWhy: 'Protects your neck during shrugs and front-loaded work where the chin tucks under load.',
+    bjjWhy: 'Used in shrugs and front-loaded work where the chin tucks.',
     singleKey: 'cervical_flex',
     normalMin: 45, normalMax: 60, riskBelow: 35, unit: '°', rxKey: 'cervical_flex',
   },
@@ -645,7 +646,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'lumbar', label: 'Lumbar Spine',
-    bjjWhy: 'Hip hinge mechanics. Deadlifts, RDLs, good-mornings — low extension is what loads your discs.',
+    bjjWhy: 'Used in hip hinge lifts: deadlifts, RDLs and good-mornings.',
     singleKey: 'lumbar_flex',
     normalMin: 40, normalMax: 80, riskBelow: 40, unit: '°', rxKey: 'lumbar',
   },
@@ -725,12 +726,12 @@ function RetestBanner({ assessedAt }: { assessedAt: string }) {
     status = 'yellow'
     Icon = Clock
     message = `Reassessment due ${retestDateStr}`
-    subtext = 'Your ROM may have shifted -- retest to update your protocol and unlock new techniques'
+    subtext = 'Retest to update your ratings.'
   } else {
     status = 'red'
     Icon = RefreshCw
     message = `Retest overdue by ${Math.abs(daysUntilRetest)} days`
-    subtext = "Retake now to see how much you've improved and update your technique ratings"
+    subtext = 'Retest to see how your results compare.'
   }
 
   const styles = {
@@ -889,12 +890,12 @@ function TodayCard({ ranked, assessedAt, userId }: TodayCardProps) {
   useEffect(() => { refreshCount() }, [refreshCount])
 
   useEffect(() => {
-    const todayIso = new Date().toISOString().slice(0, 10)
+    const todayIso = localDateISO()
     setCompletedToday(log.sessions.includes(todayIso))
   }, [log])
 
   const handleMarkComplete = useCallback(() => {
-    const todayIso = new Date().toISOString().slice(0, 10)
+    const todayIso = localDateISO()
     const protocolDay = `P${todayPriorityIndex + 1}`
     setLog(prev => {
       const sessions = prev.sessions.includes(todayIso)
@@ -1153,9 +1154,9 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-const DAILY_WHY = 'This is your minimum effective dose. Research is clear: short, consistent daily mobility work changes range of motion more than long sessions done occasionally. A few minutes a day, every day, is what actually moves your numbers. Do this and you\'re covered. Everything else is a bonus.'
+const DAILY_WHY = 'This is your minimum effective dose. Short, regular sessions are an easy habit to keep. Studies in healthy adults show regular stretching and strength work can raise range of motion over several weeks. Results vary. Everything else is a bonus.'
 
-const FULL_WHY = 'Got more time, or want to attack a specific restriction? This is your complete prescription. Every movement from your assessment, organized by the limitations holding back your game. Use it as a deeper session when you can, or as a reference to understand the whole plan. The Daily keeps you progressing. The Full lets you go further.'
+const FULL_WHY = 'Got more time, or want to attack a specific restriction? This is your complete plan. Every movement from your assessment, organized by the areas where your results are lower than the target ranges for your lifts. Use it as a deeper session when you can, or as a reference to understand the whole plan. The Daily keeps you progressing. The Full lets you go further.'
 
 export function MyProtocol() {
   const { user } = useAuth()
@@ -1183,7 +1184,7 @@ export function MyProtocol() {
     <EmptyState
       icon={ClipboardList}
       title="No assessment yet"
-      description="Complete your ROM assessment and your personal injury-prevention protocol will appear here."
+      description="Complete your ROM assessment and your personal protocol will appear here."
     />
   )
 

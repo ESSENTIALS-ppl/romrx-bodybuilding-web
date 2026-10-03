@@ -23,6 +23,12 @@ import { ProgramGenerator } from '../components/ProgramGenerator'
 //  Types
 // ────────────────────────────────────────────────────────────────────────────
 
+// Seed rows carry an import note like "Template workout from Beginner_Hypertrophy.md". Not user copy: hide it.
+function cleanDescription(d: string | null): string | null {
+  if (!d) return null
+  return /^Template workout from .+\.md$/i.test(d.trim()) ? null : d
+}
+
 interface WorkoutTemplate {
   id: string
   sport: string
@@ -426,8 +432,8 @@ function TemplatesPanel({ userTier }: { userTier: string | null }) {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-miami-text truncate">{t.day_label}</p>
-                        {t.description && (
-                          <p className="text-xs text-miami-text/60 mt-0.5 truncate">{t.description}</p>
+                        {cleanDescription(t.description) && (
+                          <p className="text-xs text-miami-text/60 mt-0.5 truncate">{cleanDescription(t.description)}</p>
                         )}
                       </div>
                       <ChevronRight
@@ -506,6 +512,8 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
   const [loading, setLoading] = useState(true)
   const [expanded, setExpanded] = useState<string | null>(null)
   const [exercises, setExercises] = useState<Record<string, WorkoutExercise[]>>({})
+  // Logged-set totals per workout (sets and volume), so a logged session is not a bare name with a dash.
+  const [logged, setLogged] = useState<Record<string, { sets: number; volumeLb: number }>>({})
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -522,6 +530,22 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
         if (!active) return
         setItems((data as WorkoutTemplate[]) ?? [])
         setLoading(false)
+      })
+    supabase
+      .from('workout_sets')
+      .select('workout_id, weight_kg, reps, is_warmup')
+      .eq('user_id', userId)
+      .then(({ data }) => {
+        if (!active) return
+        const agg: Record<string, { sets: number; volumeLb: number }> = {}
+        for (const r of (data ?? []) as Array<{ workout_id: string | null; weight_kg: number | null; reps: number | null; is_warmup: boolean | null }>) {
+          if (!r.workout_id || r.is_warmup) continue
+          const a = agg[r.workout_id] ?? { sets: 0, volumeLb: 0 }
+          a.sets += 1
+          a.volumeLb += (Number(r.weight_kg ?? 0) / 0.453592) * Number(r.reps ?? 0)
+          agg[r.workout_id] = a
+        }
+        setLogged(agg)
       })
     return () => { active = false }
   }, [userId])
@@ -587,10 +611,15 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
         >
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-miami-text text-sm">{w.name}</p>
-            {w.description && <p className="text-xs text-miami-text/60 mt-1 line-clamp-2">{w.description}</p>}
+            {cleanDescription(w.description) && <p className="text-xs text-miami-text/60 mt-1 line-clamp-2">{cleanDescription(w.description)}</p>}
+            {logged[w.id] && (
+              <p className="text-xs text-miami-text/60 mt-1 tabular-nums">
+                {logged[w.id].sets} {logged[w.id].sets === 1 ? 'set' : 'sets'} · {Math.round(logged[w.id].volumeLb).toLocaleString()} lb volume
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-2 py-0.5 rounded-full">{w.tier}</span>
+            {w.tier && <span className="text-[10px] uppercase tracking-wide font-bold text-miami bg-miami/15 px-2 py-0.5 rounded-full">{w.tier}</span>}
             <ChevronRight size={16} className={cn('text-miami-text/60 transition-transform', isOpen && 'rotate-90')} />
           </div>
         </button>
