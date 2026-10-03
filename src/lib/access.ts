@@ -2,7 +2,7 @@
 // The old rule read users.subscription_status only. Buying a sport pack never sets it,
 // so pack holders were bounced to a dead paywall. New rule: Base is active AND the
 // user owns this sport (an active or trialing sport_entitlements row that has not expired).
-// The legacy subscription_status rule and grandfathered_at still grant access.
+// The legacy subscription_status rule still grants access. BB route keeps its own grandfathered_at bypass; BJJ never had one, so none is added here.
 import type { Profile, SportEntitlement } from '../hooks/useProfile'
 
 const LEGACY_PAID = new Set(['active', 'trialing'])
@@ -23,7 +23,6 @@ export function hasSportAccess(
   sport: string,
 ): boolean {
   if (!profile) return false
-  if (profile.grandfathered_at) return true
   if (LEGACY_PAID.has(profile.subscription_status)) return true
   return profile.base_status === 'active' && ownsSport(entitlements, sport)
 }
