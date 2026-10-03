@@ -34,7 +34,12 @@ interface PhotoRow {
   signed_url?: string
 }
 
-const TODAY = () => new Date().toISOString().slice(0, 10)
+// Local calendar date (not UTC): at 8 PM ET toISOString() already reads tomorrow.
+const TODAY = () => {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
 
 export function BodyMetrics() {
   const { user } = useAuth()
@@ -123,6 +128,8 @@ export function BodyMetrics() {
     })()
 
     const { error } = await supabase.rpc('log_body_metrics', {
+      // p_measured_at is the only required argument of the RPC; send the user's LOCAL date.
+      p_measured_at: TODAY(),
       p_weight_kg: weightKg,
       p_body_fat_pct: num(form.bodyFat),
       p_neck_cm: inToCm(form.neck),
