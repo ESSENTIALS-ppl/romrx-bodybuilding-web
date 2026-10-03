@@ -3,6 +3,9 @@ import { Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { BASE_ASSESSMENT_URL } from '../lib/utils'
 
+// WIZARD RETIREMENT (draft): /onboarding/assessment now only redirects to the
+// Base assessment (BaseAssessmentRedirect); /onboarding/results is the paywall.
+// Original note:
 // Auth gate for the public-facing onboarding routes (/onboarding/assessment and
 // /onboarding/results). These pages used to render for anyone, so an
 // unauthenticated visitor hitting the URL directly could load the full
