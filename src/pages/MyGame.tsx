@@ -18,6 +18,8 @@ import {
   Plus, Search, Filter, Sparkles, AlertTriangle, BarChart3, ArrowRightLeft, Activity, Wand2,
 } from 'lucide-react'
 import { ProgramGenerator } from '../components/ProgramGenerator'
+import { BbTierPicker } from '../components/BbTierPicker'
+import { needsBbTierPick } from '../lib/bbTier'
 
 // ────────────────────────────────────────────────────────────────────────────
 //  Types
@@ -219,12 +221,14 @@ type TabKey = 'generate' | 'mesocycle' | 'templates' | 'mine' | 'library' | 'vol
 
 export function MyGame() {
   const { user } = useAuth()
-  const { profile, assessment, loading: profileLoading } = useProfile(user?.id)
+  const { profile, assessment, entitlements, loading: profileLoading, reload } = useProfile(user?.id)
   const [tab, setTab] = useState<TabKey>('generate')
 
   if (profileLoading) return <Spinner />
 
   const userTier = profile?.active_bb_tier ?? null
+  // Base-first pack owners have no tier yet: let them pick one here instead of a dead generator/library.
+  const needsTier = needsBbTierPick(profile, entitlements)
 
   return (
     <div className="space-y-5">
@@ -265,11 +269,13 @@ export function MyGame() {
         </TabBtn>
       </div>
 
-      {tab === 'generate' && <ProgramGenerator assessment={assessment} onSaved={() => setTab('mine')} />}
+      {tab === 'generate' && (needsTier
+        ? <BbTierPicker onPicked={reload} />
+        : <ProgramGenerator assessment={assessment} onSaved={() => setTab('mine')} />)}
       {tab === 'mesocycle' && <MesocyclePanel />}
       {tab === 'templates' && <TemplatesPanel userTier={userTier} />}
       {tab === 'mine' && <MyWorkoutsPanel userId={user?.id} />}
-      {tab === 'library' && <ExerciseLibraryPanel assessment={assessment} />}
+      {tab === 'library' && <ExerciseLibraryPanel assessment={assessment} needsTier={needsTier} onTierPicked={reload} />}
       {tab === 'volume' && <VolumePanel />}
     </div>
   )
@@ -684,7 +690,9 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
 const BB_CATEGORIES = ['Push', 'Pull', 'Lower', 'Core'] as const
 type Category = typeof BB_CATEGORIES[number] | 'All'
 
-function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null }) {
+function ExerciseLibraryPanel({
+  assessment, needsTier, onTierPicked,
+}: { assessment: Assessment | null; needsTier: boolean; onTierPicked: () => void }) {
   const [items, setItems] = useState<UnlockedTechnique[]>([])
   const [loading, setLoading] = useState(true)
   const [cat, setCat] = useState<Category>('All')
@@ -759,6 +767,8 @@ function ExerciseLibraryPanel({ assessment }: { assessment: Assessment | null })
   if (loading) return <Spinner />
 
   if (items.length === 0) {
+    // Pack owner with no tier: pick it right here (replaces the "go to Settings" text).
+    if (needsTier) return <BbTierPicker onPicked={onTierPicked} />
     return (
       <EmptyState
         icon={Sparkles}
