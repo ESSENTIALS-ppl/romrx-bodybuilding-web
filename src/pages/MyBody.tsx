@@ -9,7 +9,8 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tool
 import { cn, bbTierColor, bbTierLabel, formatJoint } from '../lib/utils'
 import { AlertTriangle, Activity, TrendingUp } from 'lucide-react'
 import { computePRS } from '../lib/readiness'
-import { HIP_FLEX_NOT_SCORED_CHIP, HIP_FLEX_NOT_SCORED_LINE, HIP_FLEX_SIDES_DIFFER_LINE, hipSidesDiffer, withoutHipFlex, withoutHipFlexReasons } from '../lib/hipFlex'
+import { HipSidesNote } from '../components/HipSidesNote'
+import { HIP_FLEX_NOT_SCORED_CHIP, HIP_FLEX_NOT_SCORED_LINE, withoutHipFlex, withoutHipFlexReasons } from '../lib/hipFlex'
 
 // ── Position Readiness Score ──────────────────────────────────────────────────
 // computePRS lives in ../lib/readiness (hip flexion is not in the score).
@@ -89,9 +90,7 @@ function NotScoredRow({ label, left, right }: { label: string; left?: number | n
     <div className="flex items-start gap-3 py-2">
       <div className="w-32 shrink-0">
         <p className="text-xs font-medium text-charcoal">{label}</p>
-        {hipSidesDiffer(left, right) && (
-          <p className="text-xs text-charcoal-light mt-0.5">{HIP_FLEX_SIDES_DIFFER_LINE}</p>
-        )}
+        <HipSidesNote left={left} right={right} className="text-xs text-charcoal-light mt-0.5" />
       </div>
       <div className="flex-1 min-w-0">
         <span className="inline-block text-xs font-semibold text-charcoal-light bg-gray-100 px-2 py-0.5 rounded-full">{HIP_FLEX_NOT_SCORED_CHIP}</span>

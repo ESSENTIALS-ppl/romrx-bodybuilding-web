@@ -1,6 +1,6 @@
 // node scripts/hip-not-scored.test.mjs : hip flexion is saved for each leg and NOT scored (Stacy-cleared copy, Oct 5 2026).
 // Unit checks on src/lib/hipFlex.ts + src/lib/readiness.ts (transpiled with the repo's TypeScript), plus source checks on the pages.
-import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -58,6 +58,22 @@ ok('other joints score exactly as before (old formula minus the hip flexion row)
   assert.equal(rd.computePRS({}), 100);
 });
 
+// Render check: the per-leg note on the hip display itself (HipSidesNote, used by the Assessment step and the My Body row).
+// The component is transpiled into node_modules/.cache so 'react/jsx-runtime' resolves from the repo.
+const cacheDir = join(ROOT, 'node_modules', '.cache', 'hip-not-scored-test');
+mkdirSync(join(cacheDir, 'components'), { recursive: true }); mkdirSync(join(cacheDir, 'lib'), { recursive: true });
+const tx = (rel, out, jsx) => writeFileSync(join(cacheDir, out), ts.transpileModule(src(rel), { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022, ...(jsx ? { jsx: ts.JsxEmit.ReactJSX } : {}) } }).outputText.replace("from '../lib/hipFlex'", "from '../lib/hipFlex.mjs'"));
+tx('src/lib/hipFlex.ts', 'lib/hipFlex.mjs', false);
+tx('src/components/HipSidesNote.tsx', 'components/HipSidesNote.mjs', true);
+const { HipSidesNote } = await import(pathToFileURL(join(cacheDir, 'components/HipSidesNote.mjs')).href);
+const { createElement } = await import('react');
+const { renderToStaticMarkup } = await import('react-dom/server');
+const html = (l, r) => renderToStaticMarkup(createElement(HipSidesNote, { left: l, right: r, className: 'x' }));
+ok('hip display renders "Left and right are different" at a 10 degree+ gap, nothing below it', () => {
+  for (const [l, r] of [[80, 90], [90, 80], ['95', '110'], [100, 130]]) assert.equal(html(l, r), '<p class="x" data-testid="hip-sides-note">Left and right are different</p>', `${l}/${r}`);
+  for (const [l, r] of [[80, 89], [90, 90], ['100', '109.9'], [null, 90], ['', '']]) assert.equal(html(l, r), '', `${l}/${r}`);
+});
+
 // Source checks (pages)
 const A = src('src/pages/Assessment.tsx'), B = src('src/pages/MyBody.tsx'), P = src('src/pages/MyProtocol.tsx');
 const R = src('src/pages/ResultsPreview.tsx'), S = src('src/pages/Settings.tsx');
@@ -68,7 +84,6 @@ ok('assessment: hip flexion fields have no range and no badge, cleared lines sho
   assert.match(A, /if \(field\.notScored \|\| field\.riskBelow == null \|\| field\.normalLow == null\) return null/); // no color, no AT RISK / LOW / FUNCTIONAL
   assert.match(A, /\{!field\.notScored && \(\s*<span[^>]*>Normal:/);
   assert.match(A, /\{field\.notScored && \(\s*<p[^>]*>\{HIP_FLEX_NOT_SCORED_LINE\}<\/p>/);
-  assert.match(A, /hipSidesDiffer\(values\[step\.fields\[0\]\.key\], values\[step\.fields\[1\]\.key\]\)[\s\S]{0,120}\{HIP_FLEX_SIDES_DIFFER_LINE\}/);
 });
 ok('my body: no OPTIMAL bar (was 110), no radar axis, Not scored row, filtered flags and priority joints', () => {
   assert.doesNotMatch(B, /'Hip Flex'/);
@@ -78,6 +93,14 @@ ok('my body: no OPTIMAL bar (was 110), no radar axis, Not scored row, filtered f
   assert.match(B, /const priorityJoints = withoutHipFlex\(assessment\.worst_joints\)/);
   assert.match(B, /const redFlagReasons = withoutHipFlexReasons\(assessment\.red_flag_reasons\)/);
   assert.doesNotMatch(B, /assessment\.worst_joints\.map|assessment\.red_flag_reasons\?\.join/);
+});
+ok('the per-leg note is wired into BOTH hip displays (Assessment step and My Body row)', () => {
+  assert.match(A, /step\.fields\.every\(f => f\.notScored\) && \(\s*<HipSidesNote left=\{values\[step\.fields\[0\]\.key\]\} right=\{values\[step\.fields\[1\]\.key\]\}/);
+  assert.match(B, /function NotScoredRow[\s\S]{0,400}<HipSidesNote left=\{left\} right=\{right\}/);
+  assert.match(B, /<NotScoredRow label="Hip Flexion" left=\{assessment\.hip_flex_l\} right=\{assessment\.hip_flex_r\} \/>/);
+});
+ok('BB hip why line is the cleared line', () => {
+  assert.match(A, /whyMatters: 'How far each leg lifts with the knee straight\. Left and right are shown separately\.'/);
 });
 ok('my protocol: hip flexion is never ranked', () => {
   const joints = P.slice(P.indexOf('const JOINTS: JointDef[]'), P.indexOf('// ── Scoring'));
