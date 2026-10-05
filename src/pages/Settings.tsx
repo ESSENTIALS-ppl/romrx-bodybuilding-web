@@ -11,53 +11,13 @@ import {
 } from 'lucide-react'
 import { bbTierColor, bbTierLabel, cn } from '../lib/utils'
 import { FeedbackWidget } from '../components/FeedbackWidget'
+import { computePRS } from '../lib/readiness'
 
 const BB_TIERS = ['beginner', 'intermediate', 'advanced'] as const
 type BBTier = typeof BB_TIERS[number]
 const SIDES = ['right', 'left']
 
-// ── PRS helpers (mirrors MyBody.tsx) ─────────────────────────────────────────
-const PRS_BILATERAL = [
-  { l: 'hip_er_l',        r: 'hip_er_r',        riskBelow: 40,  normalMin: 40  },
-  { l: 'hip_ir_l',        r: 'hip_ir_r',        riskBelow: 30,  normalMin: 30  },
-  { l: 'hip_abd_l',       r: 'hip_abd_r',       riskBelow: 25,  normalMin: 35  },
-  { l: 'hip_flex_l',      r: 'hip_flex_r',      riskBelow: 100, normalMin: 100 },
-  { l: 'shoulder_er_l',   r: 'shoulder_er_r',   riskBelow: 60,  normalMin: 60  },
-  { l: 'shoulder_flex_l', r: 'shoulder_flex_r', riskBelow: 120, normalMin: 140 },
-  { l: 'ankle_df_l',      r: 'ankle_df_r',      riskBelow: 10,  normalMin: 10  },
-  { l: 'cervical_lat_l',  r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
-]
-const PRS_UNILATERAL = [
-  { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },
-  { key: 'lumbar_ext',    riskBelow: 15, normalMin: 20 },
-  { key: 'cervical_flex', riskBelow: 35, normalMin: 45 },
-  { key: 'cervical_ext',  riskBelow: 40, normalMin: 55 },
-]
-
-function computePRS(a: Assessment): number {
-  let score = 100
-  for (const j of PRS_BILATERAL) {
-    const l = (a as unknown as Record<string, number | null>)[j.l]
-    const r = (a as unknown as Record<string, number | null>)[j.r]
-    if (l != null && r != null) {
-      const minVal = Math.min(l, r)
-      const gap    = Math.abs(l - r)
-      if (minVal < j.riskBelow) score -= 8
-      else if (minVal < j.normalMin) score -= 4
-      if (gap >= 15) score -= 6
-      else if (gap >= 8) score -= 3
-    }
-  }
-  for (const j of PRS_UNILATERAL) {
-    const v = (a as unknown as Record<string, number | null>)[j.key]
-    if (v != null) {
-      if (v < j.riskBelow) score -= 6
-      else if (v < j.normalMin) score -= 3
-    }
-  }
-  return Math.max(0, Math.min(100, Math.round(score)))
-}
-
+// ── PRS helpers: computePRS is shared in ../lib/readiness (hip flexion is not in the score) ──
 function getPRSTier(s: number) {
   if (s >= 85) return { label: 'ELITE',      color: 'text-miami',        bg: 'bg-miami-light' }
   if (s >= 70) return { label: 'NEAR TARGET', color: 'text-miami',        bg: 'bg-miami-light' }
