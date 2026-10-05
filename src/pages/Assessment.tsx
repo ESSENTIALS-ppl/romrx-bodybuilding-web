@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Loader2, ChevronLeft, ChevronRight, CheckCircle2, AlertTriangle, Info, ExternalLink, SkipForward } from 'lucide-react'
 import { cn } from '../lib/utils'
+import { HIP_FLEX_NOT_SCORED_LINE, HIP_FLEX_SIDES_DIFFER_LINE, hipSidesDiffer } from '../lib/hipFlex'
 
 const SUBMIT_URL = `${SUPABASE_URL}/functions/v1/submit-assessment`
 
@@ -12,9 +13,11 @@ interface Field {
   key: string
   label: string
   unit?: string
-  normalLow: number
-  normalHigh: number
-  riskBelow: number  // AT RISK threshold
+  normalLow?: number
+  normalHigh?: number
+  riskBelow?: number  // AT RISK threshold
+  /** Saved for each leg, not scored: no range, no color, no badge (hip flexion). */
+  notScored?: boolean
 }
 
 interface Step {
@@ -181,7 +184,7 @@ const STEPS: Step[] = [
   {
     id: 'hip_flex',
     title: 'Hip Flexion',
-    whyMatters: 'Squat depth. Without it you butt-wink, lose tightness, and leak power off the bottom.',
+    whyMatters: 'How far each leg lifts with the knee straight. Left and right are shown separately.',
     tool: 'iPhone: Measure → Level  ·  Android: Simple Inclinometer  ·  Lying on the floor',
     position: [
       'Lie flat on your back on the floor. Both legs straight.',
@@ -198,8 +201,9 @@ const STEPS: Step[] = [
     videoUrl: 'https://www.youtube.com/watch?v=tdYjpTQ0AQY',
     videoLabel: 'Hip Flexion Self-Assessment (The Ready State)',
     fields: [
-      { key: 'hip_flex_l', label: 'Left', unit: '°', normalLow: 100, normalHigh: 120, riskBelow: 100 },
-      { key: 'hip_flex_r', label: 'Right', unit: '°', normalLow: 100, normalHigh: 120, riskBelow: 100 },
+      // Hip flexion is saved for each leg and not scored (no range, no badge). See src/lib/hipFlex.ts.
+      { key: 'hip_flex_l', label: 'Left', unit: '°', notScored: true },
+      { key: 'hip_flex_r', label: 'Right', unit: '°', notScored: true },
     ],
   },
 
@@ -290,6 +294,7 @@ const SETUP_STEPS = [
 
 // ── Live scoring helper ───────────────────────────────────────────────────────
 function getScore(val: string, field: Field) {
+  if (field.notScored || field.riskBelow == null || field.normalLow == null) return null
   const n = parseFloat(val)
   if (isNaN(n) || val === '') return null
   if (n < field.riskBelow) return 'risk'
@@ -306,7 +311,9 @@ function MeasureInput({ field, value, onChange }: {
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <label className="text-sm font-semibold text-miami-text">{field.label}</label>
-        <span className="text-xs text-miami-text/60">Normal: {field.normalLow}–{field.normalHigh}{field.unit}</span>
+        {!field.notScored && (
+          <span className="text-xs text-miami-text/60">Normal: {field.normalLow}–{field.normalHigh}{field.unit}</span>
+        )}
       </div>
       <div className="flex items-center gap-3">
         <input
@@ -339,6 +346,9 @@ function MeasureInput({ field, value, onChange }: {
           </span>
         )}
       </div>
+      {field.notScored && (
+        <p className="text-xs text-miami-text/70">{HIP_FLEX_NOT_SCORED_LINE}</p>
+      )}
     </div>
   )
 }
@@ -547,6 +557,10 @@ export function Assessment() {
               {step.fields.map(f => (
                 <MeasureInput key={f.key} field={f} value={values[f.key] ?? ''} onChange={handleChange} />
               ))}
+              {step.fields.length === 2 && step.fields.every(f => f.notScored) &&
+                hipSidesDiffer(values[step.fields[0].key], values[step.fields[1].key]) && (
+                <p className="text-xs font-semibold text-miami-text">{HIP_FLEX_SIDES_DIFFER_LINE}</p>
+              )}
             </div>
 
             {/* Hands-free screenshot tip */}
