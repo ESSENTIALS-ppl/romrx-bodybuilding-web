@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export interface Profile {
@@ -85,6 +85,8 @@ export function useProfile(userId: string | undefined) {
   const [eligibility, setEligibility] = useState<TechniqueEligibility[]>([])
   const [entitlements, setEntitlements] = useState<SportEntitlement[]>([])
   const [loading, setLoading]       = useState(true)
+  // Bumped by reload() to refetch get_my_profile (e.g. after the BB tier picker saves).
+  const [reloadKey, setReloadKey]   = useState(0)
 
   useEffect(() => {
     if (!userId) return
@@ -117,7 +119,9 @@ export function useProfile(userId: string | undefined) {
     }
 
     load()
-  }, [userId])
+  }, [userId, reloadKey])
 
-  return { profile, assessment, eligibility, entitlements, loading }
+  const reload = useCallback(() => setReloadKey(k => k + 1), [])
+
+  return { profile, assessment, eligibility, entitlements, loading, reload }
 }
