@@ -56,8 +56,20 @@ ok('gate: Stacy copy exactly, unchecked, user tap only, current version, server 
 
 // magic link never creates an account
 assert.ok(login.includes('shouldCreateUser: false'));
-assert.ok(login.includes(`"We couldn't find an account for that email."`));
 ok('magic link: shouldCreateUser false');
+
+// privacy (Stacy, Oct 5): unknown email is treated exactly like success
+assert.ok(!login.includes("couldn't find an account"));
+assert.match(login, /const noAccount = !!err && \/signups\? not allowed\|otp_disabled\|user\[_ \]not\[_ \]found\/i/);
+assert.ok(login.includes('if (err && !noAccount) {'));
+const handler = login.slice(login.indexOf('const noAccount'), login.indexOf('setCooldown(60)'));
+assert.ok(handler.includes('setMagicSent(true)'));
+assert.doesNotMatch(handler, /console\.|noAccount \?/);
+const fl = flat(login);
+assert.ok(fl.includes('New here? Create an account .'));
+assert.match(login, /data-testid="magic-new-here">New here\? <a href=\{ownedBaseUrl\('login_cta'\)\}[^>]*>Create an account<\/a>\.<\/p>/);
+assert.match(login, /\{!magicSent && \(\s*<p[^>]*>\s*New athlete\?/);
+ok('magic link privacy: same screen whether or not the account exists; one Create an account link');
 
 // BB coach signup: server-side record, links romrx.io/legal, own wording id
 const coach = read('src/pages/CoachSignup.tsx');
