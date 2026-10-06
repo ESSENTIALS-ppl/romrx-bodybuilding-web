@@ -59,10 +59,17 @@ export function Login() {
 
     const { error: err } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/confirm` },
+      // shouldCreateUser: false. A magic link must never create an account: account creation only
+      // happens where the terms checkbox is shown (Stacy, Oct 5).
+      options: { emailRedirectTo: `${window.location.origin}/auth/confirm`, shouldCreateUser: false },
     })
     setLoading(false)
-    if (err) {
+    // Privacy (Stacy, Oct 5): never reveal whether an email has an account. With
+    // shouldCreateUser: false, Supabase answers an unknown email with otp_disabled /
+    // "Signups not allowed for otp" / user not found. Treat that exactly like success:
+    // same screen, same cooldown, no error text.
+    const noAccount = !!err && /signups? not allowed|otp_disabled|user[_ ]not[_ ]found/i.test(`${err.message} ${(err as { code?: string }).code ?? ''}`)
+    if (err && !noAccount) {
       setError(err.message.includes('rate') || err.message.includes('many')
         ? 'Too many attempts. Wait a minute and try again, or use your password instead.'
         : err.message)
@@ -157,6 +164,7 @@ export function Login() {
               </div>
               <h2 className="font-display text-lg text-white mb-1 tracking-wider">CHECK YOUR EMAIL</h2>
               <p className="text-sm text-white/60">Link sent to <strong className="text-white">{email}</strong></p>
+              <p className="text-sm text-white/60 mt-2" data-testid="magic-new-here">New here? <a href={ownedBaseUrl('login_cta')} className="miami-link">Create an account</a>.</p>
               <button onClick={() => { setMagicSent(false); setMode('password') }}
                 className="mt-5 text-xs miami-link">
                 Use password instead
@@ -183,10 +191,12 @@ export function Login() {
           )}
         </div>
 
-        <p className="text-center text-xs text-white/50 mt-5">
-          New athlete?{' '}
-          <a href={ownedBaseUrl('login_cta')} className="miami-link">Create an account</a>
-        </p>
+        {!magicSent && (
+          <p className="text-center text-xs text-white/50 mt-5">
+            New athlete?{' '}
+            <a href={ownedBaseUrl('login_cta')} className="miami-link">Create an account</a>
+          </p>
+        )}
         <p className="text-center text-xs text-white/25 mt-4 tracking-wider uppercase font-condensed">
           See how your range matches your lifts
         </p>
