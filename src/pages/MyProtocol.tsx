@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { goToBaseAssessment } from '../lib/baseAssessment'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import { localDateISO } from '../lib/dates'
@@ -701,7 +701,6 @@ function scoreJoints(assessment: Record<string, any>): ScoredJoint[] {
 
 // ── Retest status banner ──────────────────────────────────────────────────────
 function RetestBanner({ assessedAt }: { assessedAt: string }) {
-  const navigate = useNavigate()
   const now = new Date()
   const assessed = new Date(assessedAt)
   const daysSince = Math.floor((now.getTime() - assessed.getTime()) / (1000 * 60 * 60 * 24))
@@ -747,7 +746,7 @@ function RetestBanner({ assessedAt }: { assessedAt: string }) {
 
   return (
     <button
-      onClick={() => navigate('/onboarding/assessment')}
+      onClick={goToBaseAssessment}
       className={cn(
         'w-full flex items-start gap-3 rounded-2xl border px-4 py-3.5 text-left transition-opacity hover:opacity-80',
         styles[status]
