@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { goToBaseAssessment } from '../lib/baseAssessment'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
@@ -149,7 +150,7 @@ export function ResultsPreview() {
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
       <div className="text-center max-w-sm space-y-4">
         <p className="text-charcoal font-semibold">No assessment found.</p>
-        <button onClick={() => navigate('/onboarding/assessment')} className="btn-primary">Take Assessment</button>
+        <button onClick={goToBaseAssessment} className="btn-primary">Take Assessment</button>
       </div>
     </div>
   )

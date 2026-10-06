@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { BASE_ASSESSMENT_HREF } from '../lib/baseAssessment'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
@@ -784,7 +785,7 @@ function AthleteSettings() {
         <Section title="Assessment History">
           <div className="flex items-center justify-between -mt-2 mb-1">
             <p className="text-xs text-charcoal-light">Your past ROM snapshots</p>
-            <a href="/onboarding/assessment" className="text-xs font-semibold text-miami hover:underline">
+            <a href={BASE_ASSESSMENT_HREF} className="text-xs font-semibold text-miami hover:underline">
               + New Assessment
             </a>
           </div>
@@ -797,7 +798,7 @@ function AthleteSettings() {
             <div className="text-center py-6">
               <ClipboardList size={28} className="mx-auto text-charcoal-light mb-2" />
               <p className="text-sm text-charcoal-light mb-2">No assessments on file yet.</p>
-              <a href="/onboarding/assessment" className="inline-block text-sm font-semibold text-miami hover:underline">
+              <a href={BASE_ASSESSMENT_HREF} className="inline-block text-sm font-semibold text-miami hover:underline">
                 Take your first assessment
               </a>
             </div>
@@ -828,7 +829,7 @@ function AthleteSettings() {
                         </span>
                       )}
                       <a
-                        href="/onboarding/assessment"
+                        href={BASE_ASSESSMENT_HREF}
                         className="flex items-center gap-1 text-xs font-semibold text-miami hover:underline"
                       >
                         <TrendingUp size={12} />
