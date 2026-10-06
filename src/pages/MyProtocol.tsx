@@ -583,18 +583,22 @@ interface JointDef {
   rxKey: string
 }
 
+// Oct 6 2026 (Jim YES 12:10 PM, Quinn's minimums rescale): normalMin / normalMax / riskBelow rescaled to the new Base targets,
+// new = round(old x new target / old target): hip ER x 29/45, hip IR x 26/45, hip flexion (straight-leg raise) x 63/120,
+// shoulder flexion x 140/180, ankle x 6/20 (cm), neck rotation x 70/80, neck side bend x 38/45. Shoulder ER, hip abduction,
+// lumbar, thoracic and neck flexion/extension are NOT rescaled. Mirrors protocol_joint_ranking() normal_min (romrxbjj-v2 20261006170000).
 const JOINTS: JointDef[] = [
   {
     key: 'hip_er', label: 'Hip External Rotation',
     bjjWhy: 'Hip mobility for deep squats, sumo deadlift stance, and lunge depth without knee cave.',
     leftKey: 'hip_er_l', rightKey: 'hip_er_r',
-    normalMin: 40, normalMax: 60, riskBelow: 40, unit: '°', rxKey: 'hip_er',
+    normalMin: 26, normalMax: 39, riskBelow: 26, unit: '°', rxKey: 'hip_er',
   },
   {
     key: 'hip_ir', label: 'Hip Internal Rotation',
     bjjWhy: 'Used in squats and lunges.',
     leftKey: 'hip_ir_l', rightKey: 'hip_ir_r',
-    normalMin: 30, normalMax: 45, riskBelow: 30, unit: '°', rxKey: 'hip_ir',
+    normalMin: 17, normalMax: 26, riskBelow: 17, unit: '°', rxKey: 'hip_ir',
   },
   {
     key: 'hip_abd', label: 'Hip Abduction',
@@ -613,19 +617,19 @@ const JOINTS: JointDef[] = [
     key: 'shoulder_flex', label: 'Shoulder Flexion',
     bjjWhy: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
     leftKey: 'shoulder_flex_l', rightKey: 'shoulder_flex_r',
-    normalMin: 140, normalMax: 180, riskBelow: 120, unit: '°', rxKey: 'shoulder_flex',
+    normalMin: 109, normalMax: 140, riskBelow: 93, unit: '°', rxKey: 'shoulder_flex',
   },
   {
     key: 'ankle_df', label: 'Ankle Dorsiflexion',
     bjjWhy: 'Used in squat and lunge depth.',
     leftKey: 'ankle_df_l', rightKey: 'ankle_df_r',
-    normalMin: 10, normalMax: 20, riskBelow: 10, unit: 'cm', rxKey: 'ankle_df',
+    normalMin: 3, normalMax: 6, riskBelow: 3, unit: 'cm', rxKey: 'ankle_df',
   },
   {
     key: 'cervical_lat', label: 'Cervical Lateral Flexion',
     bjjWhy: 'Neck strength holds bar position under heavy squats and rows without your head pulling off-line.',
     leftKey: 'cervical_lat_l', rightKey: 'cervical_lat_r',
-    normalMin: 40, normalMax: 45, riskBelow: 30, unit: '°', rxKey: 'cervical_lat',
+    normalMin: 34, normalMax: 38, riskBelow: 25, unit: '°', rxKey: 'cervical_lat',
   },
   {
     key: 'cervical_flex', label: 'Cervical Flexion',

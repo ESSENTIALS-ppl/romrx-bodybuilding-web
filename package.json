@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:utm": "node scripts/utm-forward.test.mjs",
+    "test:minimums": "node scripts/minimums-rescale.test.mjs",
     "test:coach-pause": "node scripts/coach-checkout-paused.test.mjs",
     "test:hip": "node scripts/hip-not-scored.test.mjs",
     "test:bb-tier": "node scripts/bb-tier-picker.test.mjs"
