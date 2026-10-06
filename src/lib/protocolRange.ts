@@ -5,9 +5,17 @@ export interface RangeDef {
   normalMax: number
   unit: string
   hideRange?: boolean
+  rangeSource?: string
 }
 
 export function rangeText(def: RangeDef): string | null {
   if (def.hideRange) return null
   return `${def.normalMin}–${def.normalMax}${def.unit}`
+}
+
+// Source line under the range, same text as Base ("Source: Youdas et al., 2005"). Null when the range is hidden or
+// the joint has no Base source.
+export function sourceText(def: RangeDef): string | null {
+  if (def.hideRange || !def.rangeSource) return null
+  return `Source: ${def.rangeSource}`
 }

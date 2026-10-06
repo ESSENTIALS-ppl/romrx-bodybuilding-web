@@ -7,7 +7,7 @@ import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { PageHeader } from '../components/PageHeader'
 import { cn } from '../lib/utils'
-import { rangeText } from '../lib/protocolRange'
+import { rangeText, sourceText } from '../lib/protocolRange'
 import {
   AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Circle,
   ClipboardList, Dumbbell, Flame, PersonStanding,
@@ -582,6 +582,7 @@ interface JointDef {
   riskBelow: number
   unit: string
   rxKey: string
+  rangeSource?: string  // Base source line under the range (io assessmentSteps rangeSource / hipFlexCopy); none = no line
   hideRange?: boolean  // true = no range line on the card (shoulder ER: no typical range for the tucked-elbow test)
 }
 
@@ -596,13 +597,13 @@ const JOINTS: JointDef[] = [
     key: 'hip_er', label: 'Hip External Rotation',
     bjjWhy: 'Hip mobility for deep squats, sumo deadlift stance, and lunge depth without knee cave.',
     leftKey: 'hip_er_l', rightKey: 'hip_er_r',
-    normalMin: 29, normalMax: 43, riskBelow: 26, unit: '°', rxKey: 'hip_er',
+    normalMin: 29, normalMax: 43, riskBelow: 26, unit: '°', rxKey: 'hip_er', rangeSource: 'Simoneau et al., 1998',
   },
   {
     key: 'hip_ir', label: 'Hip Internal Rotation',
     bjjWhy: 'Used in squats and lunges.',
     leftKey: 'hip_ir_l', rightKey: 'hip_ir_r',
-    normalMin: 26, normalMax: 40, riskBelow: 17, unit: '°', rxKey: 'hip_ir',
+    normalMin: 26, normalMax: 40, riskBelow: 17, unit: '°', rxKey: 'hip_ir', rangeSource: 'Simoneau et al., 1998',
   },
   {
     key: 'hip_abd', label: 'Hip Abduction',
@@ -621,7 +622,7 @@ const JOINTS: JointDef[] = [
     key: 'shoulder_flex', label: 'Shoulder Flexion',
     bjjWhy: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
     leftKey: 'shoulder_flex_l', rightKey: 'shoulder_flex_r',
-    normalMin: 140, normalMax: 180, riskBelow: 93, unit: '°', rxKey: 'shoulder_flex',
+    normalMin: 140, normalMax: 180, riskBelow: 93, unit: '°', rxKey: 'shoulder_flex', rangeSource: 'Gill et al., 2020',
   },
   {
     key: 'ankle_df', label: 'Ankle Dorsiflexion',
@@ -1131,7 +1132,7 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
               </div>
               {severity > 0 && (
                 <div className="bg-red-tier-bg rounded-xl px-3 py-1.5">
-                  <p className="text-[10px] text-red-tier font-bold uppercase tracking-wide">Below Normal</p>
+                  <p className="text-[10px] text-red-tier font-bold uppercase tracking-wide">Below typical range</p>
                   <p className="text-sm font-bold text-red-tier">{severity}{def.unit}</p>
                 </div>
               )}
@@ -1139,8 +1140,9 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
           )}
           {rangeText(def) !== null && (
             <div className="bg-surface rounded-xl px-3 py-1.5">
-              <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Normal</p>
+              <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Typical range</p>
               <p className="text-xs font-semibold text-charcoal">{rangeText(def)}</p>
+              {sourceText(def) !== null && <p className="text-[10px] text-charcoal-light">{sourceText(def)}</p>}
             </div>
           )}
         </div>
