@@ -1,19 +1,40 @@
-// Pack MyProtocol floors follow the Oct 6 2026 minimums rescale (Jim YES 12:10 PM; Quinn): new = round(old x new target / old target).
-// Run: node scripts/minimums-rescale.test.mjs
+// My Protocol floors after the Oct 6 2026 minimums rescale (Jim YES 12:10 PM; Quinn calls 12:25 PM).
+// normalMin / normalMax = Base target / Base displayed range; riskBelow = round(old riskBelow x new/old target);
+// shoulder ER shows no range line (hideRange). Run: node scripts/minimums-rescale.test.mjs
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import ts from 'typescript'
 
 const src = readFileSync(new URL('../src/pages/MyProtocol.tsx', import.meta.url), 'utf8')
-const defs = Object.fromEntries([...src.matchAll(/normalMin: (\d+), normalMax: (\d+), riskBelow: (\d+), unit: '[^']*', rxKey: '(\w+)'/g)]
-  .map(m => [m[4], [Number(m[1]), Number(m[2]), Number(m[3])]]))
-const RAT = { hip_er: [29, 45], hip_ir: [26, 45], hip_flex: [63, 120], shoulder_flex: [140, 180], ankle_df: [6, 20], cervical_rot: [70, 80], cervical_lat: [38, 45] }
-// old (pre-rescale) floors on main, normalMin / normalMax / riskBelow
-const OLD = { hip_er: [40, 60, 40], hip_ir: [30, 45, 30], hip_flex: [100, 120, 100], shoulder_flex: [140, 180, 120], ankle_df: [10, 20, 10], cervical_lat: [40, 45, 30] }
-const UNCHANGED = { hip_abd: [35, 45, 25], shoulder_er: [60, 90, 60], cervical_flex: [45, 60, 35], cervical_ext: [55, 70, 40], lumbar: [40, 80, 40], thoracic_rot: [40, 60, 30] }
-for (const [k, old] of Object.entries(OLD)) {
-  const [n, d] = RAT[k]
-  assert.deepEqual(defs[k], old.map(v => Math.round(v * n / d)), `${k} rescaled x ${n}/${d}`)
+const rows = [...src.matchAll(/normalMin: (\d+), normalMax: (\d+), riskBelow: (\d+), unit: '([^']*)', rxKey: '(\w+)',( hideRange: true,)?/g)]
+const defs = Object.fromEntries(rows.map(m => [m[5], [Number(m[1]), Number(m[2]), Number(m[3])]]))
+const JOINTS = rows.map(m => ({ key: m[5], normalMin: Number(m[1]), normalMax: Number(m[2]), unit: m[4], ...(m[6] ? { hideRange: true } : {}) }))
+
+// 1) values: [normalMin, normalMax, riskBelow]
+const EXPECTED = { hip_er: [29, 43, 26], hip_ir: [26, 40, 17], hip_flex: [60, 80, 50], shoulder_er: [40, 75, 27], shoulder_flex: [140, 180, 93], ankle_df: [6, 13, 3], cervical_lat: [38, 53, 25] }
+const UNCHANGED = { hip_abd: [35, 45, 25], cervical_flex: [45, 60, 35], cervical_ext: [55, 70, 40], lumbar: [40, 80, 40], thoracic_rot: [40, 60, 30] }
+for (const [k, v] of Object.entries(EXPECTED)) assert.deepEqual(defs[k], v, `${k} = ${v}`)
+for (const [k, v] of Object.entries(UNCHANGED)) assert.deepEqual(defs[k], v, `${k} not changed`)
+assert.equal(Object.keys(defs).length, Object.keys(EXPECTED).length + Object.keys(UNCHANGED).length, 'every My Protocol joint is pinned')
+
+// 2) riskBelow = round(old riskBelow x new/old target) (Quinn item 4: riskBelow stays ratio-scaled; SLR now 60/120)
+const OLD = { hip_er: [40, 60, 40], hip_ir: [30, 45, 30], hip_flex: [100, 120, 100], shoulder_er: [60, 90, 60], shoulder_flex: [140, 180, 120], ankle_df: [10, 20, 10], cervical_lat: [40, 45, 30] }
+const RAT = { hip_er: [29, 45], hip_ir: [26, 45], hip_flex: [60, 120], shoulder_er: [40, 90], shoulder_flex: [140, 180], ankle_df: [6, 20], cervical_lat: [38, 45] }
+for (const [k, o] of Object.entries(OLD)) assert.equal(defs[k][2], Math.round(o[2] * RAT[k][0] / RAT[k][1]), `${k} riskBelow ratio-scaled`)
+
+// 3) range line: suppressed for shoulder ER only
+const lib = readFileSync(new URL('../src/lib/protocolRange.ts', import.meta.url), 'utf8')
+const js = ts.transpileModule(lib, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2020 } }).outputText
+const { rangeText } = await import('data:text/javascript,' + encodeURIComponent(js))
+assert.deepEqual(JOINTS.filter(j => j.hideRange).map(j => j.key), ['shoulder_er'], 'only shoulder ER hides its range')
+for (const j of JOINTS) {
+  if (j.key === 'shoulder_er') assert.equal(rangeText(j), null, 'shoulder ER: no range line')
+  else assert.equal(rangeText(j), `${j.normalMin}–${j.normalMax}${j.unit}`, `${j.key} range line still shown`)
 }
-for (const [k, v] of Object.entries(UNCHANGED)) assert.deepEqual(defs[k], v, `${k} not rescaled`)
-assert.equal(Object.keys(defs).length, Object.keys(OLD).length + Object.keys(UNCHANGED).length, 'every MyProtocol joint is pinned')
+assert.equal(rangeText(JOINTS.find(j => j.key === 'shoulder_flex')), '140–180°')
+assert.equal(rangeText(JOINTS.find(j => j.key === 'hip_flex')), '60–80°')
+assert.equal(rangeText(JOINTS.find(j => j.key === 'ankle_df')), '6–13cm')
+// the card renders the range only through rangeText() and skips the whole box when it is null
+assert.ok(!/\{def\.normalMin\}–\{def\.normalMax\}/.test(src), 'no direct min–max render left')
+assert.match(src, /\{rangeText\(def\) !== null && \(\s*<div className="bg-surface rounded-xl px-3 py-1\.5">\s*<p [^>]*>Normal<\/p>\s*<p [^>]*>\{rangeText\(def\)\}<\/p>/, 'range box gated on rangeText(def)')
 console.log('minimums-rescale tests: ok')

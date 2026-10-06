@@ -7,6 +7,7 @@ import { Spinner } from '../components/Spinner'
 import { EmptyState } from '../components/EmptyState'
 import { PageHeader } from '../components/PageHeader'
 import { cn } from '../lib/utils'
+import { rangeText } from '../lib/protocolRange'
 import {
   AlertTriangle, ChevronDown, ChevronUp, CheckCircle2, Circle,
   ClipboardList, Dumbbell, Flame, PersonStanding,
@@ -581,24 +582,27 @@ interface JointDef {
   riskBelow: number
   unit: string
   rxKey: string
+  hideRange?: boolean  // true = no range line on the card (shoulder ER: no typical range for the tucked-elbow test)
 }
 
-// Oct 6 2026 (Jim YES 12:10 PM, Quinn's minimums rescale): normalMin / normalMax / riskBelow rescaled to the new Base targets,
-// new = round(old x new target / old target): hip ER x 29/45, hip IR x 26/45, hip flexion (straight-leg raise) x 63/120,
-// shoulder flexion x 140/180, ankle x 6/20 (cm), neck rotation x 70/80, neck side bend x 38/45. Shoulder ER, hip abduction,
-// lumbar, thoracic and neck flexion/extension are NOT rescaled. Mirrors protocol_joint_ranking() normal_min (romrxbjj-v2 20261006170000).
+// Oct 6 2026 (Jim YES 12:10 PM; Quinn calls 12:25 PM): normalMin / normalMax = the Base target and the Base displayed range
+// (hip ER 29-43, hip IR 26-40, hip flexion / straight-leg raise 60-80, shoulder flexion 140-180). Ankle 6 cm, neck rotation 70 and
+// neck side bend 38 have no Base range; their max is the study mean + 1 SD (ankle 13, rotation 88, side bend 53).
+// Shoulder ER (tucked elbow): min 40, no range line (hideRange). riskBelow = round(old riskBelow x new/old target).
+// Hip abduction, lumbar, thoracic and neck flexion/extension are unchanged. Mirrors protocol_joint_ranking() normal_min
+// (romrxbjj-v2 20261006170000).
 const JOINTS: JointDef[] = [
   {
     key: 'hip_er', label: 'Hip External Rotation',
     bjjWhy: 'Hip mobility for deep squats, sumo deadlift stance, and lunge depth without knee cave.',
     leftKey: 'hip_er_l', rightKey: 'hip_er_r',
-    normalMin: 26, normalMax: 39, riskBelow: 26, unit: '°', rxKey: 'hip_er',
+    normalMin: 29, normalMax: 43, riskBelow: 26, unit: '°', rxKey: 'hip_er',
   },
   {
     key: 'hip_ir', label: 'Hip Internal Rotation',
     bjjWhy: 'Used in squats and lunges.',
     leftKey: 'hip_ir_l', rightKey: 'hip_ir_r',
-    normalMin: 17, normalMax: 26, riskBelow: 17, unit: '°', rxKey: 'hip_ir',
+    normalMin: 26, normalMax: 40, riskBelow: 17, unit: '°', rxKey: 'hip_ir',
   },
   {
     key: 'hip_abd', label: 'Hip Abduction',
@@ -611,25 +615,25 @@ const JOINTS: JointDef[] = [
     key: 'shoulder_er', label: 'Shoulder External Rotation',
     bjjWhy: 'Used in benching, overhead press and behind-the-neck work.',
     leftKey: 'shoulder_er_l', rightKey: 'shoulder_er_r',
-    normalMin: 60, normalMax: 90, riskBelow: 60, unit: '°', rxKey: 'shoulder_er',
+    normalMin: 40, normalMax: 75, riskBelow: 27, unit: '°', rxKey: 'shoulder_er', hideRange: true,
   },
   {
     key: 'shoulder_flex', label: 'Shoulder Flexion',
     bjjWhy: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
     leftKey: 'shoulder_flex_l', rightKey: 'shoulder_flex_r',
-    normalMin: 109, normalMax: 140, riskBelow: 93, unit: '°', rxKey: 'shoulder_flex',
+    normalMin: 140, normalMax: 180, riskBelow: 93, unit: '°', rxKey: 'shoulder_flex',
   },
   {
     key: 'ankle_df', label: 'Ankle Dorsiflexion',
     bjjWhy: 'Used in squat and lunge depth.',
     leftKey: 'ankle_df_l', rightKey: 'ankle_df_r',
-    normalMin: 3, normalMax: 6, riskBelow: 3, unit: 'cm', rxKey: 'ankle_df',
+    normalMin: 6, normalMax: 13, riskBelow: 3, unit: 'cm', rxKey: 'ankle_df',
   },
   {
     key: 'cervical_lat', label: 'Cervical Lateral Flexion',
     bjjWhy: 'Neck strength holds bar position under heavy squats and rows without your head pulling off-line.',
     leftKey: 'cervical_lat_l', rightKey: 'cervical_lat_r',
-    normalMin: 34, normalMax: 38, riskBelow: 25, unit: '°', rxKey: 'cervical_lat',
+    normalMin: 38, normalMax: 53, riskBelow: 25, unit: '°', rxKey: 'cervical_lat',
   },
   {
     key: 'cervical_flex', label: 'Cervical Flexion',
@@ -1133,10 +1137,12 @@ function IssueCard({ ranked, rank }: { ranked: ScoredJoint; rank: number }) {
               )}
             </>
           )}
-          <div className="bg-surface rounded-xl px-3 py-1.5">
-            <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Normal</p>
-            <p className="text-xs font-semibold text-charcoal">{def.normalMin}–{def.normalMax}{def.unit}</p>
-          </div>
+          {rangeText(def) !== null && (
+            <div className="bg-surface rounded-xl px-3 py-1.5">
+              <p className="text-[10px] text-charcoal-light font-medium uppercase tracking-wide">Normal</p>
+              <p className="text-xs font-semibold text-charcoal">{rangeText(def)}</p>
+            </div>
+          )}
         </div>
       </button>
 
