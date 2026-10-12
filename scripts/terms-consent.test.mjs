@@ -66,6 +66,7 @@ const handler = login.slice(login.indexOf('const noAccount'), login.indexOf('set
 assert.ok(handler.includes('setMagicSent(true)'));
 assert.doesNotMatch(handler, /console\.|noAccount \?/);
 const fl = flat(login);
+assert.ok(fl.includes('If that email has an account, we sent a sign-in link.') && !fl.includes('Link sent to'), 'Stacy neutral sent line');
 assert.ok(fl.includes('New here? Create an account .'));
 assert.match(login, /data-testid="magic-new-here">New here\? <a href=\{ownedBaseUrl\('login_cta'\)\}[^>]*>Create an account<\/a>\.<\/p>/);
 assert.match(login, /\{!magicSent && \(\s*<p[^>]*>\s*New athlete\?/);

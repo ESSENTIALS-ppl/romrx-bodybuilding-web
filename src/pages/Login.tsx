@@ -163,7 +163,7 @@ export function Login() {
                 <Mail size={24} className="text-miami-teal" />
               </div>
               <h2 className="font-display text-lg text-white mb-1 tracking-wider">CHECK YOUR EMAIL</h2>
-              <p className="text-sm text-white/60">Link sent to <strong className="text-white">{email}</strong></p>
+              <p className="text-sm text-white/60">If that email has an account, we sent a sign-in link.</p>
               <p className="text-sm text-white/60 mt-2" data-testid="magic-new-here">New here? <a href={ownedBaseUrl('login_cta')} className="miami-link">Create an account</a>.</p>
               <button onClick={() => { setMagicSent(false); setMode('password') }}
                 className="mt-5 text-xs miami-link">
