@@ -602,12 +602,7 @@ const JOINTS: JointDef[] = [
     leftKey: 'hip_abd_l', rightKey: 'hip_abd_r',
     normalMin: 35, normalMax: 45, riskBelow: 25, unit: '°', rxKey: 'hip_abd',
   },
-  {
-    key: 'hip_flex', label: 'Hip Flexion',
-    bjjWhy: 'Squat depth. Without it you butt-wink, lose tightness, and leak power off the bottom.',
-    leftKey: 'hip_flex_l', rightKey: 'hip_flex_r',
-    normalMin: 100, normalMax: 120, riskBelow: 100, unit: '°', rxKey: 'hip_flex',
-  },
+  // Hip flexion is not in this list: it is saved for each leg and never ranked as a priority joint (src/lib/hipFlex.ts).
   {
     key: 'shoulder_er', label: 'Shoulder External Rotation',
     bjjWhy: 'Used in benching, overhead press and behind-the-neck work.',
