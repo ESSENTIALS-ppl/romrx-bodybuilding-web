@@ -613,10 +613,12 @@ const JOINTS: JointDef[] = [
   },
   // Hip flexion is not in this list: it is saved for each leg and never ranked as a priority joint (src/lib/hipFlex.ts).
   {
+    // Oct 12 2026: Base shoulder ER is the standing goal-post test again (target 85, Quinn Oct 6 8:19 PM). riskBelow = round(60 x 85/90) = 57.
+    // No range line (Stacy Oct 6: no standing general-adult source), so hideRange stays.
     key: 'shoulder_er', label: 'Shoulder External Rotation',
     bjjWhy: 'Used in benching, overhead press and behind-the-neck work.',
     leftKey: 'shoulder_er_l', rightKey: 'shoulder_er_r',
-    normalMin: 40, normalMax: 75, riskBelow: 27, unit: '°', rxKey: 'shoulder_er', hideRange: true,
+    normalMin: 85, normalMax: 110, riskBelow: 57, unit: '°', rxKey: 'shoulder_er', hideRange: true,
   },
   {
     key: 'shoulder_flex', label: 'Shoulder Flexion',

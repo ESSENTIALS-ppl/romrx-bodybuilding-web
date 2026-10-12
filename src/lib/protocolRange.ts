@@ -1,5 +1,5 @@
 // My Protocol joint card range line ("<min>–<max><unit>"). Returns null when the joint shows no range
-// (hideRange: shoulder ER tucked-elbow test has no typical range, Stacy / Quinn Oct 6 2026).
+// (hideRange: shoulder ER (standing goal-post since Oct 6 8:19 PM) shows no typical range, Stacy / Quinn Oct 6 2026).
 export interface RangeDef {
   normalMin: number
   normalMax: number
