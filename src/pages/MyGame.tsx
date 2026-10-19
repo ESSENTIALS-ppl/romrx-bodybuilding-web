@@ -1231,7 +1231,7 @@ function MesocyclePanel() {
             <span className="inline-block w-2 h-2 rounded-full bg-yellow-tier mt-1 shrink-0" />
             <p><span className="font-semibold text-miami-text">Deload (final week)</span>: RIR 4-5, ~50% volume. Recover, then start the next block.</p>
           </div>
-          <p className="pt-1 text-miami-text/60">When you log a workout, the set’s target RIR is filled in from your current week automatically. ROMBot reads your block and tailors its coaching to the phase.</p>
+          <p className="pt-1 text-miami-text/60">When you log a workout, the set’s target RIR is filled in from your current week automatically. ROMBot reads your block and tailors its guidance to the phase.</p>
         </div>
       </SectionCard>
     </div>
