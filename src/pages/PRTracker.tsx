@@ -151,7 +151,7 @@ export function PRTracker() {
               </div>
               <div className="text-sm text-miami-text/70 mt-1">
                 {deloadSignal.kind === 'deload'
-                  ? 'Consider a deload next week — large jumps in weekly volume can outpace recovery. Drop intensity ~10% or sets ~30%.'
+                  ? 'Consider a deload next week. Large jumps in weekly volume can outpace recovery. Drop intensity ~10% or sets ~30%.'
                   : 'Looks like a deload or off week. Plan a return-to-volume next session at ~80% of your peak.'}
               </div>
             </div>
@@ -199,7 +199,7 @@ export function PRTracker() {
       {/* e1RM curve for selected exercise */}
       {selectedExercise && history.length > 0 && (
         <SectionCard
-          title={`${selectedExercise} — e1RM Curve`}
+          title={`${selectedExercise}: e1RM Curve`}
           subtitle={`${history.length} sets logged`}
         >
           <div className="h-64">

@@ -417,7 +417,7 @@ function TemplatesPanel({ userTier }: { userTier: string | null }) {
                   : 'bg-miami')} />
                 <span className="capitalize">{tier} hypertrophy</span>
                 <span className="text-xs font-normal text-miami-text/60">
-                  · {SPLIT_LABEL[list[0]?.split_type ?? ''] ?? '—'}
+                  · {SPLIT_LABEL[list[0]?.split_type ?? ''] ?? '-'}
                 </span>
                 {locked && <span className="text-xs bg-miami-violet/15 text-miami-text/70 px-2 py-0.5 rounded-full">Above your tier</span>}
               </span>
@@ -462,9 +462,9 @@ function TemplatesPanel({ userTier }: { userTier: string | null }) {
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-miami-text">{e.exercise_name}</p>
                                   <p className="text-xs text-miami-text/60">
-                                    {e.sets ?? '?'} × {e.reps_min ?? '?'}–{e.reps_max ?? '?'}
+                                    {e.sets ?? '?'} × {e.reps_min ?? '?'}-{e.reps_max ?? '?'}
                                     {e.rest_seconds_min && e.rest_seconds_max
-                                      ? ` · ${e.rest_seconds_min}–${e.rest_seconds_max}s rest`
+                                      ? ` · ${e.rest_seconds_min}-${e.rest_seconds_max}s rest`
                                       : ''}
                                     {e.target_notes ? ` · ${e.target_notes}` : ''}
                                   </p>
@@ -642,8 +642,8 @@ function MyWorkoutsPanel({ userId }: { userId: string | undefined }) {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-miami-text">{e.exercise_name}</p>
                       <p className="text-xs text-miami-text/60">
-                        {e.sets ?? '?'} × {e.reps_min ?? '?'}–{e.reps_max ?? '?'}
-                        {e.rest_seconds_min && e.rest_seconds_max ? ` · ${e.rest_seconds_min}–${e.rest_seconds_max}s rest` : ''}
+                        {e.sets ?? '?'} × {e.reps_min ?? '?'}-{e.reps_max ?? '?'}
+                        {e.rest_seconds_min && e.rest_seconds_max ? ` · ${e.rest_seconds_min}-${e.rest_seconds_max}s rest` : ''}
                         {e.target_notes ? ` · ${e.target_notes}` : ''}
                       </p>
                     </div>
@@ -815,7 +815,7 @@ function ExerciseLibraryPanel({
             <span className="inline-block w-2.5 h-3 rounded-sm bg-green-tier" /> Ready (≥90%)
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block w-2.5 h-3 rounded-sm bg-yellow-tier" /> Caution (75–89%)
+            <span className="inline-block w-2.5 h-3 rounded-sm bg-yellow-tier" /> Caution (75-89%)
           </span>
           <span className="flex items-center gap-1.5">
             <span className="inline-block w-2.5 h-3 rounded-sm bg-red-tier" /> Mobility first (&lt;75%)
@@ -914,7 +914,7 @@ function ExerciseLibraryPanel({
                 <div className="mt-2 pt-2 border-t border-red-tier/20 space-y-2 text-[11px]" onClick={e => e.stopPropagation()}>
                   <p className="text-miami-text/80 leading-snug">
                     Your{jointLabel ? ` ${jointLabel}` : ' mobility'} limits the bottom of <span className="font-semibold text-miami-text">{it.name}</span>
-                    {it.stretch_emphasis === 'high' && <> — and this is a <span className="text-miami font-semibold">high-stretch</span> movement, so you lose the most growth-driving part of the rep.</>}
+                    {it.stretch_emphasis === 'high' && <>, and this is a <span className="text-miami font-semibold">high-stretch</span> movement, so you lose the most growth-driving part of the rep.</>}
                     {it.stretch_emphasis !== 'high' && <>, cutting the lengthened-position stimulus.</>}
                   </p>
                   {it.rom_note && (
@@ -926,12 +926,12 @@ function ExerciseLibraryPanel({
                   {sub ? (
                     <p className="flex items-start gap-1 text-green-tier">
                       <ArrowRightLeft size={12} className="mt-0.5 shrink-0" />
-                      <span><span className="font-semibold">Swap to:</span> {sub.name} — same {it.primary_muscle} target, hits it without the {jointLabel ?? 'mobility'} demand.</span>
+                      <span><span className="font-semibold">Swap to:</span> {sub.name}, same {it.primary_muscle} target, hits it without the {jointLabel ?? 'mobility'} demand.</span>
                     </p>
                   ) : (
                     <p className="flex items-start gap-1 text-miami-text/60">
                       <ArrowRightLeft size={12} className="mt-0.5 shrink-0" />
-                      <span>Reduce range to a pain-free depth and load the partial — or work the mobility Rx first.</span>
+                      <span>Reduce range to a pain-free depth and load the partial, or work the mobility Rx first.</span>
                     </p>
                   )}
                 </div>
@@ -1021,11 +1021,11 @@ interface Mesocycle {
 // Weekly target as % of your MAV range — ramp volume, then deload on the final week.
 function weekPlan(week: number, weeks: number): { rir: string; volume: string; note: string; deload: boolean } {
   const isDeload = week === weeks
-  if (isDeload) return { rir: '4–5', volume: '~50%', note: 'Deload — halve sets, keep the bar moving', deload: true }
+  if (isDeload) return { rir: '4-5', volume: '~50%', note: 'Deload: halve sets, keep the bar moving', deload: true }
   const progress = (week - 1) / Math.max(1, weeks - 1) // 0 .. 1 across accumulation
-  if (progress < 0.34) return { rir: '3–4', volume: 'MEV → low MAV', note: 'Accumulation — add 1–2 sets/muscle from last week', deload: false }
-  if (progress < 0.67) return { rir: '2–3', volume: 'mid MAV', note: 'Build — push sets toward your MAV ceiling', deload: false }
-  return { rir: '1–2', volume: 'high MAV → MRV', note: 'Overreach — near MRV, RIR 1–2, then deload next', deload: false }
+  if (progress < 0.34) return { rir: '3-4', volume: 'MEV → low MAV', note: 'Accumulation: add 1-2 sets/muscle from last week', deload: false }
+  if (progress < 0.67) return { rir: '2-3', volume: 'mid MAV', note: 'Build: push sets toward your MAV ceiling', deload: false }
+  return { rir: '1-2', volume: 'high MAV → MRV', note: 'Overreach: near MRV, RIR 1-2, then deload next', deload: false }
 }
 
 function MesocycleCard() {
@@ -1126,7 +1126,7 @@ function MesocycleCard() {
             {busy ? 'Starting…' : 'Start block'}
           </button>
         </div>
-        <p className="text-[11px] text-miami-text/50 mt-2">The last week is always a deload (RIR 4–5, ~50% volume). A {weeks}-week block = {weeks - 1} working weeks + 1 deload.</p>
+        <p className="text-[11px] text-miami-text/50 mt-2">The last week is always a deload (RIR 4-5, ~50% volume). A {weeks}-week block = {weeks - 1} working weeks + 1 deload.</p>
       </SectionCard>
     )
   }
@@ -1217,19 +1217,19 @@ function MesocyclePanel() {
         <div className="space-y-2 text-xs text-miami-text/80">
           <div className="flex items-start gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-miami mt-1 shrink-0" />
-            <p><span className="font-semibold text-miami-text">Accumulation (early weeks)</span> — RIR 3–4, volume MEV → low MAV. Add 1–2 sets per muscle each week.</p>
+            <p><span className="font-semibold text-miami-text">Accumulation (early weeks)</span>: RIR 3-4, volume MEV → low MAV. Add 1-2 sets per muscle each week.</p>
           </div>
           <div className="flex items-start gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-miami mt-1 shrink-0" />
-            <p><span className="font-semibold text-miami-text">Build (mid)</span> — RIR 2–3, volume mid-MAV. Push sets toward your MAV ceiling.</p>
+            <p><span className="font-semibold text-miami-text">Build (mid)</span>: RIR 2-3, volume mid-MAV. Push sets toward your MAV ceiling.</p>
           </div>
           <div className="flex items-start gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-miami mt-1 shrink-0" />
-            <p><span className="font-semibold text-miami-text">Overreach (late)</span> — RIR 1–2, volume high-MAV → MRV. Hardest week before the deload.</p>
+            <p><span className="font-semibold text-miami-text">Overreach (late)</span>: RIR 1-2, volume high-MAV → MRV. Hardest week before the deload.</p>
           </div>
           <div className="flex items-start gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-yellow-tier mt-1 shrink-0" />
-            <p><span className="font-semibold text-miami-text">Deload (final week)</span> — RIR 4–5, ~50% volume. Recover, then start the next block.</p>
+            <p><span className="font-semibold text-miami-text">Deload (final week)</span>: RIR 4-5, ~50% volume. Recover, then start the next block.</p>
           </div>
           <p className="pt-1 text-miami-text/60">When you log a workout, the set’s target RIR is filled in from your current week automatically. ROMBot reads your block and tailors its coaching to the phase.</p>
         </div>
@@ -1338,7 +1338,7 @@ function VolumeBoard({
       )}
       {totalSets === 0 && mode === 'planned' && (
         <div className="rounded-lg bg-miami-violet/10 border border-miami-violet/20 px-3 py-2 text-xs text-miami-text/70">
-          No generated program yet. Head to the Generate tab to auto-build a ROM-tuned program — its planned weekly volume per muscle will show here vs your MEV/MAV/MRV landmarks.
+          No generated program yet. Head to the Generate tab to auto-build a ROM-tuned program. Its planned weekly volume per muscle will show here vs your MEV/MAV/MRV landmarks.
         </div>
       )}
 
@@ -1359,7 +1359,7 @@ function VolumeBoard({
                   <span className="font-semibold text-miami-text">{lm.muscle}</span>
                   <span className="tabular-nums">
                     <span className="font-bold text-miami-text">{sets}</span>
-                    <span className="text-miami-text/40"> / {lm.mav_low}–{lm.mav_high} sets</span>
+                    <span className="text-miami-text/40"> / {lm.mav_low}-{lm.mav_high} sets</span>
                     <span className={cn('ml-2 font-semibold', c.cls)}>{c.label}</span>
                   </span>
                 </div>
@@ -1378,7 +1378,7 @@ function VolumeBoard({
                 </div>
                 <div className="flex justify-between text-[9px] text-miami-text/40 mt-0.5 tabular-nums">
                   <span>MEV {lm.mev}</span>
-                  <span>MAV {lm.mav_low}–{lm.mav_high}</span>
+                  <span>MAV {lm.mav_low}-{lm.mav_high}</span>
                   <span>MRV {lm.mrv}</span>
                 </div>
               </div>

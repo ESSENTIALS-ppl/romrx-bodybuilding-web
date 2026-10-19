@@ -622,7 +622,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'shoulder_flex', label: 'Shoulder Flexion',
-    bjjWhy: 'Overhead press, snatch, jerk, even pullovers — locked-out arms only if the joint allows it.',
+    bjjWhy: 'Overhead press, snatch, jerk, even pullovers: locked-out arms only if the joint allows it.',
     leftKey: 'shoulder_flex_l', rightKey: 'shoulder_flex_r',
     normalMin: 140, normalMax: 180, riskBelow: 93, unit: '°', rxKey: 'shoulder_flex', rangeSource: 'Gill et al., 2020',
   },
@@ -646,7 +646,7 @@ const JOINTS: JointDef[] = [
   },
   {
     key: 'cervical_ext', label: 'Cervical Extension',
-    bjjWhy: 'Deadlift lockout and overhead pressing — extension keeps a neutral, braced neck under the bar.',
+    bjjWhy: 'Deadlift lockout and overhead pressing: extension keeps a neutral, braced neck under the bar.',
     singleKey: 'cervical_ext',
     normalMin: 55, normalMax: 70, riskBelow: 40, unit: '°', rxKey: 'cervical_ext',
   },
