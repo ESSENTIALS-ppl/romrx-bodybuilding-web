@@ -28,10 +28,10 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 const RAMP_STEPS = [
-  { key: 'raise',      label: 'R — Raise',      minutes: '3 min', field: 'raise_drills',      bg: 'bg-miami',      text: 'text-white' },
-  { key: 'activate',   label: 'A — Activate',   minutes: '5 min', field: 'activate_drills',   bg: 'bg-gold',      text: 'text-charcoal' },
-  { key: 'mobilize',   label: 'M — Mobilize',   minutes: '5 min', field: 'mobilize_drills',   bg: 'bg-charcoal',  text: 'text-white' },
-  { key: 'potentiate', label: 'P — Potentiate', minutes: '7 min', field: 'potentiate_drills', bg: 'bg-teal-dark', text: 'text-white' },
+  { key: 'raise',      label: 'R: Raise',      minutes: '3 min', field: 'raise_drills',      bg: 'bg-miami',      text: 'text-white' },
+  { key: 'activate',   label: 'A: Activate',   minutes: '5 min', field: 'activate_drills',   bg: 'bg-gold',      text: 'text-charcoal' },
+  { key: 'mobilize',   label: 'M: Mobilize',   minutes: '5 min', field: 'mobilize_drills',   bg: 'bg-charcoal',  text: 'text-white' },
+  { key: 'potentiate', label: 'P: Potentiate', minutes: '7 min', field: 'potentiate_drills', bg: 'bg-teal-dark', text: 'text-white' },
 ] as const
 
 const BELT_ORDER = ['white', 'blue', 'purple', 'brown', 'black']
@@ -412,7 +412,7 @@ function InjuryForm({ athlete, session, onClose }: {
   return (
     <div className="mt-3 border-t border-miami-light pt-3 space-y-2">
       <p className="text-xs font-semibold text-charcoal flex items-center gap-1.5">
-        <Syringe size={12} className="text-red-tier" /> Report Injury — {athlete.name}
+        <Syringe size={12} className="text-red-tier" /> Report Injury: {athlete.name}
       </p>
       <div className="grid grid-cols-2 gap-2">
         <select value={bodyPart} onChange={e => setBodyPart(e.target.value)}
@@ -437,7 +437,7 @@ function InjuryForm({ athlete, session, onClose }: {
       <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Optional notes..."
         className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami transition-colors resize-none" />
       {err && <p className="text-xs text-red-tier">{err}</p>}
-      {saved && <p className="text-xs text-green-tier flex items-center gap-1"><CheckCircle2 size={12} /> Injury logged. Stage 0 — Off Mat assigned.</p>}
+      {saved && <p className="text-xs text-green-tier flex items-center gap-1"><CheckCircle2 size={12} /> Injury logged. Stage 0: Off Mat assigned.</p>}
       <div className="flex gap-2 justify-end">
         <button onClick={onClose} className="text-xs text-charcoal-light hover:text-charcoal px-3 py-1.5 rounded-lg transition-colors">Cancel</button>
         <button onClick={handleSubmit} disabled={saving || saved} className="btn-primary text-xs px-3 py-1.5 flex items-center gap-1.5 disabled:opacity-50 bg-red-tier hover:bg-red-tier/90">
@@ -752,7 +752,7 @@ function TechniqueReadinessPanel({ session, code }: {
                         {j.actual !== null && (
                           <span className="font-semibold text-charcoal">{j.actual}°</span>
                         )}
-                        <span className={cn('font-medium', sevColor)}>— {sevLabel}</span>
+                        <span className={cn('font-medium', sevColor)}>{sevLabel}</span>
                       </div>
                     )
                   })}
@@ -944,7 +944,7 @@ function WarmupTab({ session, techniques, loadingTechs, selectedCode, setSelecte
               <FileText size={13} className="text-miami" /> Session Notes
             </p>
             <p className="text-[11px] text-charcoal-light">
-              Optional notes for this session — included when you log to Journal below.
+              Optional notes for this session, included when you log to Journal below.
             </p>
             <textarea
               value={sessionNotes}
@@ -1291,16 +1291,16 @@ function InDevelopmentTab({ title, description, features }: {
 
 // ── My Injury Tab ─────────────────────────────────────────────────────────────
 const STAGE_LABELS: Record<number, { name: string; description: string; color: string }> = {
-  0: { name: 'Off Mat',            description: 'Complete rest — no physical activity affecting injury.', color: 'text-red-tier' },
-  1: { name: 'Cardio Only',        description: 'Bike, swim, walk — no grappling contact.',              color: 'text-red-tier' },
+  0: { name: 'Off Mat',            description: 'Complete rest: no physical activity affecting injury.', color: 'text-red-tier' },
+  1: { name: 'Cardio Only',        description: 'Bike, swim, walk: no grappling contact.',              color: 'text-red-tier' },
   2: { name: 'Solo Movement',      description: 'Individual movement patterns, no contact.',             color: 'text-gold' },
   3: { name: 'Technical Solo',     description: 'Solo drilling of non-affected techniques only.',       color: 'text-gold' },
   4: { name: 'Technical Drilling', description: 'Compliant partner, zero resistance.',                  color: 'text-gold' },
   5: { name: 'Positional (Protected)', description: 'Sparring avoiding the injury area.',             color: 'text-miami' },
   6: { name: 'Flow Rolling',       description: 'Light intensity, injury-aware partner only.',         color: 'text-miami' },
   7: { name: 'Modified Training',  description: 'Full class with specific technique restrictions.',    color: 'text-miami' },
-  8: { name: 'Full Training',      description: 'No modifications — full intensity.',                  color: 'text-green-tier' },
-  9: { name: 'Competition Ready',  description: 'Competition cleared — coach sign-off required.',     color: 'text-green-tier' },
+  8: { name: 'Full Training',      description: 'No modifications, full intensity.',                  color: 'text-green-tier' },
+  9: { name: 'Competition Ready',  description: 'Competition cleared. Coach sign-off required.',     color: 'text-green-tier' },
 }
 
 interface InjuryRecord {
@@ -1362,7 +1362,7 @@ function InjuryCard({
       {!isCleared && (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <p className={cn('text-xs font-bold', stageInfo.color)}>Stage {injury.stage}/9 — {stageInfo.name}</p>
+            <p className={cn('text-xs font-bold', stageInfo.color)}>Stage {injury.stage}/9: {stageInfo.name}</p>
             <button onClick={() => setExpanded(o => !o)} className="text-[11px] text-charcoal-light hover:text-charcoal transition-colors">
               {expanded ? 'Less' : 'Advance'}
             </button>
@@ -1381,7 +1381,7 @@ function InjuryCard({
             <div className="space-y-1">
               <p className="text-[10px] font-bold text-charcoal uppercase tracking-wide">Next Stage</p>
               <p className={cn('text-xs font-semibold', STAGE_LABELS[Math.min(injury.stage + 1, 9)]?.color)}>
-                Stage {Math.min(injury.stage + 1, 9)} — {STAGE_LABELS[Math.min(injury.stage + 1, 9)]?.name}
+                Stage {Math.min(injury.stage + 1, 9)}: {STAGE_LABELS[Math.min(injury.stage + 1, 9)]?.name}
               </p>
               <p className="text-[10px] text-charcoal-light">{STAGE_LABELS[Math.min(injury.stage + 1, 9)]?.description}</p>
             </div>
@@ -1630,7 +1630,7 @@ export function CoachDashboard({ defaultSection = 'team' }: { defaultSection?: T
   }, [defaultSection, pendingFromRoute])
 
   const sectionTitle = {
-    team: `My Team${!rosterLoading ? ` — ${roster.length} athlete${roster.length !== 1 ? 's' : ''}` : ''}`,
+    team: `My Team${!rosterLoading ? `: ${roster.length} athlete${roster.length !== 1 ? 's' : ''}` : ''}`,
     coaching: 'My Coaching',
     competitions: 'My Competitions',
     injury: 'My Injury',

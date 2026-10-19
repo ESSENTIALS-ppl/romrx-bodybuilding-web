@@ -330,7 +330,7 @@ export function BodyMetrics() {
       {/* Photos */}
       <SectionCard
         title={<><Camera size={14} className="inline mr-1" /> Progress Photos</>}
-        subtitle="Front · Side · Back — same lighting, same pose"
+        subtitle="Front · Side · Back: same lighting, same pose"
       >
         <div className="flex flex-wrap gap-3 mb-4">
           {(['front', 'side', 'back'] as const).map(pose => (
