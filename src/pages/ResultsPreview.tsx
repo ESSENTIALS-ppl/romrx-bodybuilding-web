@@ -195,7 +195,7 @@ export function ResultsPreview() {
         </a>
         <p className="text-center text-xs text-miami-text/50">
           {baseActive
-            ? `Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. A card is needed at checkout. You can cancel anytime in Settings > Subscription. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`
+            ? `Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. A card is needed at checkout. You can cancel anytime in Settings, under Subscription. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`
             : 'Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.'}
         </p>
         <p className="text-center text-xs text-miami-text/30">
