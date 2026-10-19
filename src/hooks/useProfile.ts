@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
 export interface Profile {
@@ -16,6 +16,15 @@ export interface Profile {
   sports_enabled: string[]
   /** Bodybuilding tier — beginner / intermediate / advanced. Null for non-BB users. */
   active_bb_tier: string | null
+  /** 'active' once Base is paid. Used with sport_entitlements for the sport-site gate (F-02). */
+  base_status?: string | null
+  grandfathered_at?: string | null
+}
+
+export interface SportEntitlement {
+  sport: string
+  status: string
+  expires_at: string | null
 }
 
 export interface Assessment {
@@ -74,7 +83,10 @@ export function useProfile(userId: string | undefined) {
   const [profile, setProfile]       = useState<Profile | null>(null)
   const [assessment, setAssessment] = useState<Assessment | null>(null)
   const [eligibility, setEligibility] = useState<TechniqueEligibility[]>([])
+  const [entitlements, setEntitlements] = useState<SportEntitlement[]>([])
   const [loading, setLoading]       = useState(true)
+  // Bumped by reload() to refetch get_my_profile (e.g. after the BB tier picker saves).
+  const [reloadKey, setReloadKey]   = useState(0)
 
   useEffect(() => {
     if (!userId) return
@@ -96,16 +108,20 @@ export function useProfile(userId: string | undefined) {
         profile: Profile | null
         assessment: Assessment | null
         eligibility: TechniqueEligibility[]
+        sport_entitlements?: SportEntitlement[]
       }
 
       setProfile(result.profile)
       setAssessment(result.assessment)
       setEligibility(result.eligibility ?? [])
+      setEntitlements(result.sport_entitlements ?? [])
       setLoading(false)
     }
 
     load()
-  }, [userId])
+  }, [userId, reloadKey])
 
-  return { profile, assessment, eligibility, loading }
+  const reload = useCallback(() => setReloadKey(k => k + 1), [])
+
+  return { profile, assessment, eligibility, entitlements, loading, reload }
 }

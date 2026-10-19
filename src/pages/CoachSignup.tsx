@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
-import { recordConsent } from '../lib/terms'
+import { coachSignupConsentMetadata } from '../lib/terms'
 import { Loader2, Users } from 'lucide-react'
 import { ownedBaseUrl } from '../lib/utils'
 
@@ -47,6 +47,10 @@ export function CoachSignup() {
           gym,
           role: 'coach',
           portal_role: 'coach',
+          // Terms record (Stacy, Oct 5): this checkbox links romrx.io/legal, so it records 2026-10-03.
+          // The database writes the consents row in the same step as the account; if that fails,
+          // signUp fails and no account is created.
+          ...coachSignupConsentMetadata(agreedToTerms, navigator.userAgent),
         },
       },
     })
@@ -66,9 +70,6 @@ export function CoachSignup() {
         subscription_tier: 'coach',
         platforms: ['bodybuilding'],
       }, { onConflict: 'id' })
-
-      // Record timestamped proof of agreement to the ROMRx LLC Terms of Service.
-      await recordConsent({ userId: data.user.id, signedName: fullName })
 
       // Notify Jim of new coach account creation (pre-payment)
       // Fire-and-forget — don't block checkout on this

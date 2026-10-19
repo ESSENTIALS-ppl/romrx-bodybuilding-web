@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { goToBaseAssessment } from '../lib/baseAssessment'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import { Spinner } from '../components/Spinner'
 import { AlertTriangle, CheckCircle, Unlock, TrendingUp } from 'lucide-react'
 import { cn } from '../lib/utils'
+import { computePRS, PRS_BILATERAL } from '../lib/readiness'
 
 // F-03: the old button posted {plan:'athlete'} to create-checkout-session, which only accepts
 // mode base|unlock|coach, so it always errored. The Add-sport flow in the main app already handles
@@ -17,23 +19,9 @@ const UNLOCK_URL = 'https://romrx.io/app/unlock/bodybuilding'
 // the placeholder is still here. Only the Base-active small print uses this; the no-Base branch keeps its own text.
 export const PACK_CHARGE_DATE_TEXT = '[DATE TO CONFIRM]'
 
-// ── PRS scoring algorithm ─────────────────────────────────────────────────────
-const BILATERAL_JOINTS = [
-  { l: 'hip_er_l',       r: 'hip_er_r',       riskBelow: 40,  normalMin: 40  },
-  { l: 'hip_ir_l',       r: 'hip_ir_r',       riskBelow: 30,  normalMin: 30  },
-  { l: 'hip_abd_l',      r: 'hip_abd_r',      riskBelow: 25,  normalMin: 35  },
-  { l: 'hip_flex_l',     r: 'hip_flex_r',     riskBelow: 100, normalMin: 100 },
-  { l: 'shoulder_er_l',  r: 'shoulder_er_r',  riskBelow: 60,  normalMin: 60  },
-  { l: 'shoulder_flex_l',r: 'shoulder_flex_r', riskBelow: 120, normalMin: 140 },
-  { l: 'ankle_df_l',     r: 'ankle_df_r',     riskBelow: 10,  normalMin: 10  },
-  { l: 'cervical_lat_l', r: 'cervical_lat_r', riskBelow: 30,  normalMin: 40  },
-]
-const UNILATERAL_JOINTS = [
-  { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },
-  { key: 'lumbar_ext',    riskBelow: 15, normalMin: 20 },
-  { key: 'cervical_flex', riskBelow: 35, normalMin: 45 },
-  { key: 'cervical_ext',  riskBelow: 40, normalMin: 55 },
-]
+// ── PRS scoring: shared in ../lib/readiness (hip flexion is not in the score) ──
+const BILATERAL_JOINTS = PRS_BILATERAL
+
 const JOINT_LABELS: Record<string, string> = {
   hip_er: 'Hip External Rotation', hip_ir: 'Hip Internal Rotation',
   hip_abd: 'Hip Abduction', hip_flex: 'Hip Flexion',
@@ -41,30 +29,6 @@ const JOINT_LABELS: Record<string, string> = {
   ankle_df: 'Ankle Dorsiflexion', cervical_lat: 'Cervical Lateral Flexion',
   cervical_flex: 'Cervical Flexion', cervical_ext: 'Cervical Extension',
   lumbar_flex: 'Lumbar Flexion', lumbar_ext: 'Lumbar Extension',
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function computePRS(assessment: Record<string, any>): number {
-  let score = 100
-  for (const j of BILATERAL_JOINTS) {
-    const l = assessment[j.l], r = assessment[j.r]
-    if (l != null && r != null) {
-      const minVal = Math.min(l, r)
-      const gap = Math.abs(l - r)
-      if (minVal < j.riskBelow) score -= 8
-      else if (minVal < j.normalMin) score -= 4
-      if (gap >= 15) score -= 6
-      else if (gap >= 8) score -= 3
-    }
-  }
-  for (const j of UNILATERAL_JOINTS) {
-    const v = assessment[j.key]
-    if (v != null) {
-      if (v < j.riskBelow) score -= 6
-      else if (v < j.normalMin) score -= 3
-    }
-  }
-  return Math.max(0, Math.min(100, Math.round(score)))
 }
 
 function getPRSTier(score: number): { label: string; color: string; bg: string; desc: string } {
@@ -135,7 +99,7 @@ export function ResultsPreview() {
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
       <div className="text-center max-w-sm space-y-4">
         <p className="text-charcoal font-semibold">No assessment found.</p>
-        <button onClick={() => navigate('/onboarding/assessment')} className="btn-primary">Take Assessment</button>
+        <button onClick={goToBaseAssessment} className="btn-primary">Take Assessment</button>
       </div>
     </div>
   )

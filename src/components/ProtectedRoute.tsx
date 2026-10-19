@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
+import { hasSportAccess } from '../lib/access'
 import { SportProvider } from '../sports/SportProvider'
 
 // This is the romrxbodybuilding.com build. Every authed page renders BB context,
@@ -15,11 +16,10 @@ const SITE_SPORT = 'bodybuilding'
 // BB Signup path now writes 'pending' (not 'trialing'), so client-side signup
 // can no longer bypass the paywall. Legacy pre-fix accounts are grandfathered
 // via users.grandfathered_at (set by the 2026-07-02 backfill).
-const PAID_STATUSES = new Set(['active', 'trialing'])
 
 export function ProtectedRoute() {
   const { session, user, loading } = useAuth()
-  const { profile, loading: profileLoading } = useProfile(user?.id)
+  const { profile, entitlements, loading: profileLoading } = useProfile(user?.id)
 
   if (loading || (session && profileLoading)) {
     return (
@@ -36,12 +36,12 @@ export function ProtectedRoute() {
 
   if (!session) return <Navigate to="/login" replace />
 
-  // Paywall gate. Anyone whose subscription_status isn't in PAID_STATUSES
+  // Paywall gate (F-02). Access = legacy paid status, grandfathered, or Base active + owns this sport. Anyone else
   // gets routed to the assessment/checkout flow instead of the dashboard.
   // grandfathered_at exempts users who signed up before the paywall was
   // enforced on BB (see 2026-07-02 backfill).
   const grandfathered = Boolean((profile as { grandfathered_at?: string | null } | null)?.grandfathered_at)
-  if (profile && !grandfathered && !PAID_STATUSES.has(profile.subscription_status)) {
+  if (profile && !grandfathered && !hasSportAccess(profile, entitlements, SITE_SPORT)) {
     return <Navigate to="/onboarding/results" replace />
   }
 

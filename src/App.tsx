@@ -2,11 +2,13 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { OnboardingGuard } from './components/OnboardingGuard'
 import { Layout } from './components/Layout'
+import { TermsReacceptGate } from './components/TermsReacceptGate'
 import { Login } from './pages/Login'
 import { AuthCallback } from './pages/AuthCallback'
 import { AuthConfirm } from './pages/AuthConfirm'
 import { Signup } from './pages/Signup'
-import { Assessment } from './pages/Assessment'
+import { BaseAssessmentRedirect } from './components/BaseAssessmentRedirect'
+// pages/Assessment.tsx is retired (unrouted, kept until the open hip PR #57 merges; see BaseAssessmentRedirect).
 import { MyGame } from './pages/MyGame'
 import { WorkoutLogger } from './pages/WorkoutLogger'
 import { PRTracker } from './pages/PRTracker'
@@ -23,6 +25,7 @@ import { Unsubscribe } from './pages/Unsubscribe'
 export default function App() {
   return (
     <BrowserRouter>
+      <TermsReacceptGate />
       <Routes>
         {/* Public routes */}
         <Route path="/login"          element={<Login />} />
@@ -33,8 +36,9 @@ export default function App() {
         {/* Onboarding is public-facing but gated: unauthenticated visitors are
             sent to ROMRx Base (new-athlete acquisition lives there), while a
             valid session keeps assessment/retest/results access. */}
+        {/* The BB assessment is retired: the Base assessment on romrx.io is the only one (Jim, Oct 6 2026). */}
+        <Route path="/onboarding/assessment" element={<BaseAssessmentRedirect />} />
         <Route element={<OnboardingGuard />}>
-          <Route path="/onboarding/assessment" element={<Assessment />} />
           <Route path="/onboarding/results"    element={<ResultsPreview />} />
         </Route>
         <Route path="/unsubscribe"     element={<Unsubscribe />} />

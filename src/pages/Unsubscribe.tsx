@@ -67,7 +67,7 @@ export function Unsubscribe() {
             <h1 style={styles.heading}>Something went wrong.</h1>
             <p style={styles.body}>
               We couldn’t process your request. Email us at{' '}
-              <a href="mailto:support@romrxbodybuilding.com" style={styles.link}>support@romrxbodybuilding.com</a>{' '}
+              <a href="mailto:hello@romrx.io" style={styles.link}>hello@romrx.io</a>{' '}
               and we’ll remove you manually.
             </p>
           </>
