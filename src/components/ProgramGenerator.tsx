@@ -29,9 +29,9 @@ import {
 } from '../lib/programGenerator'
 
 const SPLIT_OPTIONS: Array<{ key: SplitType; label: string; blurb: string }> = [
-  { key: 'full_body', label: 'Full Body', blurb: 'Every muscle each session — great for 2–3 days' },
-  { key: 'upper_lower', label: 'Upper / Lower', blurb: 'Balanced frequency — ideal for 4 days' },
-  { key: 'ppl', label: 'Push / Pull / Legs', blurb: 'Max volume per muscle — best for 5–6 days' },
+  { key: 'full_body', label: 'Full Body', blurb: 'Every muscle each session, great for 2-3 days' },
+  { key: 'upper_lower', label: 'Upper / Lower', blurb: 'Balanced frequency, ideal for 4 days' },
+  { key: 'ppl', label: 'Push / Pull / Legs', blurb: 'Max volume per muscle, best for 5-6 days' },
 ]
 
 const EMPHASIS_MUSCLES = ['Chest', 'Back', 'Side Delts', 'Biceps', 'Triceps', 'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs']
@@ -226,7 +226,7 @@ export function ProgramGenerator({
           title={<span className="flex items-center gap-2"><Wand2 size={16} className="text-miami" /> Generate a program</span>}
         >
           <p className="text-xs text-miami-text/70 mb-4">
-            We auto-build a full week around your mobility — picking growth-driving, stretch-biased lifts you can actually load through range, then setting volume per muscle to your science-based MAV. You can tweak everything before saving.
+            We auto-build a full week around your mobility, picking growth-driving, stretch-biased lifts you can actually load through range, then setting volume per muscle to your science-based MAV. You can tweak everything before saving.
           </p>
 
           {noAssessment && (
@@ -280,7 +280,7 @@ export function ProgramGenerator({
 
           {/* Emphasis */}
           <p className="text-[11px] font-bold uppercase tracking-wide text-miami-text/50 mb-1.5">
-            Emphasis <span className="font-normal normal-case text-miami-text/40">· optional, up to 3 — biases volume higher</span>
+            Emphasis <span className="font-normal normal-case text-miami-text/40">· optional, up to 3, biases volume higher</span>
           </p>
           <div className="flex flex-wrap gap-1.5 mb-5">
             {EMPHASIS_MUSCLES.map(m => (
@@ -414,7 +414,7 @@ function WeeklyVolumeTally({ program }: { program: GeneratedProgram }) {
                 <span className="font-semibold text-miami-text">{muscle}</span>
                 <span className="tabular-nums">
                   <span className="font-bold text-miami-text">{planned}</span>
-                  <span className="text-miami-text/40"> / {lm.mav_low}–{lm.mav_high}</span>
+                  <span className="text-miami-text/40"> / {lm.mav_low}-{lm.mav_high}</span>
                   <span className={cn('ml-1.5 font-semibold', c.cls)}>{c.label}</span>
                 </span>
               </div>
@@ -462,7 +462,7 @@ function SessionCard({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-miami-text leading-tight">{e.exercise_name}</p>
                   <p className="text-[10px] text-miami-text/55 mt-0.5">
-                    {e.primary_muscle} · {e.reps_min}–{e.reps_max} reps
+                    {e.primary_muscle} · {e.reps_min}-{e.reps_max} reps
                     {e.readiness != null && (
                       <span className={cn('ml-1 font-semibold', e.readiness >= 90 ? 'text-green-tier' : e.readiness >= 75 ? 'text-yellow-tier' : 'text-red-tier')}>
                         · {e.readiness}% ready
@@ -488,25 +488,25 @@ function SessionCard({
               {e.swapped_from && (
                 <p className="mt-1.5 text-[10px] text-green-tier flex items-start gap-1">
                   <ArrowRightLeft size={10} className="mt-0.5 shrink-0" />
-                  <span>Swapped from <span className="font-semibold">{e.swapped_from}</span> — same target, no mobility tax.</span>
+                  <span>Swapped from <span className="font-semibold">{e.swapped_from}</span>, same target, no mobility tax.</span>
                 </p>
               )}
               {!e.swapped_from && isRed && (
                 <p className="mt-1.5 text-[10px] text-red-tier flex items-start gap-1">
                   <AlertTriangle size={10} className="mt-0.5 shrink-0" />
-                  <span>{e.note ?? 'Mobility-limited — reduce range to a pain-free depth.'}</span>
+                  <span>{e.note ?? 'Mobility-limited: reduce range to a pain-free depth.'}</span>
                 </p>
               )}
               {!e.swapped_from && !isRed && e.stretch_emphasis === 'high' && (
                 <p className="mt-1.5 text-[10px] text-miami flex items-center gap-1">
-                  <Sparkles size={10} className="shrink-0" /> High-stretch — drives growth at length.
+                  <Sparkles size={10} className="shrink-0" /> High-stretch: drives growth at length.
                 </p>
               )}
             </div>
           )
         })}
         {session.exercises.length === 0 && (
-          <p className="text-xs text-miami-text/50 italic py-2">No exercises — regenerate or pick from the library.</p>
+          <p className="text-xs text-miami-text/50 italic py-2">No exercises. Regenerate or pick from the library.</p>
         )}
       </div>
     </div>

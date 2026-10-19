@@ -305,12 +305,12 @@ function pickExercisesForMuscle(
       if (swap) {
         chosen = swap
         swappedFrom = e.name
-        note = `ROM swap — ${e.name} needs more range than you have right now; this hits the same ${muscle} without the mobility tax.`
+        note = `ROM swap: ${e.name} needs more range than you have right now; this hits the same ${muscle} without the mobility tax.`
       } else {
-        note = `Mobility-limited — reduce range to a pain-free depth and load the partial. ${e.rom_note ?? ''}`.trim()
+        note = `Mobility-limited: reduce range to a pain-free depth and load the partial. ${e.rom_note ?? ''}`.trim()
       }
     } else if (e.stretch_emphasis === 'high') {
-      note = 'High-stretch pick — drives growth through the lengthened position.'
+      note = 'High-stretch pick: drives growth through the lengthened position.'
     }
 
     if (usedIds.has(chosen.id)) continue
@@ -409,7 +409,7 @@ export function generateProgram(
       const exCount = Math.min(2, Math.max(1, Math.round(sessionSets / 3.5)))
       const picks = pickExercisesForMuscle(muscle, library, assessment, exCount, usedIds)
       if (picks.length === 0) {
-        notes.push(`No unlocked ${muscle} exercises available — skipped in ${sessions[sIdx].day_label}.`)
+        notes.push(`No unlocked ${muscle} exercises available, skipped in ${sessions[sIdx].day_label}.`)
         continue
       }
 
@@ -446,8 +446,8 @@ export function generateProgram(
   const swapCount = sessions.flatMap(s => s.exercises).filter(e => e.swapped_from).length
   if (swapCount > 0) notes.unshift(`${swapCount} exercise${swapCount > 1 ? 's' : ''} auto-swapped to ROM-friendly variations based on your mobility.`)
   const blockNote = prefs.mesoWeeks >= 2
-    ? (prefs.mesoWeek === prefs.mesoWeeks ? 'Deload week — volume pulled back to maintenance.' : `Mesocycle week ${prefs.mesoWeek}/${prefs.mesoWeeks} — volume set for this phase.`)
-    : 'No active block — volume set to the productive middle of your MAV range.'
+    ? (prefs.mesoWeek === prefs.mesoWeeks ? 'Deload week: volume pulled back to maintenance.' : `Mesocycle week ${prefs.mesoWeek}/${prefs.mesoWeeks}: volume set for this phase.`)
+    : 'No active block: volume set to the productive middle of your MAV range.'
   notes.unshift(blockNote)
 
   const splitLabel = prefs.split === 'full_body' ? 'Full Body' : prefs.split === 'upper_lower' ? 'Upper/Lower' : 'Push/Pull/Legs'

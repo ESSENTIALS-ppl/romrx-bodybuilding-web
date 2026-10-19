@@ -55,7 +55,7 @@ export function tierColor(tier: string | null): string {
 // DELAY_TECHNIQUE is an internal flag — always surfaces as RED in the UI
 export function tierLabel(tier: string | null, flag: string | null): string {
   if (flag === 'DELAY_TECHNIQUE') return 'RED'
-  return tier ?? '—'
+  return tier ?? '-'
 }
 
 export function formatJoint(key: string): string {

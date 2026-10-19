@@ -10,7 +10,7 @@ export interface RangeDef {
 
 export function rangeText(def: RangeDef): string | null {
   if (def.hideRange) return null
-  return `${def.normalMin}–${def.normalMax}${def.unit}`
+  return `${def.normalMin}-${def.normalMax}${def.unit}`
 }
 
 // Source line under the range, same text as Base ("Source: Youdas et al., 2005"). Null when the range is hidden or
