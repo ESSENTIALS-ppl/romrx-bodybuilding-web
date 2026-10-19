@@ -21,6 +21,9 @@ import { MyCoach } from './pages/MyCoach'
 import { MySchool } from './pages/MySchool'
 import { ResultsPreview } from './pages/ResultsPreview'
 import { Unsubscribe } from './pages/Unsubscribe'
+import { PreviewPaywall } from './pages/PreviewPaywall'
+
+const PREVIEW_HARNESS = import.meta.env.VITE_PREVIEW_HARNESS === 'on'
 
 export default function App() {
   return (
@@ -42,6 +45,7 @@ export default function App() {
           <Route path="/onboarding/results"    element={<ResultsPreview />} />
         </Route>
         <Route path="/unsubscribe"     element={<Unsubscribe />} />
+        {PREVIEW_HARNESS && <Route path="/preview/paywall" element={<PreviewPaywall />} />}
 
         {/* / is handled by Netlify rewrite to marketing.html — this catches any edge case */}
         <Route path="/" element={null} />

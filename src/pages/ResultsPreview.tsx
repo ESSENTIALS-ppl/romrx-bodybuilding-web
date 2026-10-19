@@ -52,16 +52,21 @@ function getTopAsymmetries(assessment: Record<string, any>): Array<{ joint: stri
     .slice(0, 3) as Array<{ joint: string; gap: number; left: number; right: number }>
 }
 
-export function ResultsPreview() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ResultsPreviewMock = { assessment: Record<string, any>; baseActive: boolean }
+
+// `mock` is used ONLY by the preview harness (/preview/paywall, built only with VITE_PREVIEW_HARNESS=on). It skips the
+// Supabase reads; everything else (copy, button href) is the real component.
+export function ResultsPreview({ mock }: { mock?: ResultsPreviewMock } = {}) {
   const { user } = useAuth()
   const navigate = useNavigate()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [assessment, setAssessment] = useState<Record<string, any> | null>(null)
-  const [loading, setLoading]       = useState(true)
-  const [baseActive, setBaseActive] = useState(false)
+  const [assessment, setAssessment] = useState<Record<string, any> | null>(mock?.assessment ?? null)
+  const [loading, setLoading]       = useState(!mock)
+  const [baseActive, setBaseActive] = useState(mock?.baseActive ?? false)
 
   useEffect(() => {
-    if (!user) return
+    if (mock || !user) return
     ;(async () => {
       // Check if already paid
       const { data: userRow } = await supabase
@@ -91,7 +96,7 @@ export function ResultsPreview() {
       setAssessment(data ?? null)
       setLoading(false)
     })()
-  }, [user, navigate])
+  }, [user, navigate, mock])
 
   if (loading) return <Spinner />
 
