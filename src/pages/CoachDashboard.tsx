@@ -1300,7 +1300,7 @@ const STAGE_LABELS: Record<number, { name: string; description: string; color: s
   6: { name: 'Flow Rolling',       description: 'Light intensity, injury-aware partner only.',         color: 'text-miami' },
   7: { name: 'Modified Training',  description: 'Full class with specific technique restrictions.',    color: 'text-miami' },
   8: { name: 'Full Training',      description: 'No modifications, full intensity.',                  color: 'text-green-tier' },
-  9: { name: 'Competition Ready',  description: 'Competition cleared. Coach sign-off required.',     color: 'text-green-tier' },
+  9: { name: 'Return to competition',  description: 'Return to competition. The athlete decides with their medical professional and coach.',     color: 'text-green-tier' },
 }
 
 interface InjuryRecord {
