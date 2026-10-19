@@ -45,9 +45,10 @@ function buildRadar(a: Assessment) {
   ]
 }
 
-function JointBar({ label, left, right, midline, optimal }: {
+// unit: ankle dorsiflexion is the knee-to-wall test in centimeters (not degrees); every other joint is degrees.
+function JointBar({ label, left, right, midline, optimal, unit = '°' }: {
   label: string; left?: number | null; right?: number | null
-  midline?: number | null; optimal: number
+  midline?: number | null; optimal: number; unit?: string
 }) {
   const best = midline ?? Math.max(left ?? 0, right ?? 0)
   const pct  = Math.min(100, Math.round((best / optimal) * 100))
@@ -60,7 +61,7 @@ function JointBar({ label, left, right, midline, optimal }: {
         <p className={cn('text-xs font-medium', isBad ? 'text-red-tier' : 'text-charcoal')}>{label}</p>
         {asym > 10 && (
           <p className="text-xs text-gold flex items-center gap-0.5 mt-0.5">
-            <AlertTriangle size={9} /> {asym}° gap
+            <AlertTriangle size={9} /> {asym}{unit === '°' ? '°' : ` ${unit}`} gap
           </p>
         )}
       </div>
@@ -72,7 +73,7 @@ function JointBar({ label, left, right, midline, optimal }: {
         />
       </div>
       <div className="w-20 text-right shrink-0 text-xs text-charcoal-light">
-        {midline != null ? `${midline}°` : `${left ?? 0}° / ${right ?? 0}°`}
+        {midline != null ? `${midline}${unit === '°' ? unit : ` ${unit}`}` : `${left ?? 0}${unit === '°' ? unit : ''} / ${right ?? 0}${unit === '°' ? unit : ` ${unit}`}`}
       </div>
       <div className="w-8 text-right shrink-0">
         <span className={cn('text-xs font-bold',
@@ -216,7 +217,7 @@ export function MyBody() {
           <NotScoredRow label="Hip Flexion" left={assessment.hip_flex_l} right={assessment.hip_flex_r} />
           <JointBar label="Shoulder ER"    left={assessment.shoulder_er_l}   right={assessment.shoulder_er_r}   optimal={OPTIMAL['Shoulder ER']} />
           <JointBar label="Shoulder Flex"  left={assessment.shoulder_flex_l} right={assessment.shoulder_flex_r} optimal={OPTIMAL['Shoulder Flex']} />
-          <JointBar label="Ankle DF"       left={assessment.ankle_df_l}      right={assessment.ankle_df_r}      optimal={OPTIMAL['Ankle DF']} />
+          <JointBar label="Ankle DF"       left={assessment.ankle_df_l}      right={assessment.ankle_df_r}      optimal={OPTIMAL['Ankle DF']} unit="cm" />
           <JointBar label="Lumbar Flex"    midline={assessment.lumbar_flex}   optimal={OPTIMAL['Lumbar Flex']} />
           <JointBar label="Lumbar Ext"     midline={assessment.lumbar_ext}    optimal={OPTIMAL['Lumbar Ext']} />
           <JointBar label="Cervical Lateral" left={assessment.cervical_lat_l} right={assessment.cervical_lat_r} optimal={OPTIMAL['Cervical Lat']} />
