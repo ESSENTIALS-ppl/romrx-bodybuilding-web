@@ -10,7 +10,7 @@ assert.ok(m, 'PACK_CHARGE_DATE_TEXT constant must exist exactly once')
 assert.equal(s.split('PACK_CHARGE_DATE_TEXT =').length, 2, 'declared once')
 // Base-active small print: exact approved wording, date only via the constant.
 assert.ok(
-  s.includes('`Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`'),
+  s.includes('`Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. A card is needed at checkout. You can cancel anytime in Settings > Subscription. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`'),
   'Base-active small print must be the approved wording',
 )
 // No-Base branch stays as written.

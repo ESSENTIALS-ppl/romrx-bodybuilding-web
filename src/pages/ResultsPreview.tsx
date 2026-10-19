@@ -11,13 +11,13 @@ import { computePRS, PRS_BILATERAL } from '../lib/readiness'
 // F-03: the old button posted {plan:'athlete'} to create-checkout-session, which only accepts
 // mode base|unlock|coach, so it always errored. The Add-sport flow in the main app already handles
 // both cases (Base active: $149 pack checkout; no Base: Base + pack, sent to login first).
-const UNLOCK_URL = 'https://romrx.io/app/unlock/bodybuilding'
+const UNLOCK_URL = 'https://romrx.io/app/unlock/bodybuilding?add=bodybuilding'
 
 // TODO(LEGAL, MUST CONFIRM BEFORE ANY PRODUCTION MERGE): the pack charge date is not confirmed (today, or January 1, 2027).
 // Replace the placeholder with the real date text, for example 'January 1, 2027' or 'today'. The prebuild check in
 // scripts/pack-charge-date.test.mjs FAILS a production build (Netlify CONTEXT=production, or PACK_DATE_STRICT=1) while
 // the placeholder is still here. Only the Base-active small print uses this; the no-Base branch keeps its own text.
-export const PACK_CHARGE_DATE_TEXT = '[DATE TO CONFIRM]'
+export const PACK_CHARGE_DATE_TEXT = '[DATE]'
 
 // ── PRS scoring: shared in ../lib/readiness (hip flexion is not in the score) ──
 const BILATERAL_JOINTS = PRS_BILATERAL
@@ -195,7 +195,7 @@ export function ResultsPreview() {
         </a>
         <p className="text-center text-xs text-miami-text/50">
           {baseActive
-            ? `Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`
+            ? `Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. A card is needed at checkout. You can cancel anytime in Settings > Subscription. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`
             : 'Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.'}
         </p>
         <p className="text-center text-xs text-miami-text/30">
