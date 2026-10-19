@@ -29,13 +29,13 @@ const { rangeText, sourceText } = await import('data:text/javascript,' + encodeU
 assert.deepEqual(JOINTS.filter(j => j.hideRange).map(j => j.key), ['shoulder_er'], 'only shoulder ER hides its range')
 for (const j of JOINTS) {
   if (j.key === 'shoulder_er') assert.equal(rangeText(j), null, 'shoulder ER: no range line')
-  else assert.equal(rangeText(j), `${j.normalMin}–${j.normalMax}${j.unit}`, `${j.key} range line still shown`)
+  else assert.equal(rangeText(j), `${j.normalMin}-${j.normalMax}${j.unit}`, `${j.key} range line still shown`)
 }
-assert.equal(rangeText(JOINTS.find(j => j.key === 'shoulder_flex')), '140–180°')
+assert.equal(rangeText(JOINTS.find(j => j.key === 'shoulder_flex')), '140-180°')
 assert.equal(defs.hip_flex, undefined, 'hip flexion is not a My Protocol joint (hip display: saved per leg, not ranked)')
-assert.equal(rangeText(JOINTS.find(j => j.key === 'ankle_df')), '6–13cm')
+assert.equal(rangeText(JOINTS.find(j => j.key === 'ankle_df')), '6-13cm')
 // the card renders the range only through rangeText() and skips the whole box when it is null
-assert.ok(!/\{def\.normalMin\}–\{def\.normalMax\}/.test(src), 'no direct min–max render left')
+assert.ok(!/\{def\.normalMin\}[–-]\{def\.normalMax\}/.test(src), 'no direct min-max render left')
 assert.match(src, /\{rangeText\(def\) !== null && \(\s*<div className="bg-surface rounded-xl px-3 py-1\.5">\s*<p [^>]*>Typical range<\/p>\s*<p [^>]*>\{rangeText\(def\)\}<\/p>/, 'range box gated on rangeText(def)')
 
 // 4) Stacy PASS wording (Oct 6 12:29 PM): no 'Normal' label left on the card
