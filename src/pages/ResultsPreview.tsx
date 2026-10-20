@@ -13,11 +13,9 @@ import { computePRS, PRS_BILATERAL } from '../lib/readiness'
 // both cases (Base active: $149 pack checkout; no Base: Base + pack, sent to login first).
 const UNLOCK_URL = 'https://romrx.io/app/unlock/bodybuilding?add=bodybuilding'
 
-// TODO(LEGAL, MUST CONFIRM BEFORE ANY PRODUCTION MERGE): the pack charge date is not confirmed (today, or January 1, 2027).
-// Replace the placeholder with the real date text, for example 'January 1, 2027' or 'today'. The prebuild check in
-// scripts/pack-charge-date.test.mjs FAILS a production build (Netlify CONTEXT=production, or PACK_DATE_STRICT=1) while
-// the placeholder is still here. Only the Base-active small print uses this; the no-Base branch keeps its own text.
-export const PACK_CHARGE_DATE_TEXT = '[DATE]'
+// Pack charge date confirmed by Jim Oct 20 2026, 10:39 AM ET: January 1, 2027 (was the [DATE] placeholder).
+// Only the Base-active small print uses this; the no-Base branch keeps its own text. scripts/pack-charge-date.test.mjs checks it.
+export const PACK_CHARGE_DATE_TEXT = 'January 1, 2027'
 
 // ── PRS scoring: shared in ../lib/readiness (hip flexion is not in the score) ──
 const BILATERAL_JOINTS = PRS_BILATERAL
@@ -146,8 +144,8 @@ export function ResultsPreview() {
               <div key={i} className="flex items-center justify-between">
                 <span className="text-sm text-miami-text/80">{a.joint}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-miami-text/50">L {a.left}° / R {a.right}°</span>
-                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full', a.gap >= 15 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400')}>
+                  <span className="text-xs text-miami-text/50 whitespace-nowrap">L {a.left}° / R {a.right}°</span>
+                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap', a.gap >= 15 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400')}>
                     {a.gap}° gap
                   </span>
                 </div>
