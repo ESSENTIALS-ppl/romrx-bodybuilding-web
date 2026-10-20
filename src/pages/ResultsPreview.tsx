@@ -2,13 +2,20 @@ import { useEffect, useState } from 'react'
 import { goToBaseAssessment } from '../lib/baseAssessment'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { Spinner } from '../components/Spinner'
 import { AlertTriangle, CheckCircle, Unlock, TrendingUp } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { computePRS, PRS_BILATERAL } from '../lib/readiness'
 
-const CHECKOUT_URL = `${SUPABASE_URL}/functions/v1/create-checkout-session`
+// F-03: the old button posted {plan:'athlete'} to create-checkout-session, which only accepts
+// mode base|unlock|coach, so it always errored. The Add-sport flow in the main app already handles
+// both cases (Base active: $149 pack checkout; no Base: Base + pack, sent to login first).
+const UNLOCK_URL = 'https://romrx.io/app/unlock/bodybuilding?add=bodybuilding'
+
+// Pack charge date confirmed by Jim Oct 20 2026, 10:39 AM ET: January 1, 2027 (was the [DATE] placeholder).
+// Only the Base-active small print uses this; the no-Base branch keeps its own text. scripts/pack-charge-date.test.mjs checks it.
+export const PACK_CHARGE_DATE_TEXT = 'January 1, 2027'
 
 // ── PRS scoring: shared in ../lib/readiness (hip flexion is not in the score) ──
 const BILATERAL_JOINTS = PRS_BILATERAL
@@ -44,13 +51,12 @@ function getTopAsymmetries(assessment: Record<string, any>): Array<{ joint: stri
 }
 
 export function ResultsPreview() {
-  const { user, session } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [assessment, setAssessment] = useState<Record<string, any> | null>(null)
   const [loading, setLoading]       = useState(true)
-  const [paying, setPaying]         = useState(false)
-  const [error, setError]           = useState('')
+  const [baseActive, setBaseActive] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -58,7 +64,7 @@ export function ResultsPreview() {
       // Check if already paid
       const { data: userRow } = await supabase
         .from('users')
-        .select('subscription_status')
+        .select('subscription_status, base_status')
         .eq('id', user.id)
         .maybeSingle()
 
@@ -68,6 +74,8 @@ export function ResultsPreview() {
         navigate('/dashboard', { replace: true })
         return
       }
+
+      setBaseActive(userRow?.base_status === 'active')
 
       // Load latest assessment
       const { data } = await supabase
@@ -82,30 +90,6 @@ export function ResultsPreview() {
       setLoading(false)
     })()
   }, [user, navigate])
-
-  const handleUnlock = async () => {
-    if (!session) return
-    setPaying(true)
-    setError('')
-    try {
-      const res = await fetch(CHECKOUT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': SUPABASE_ANON,
-        },
-        body: JSON.stringify({ email: user?.email, plan: 'athlete' }),
-      })
-      const { url, error: err } = await res.json()
-      if (url) { window.location.href = url; return }
-      setError(err ?? 'Payment setup failed. Please try again.')
-    } catch (e) {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setPaying(false)
-    }
-  }
 
   if (loading) return <Spinner />
 
@@ -160,8 +144,8 @@ export function ResultsPreview() {
               <div key={i} className="flex items-center justify-between">
                 <span className="text-sm text-miami-text/80">{a.joint}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-miami-text/50">L {a.left}° / R {a.right}°</span>
-                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full', a.gap >= 15 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400')}>
+                  <span className="text-xs text-miami-text/50 whitespace-nowrap">L {a.left}° / R {a.right}°</span>
+                  <span className={cn('text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap', a.gap >= 15 ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400')}>
                     {a.gap}° gap
                   </span>
                 </div>
@@ -198,18 +182,19 @@ export function ResultsPreview() {
         </div>
 
         {/* CTA */}
-        {error && <p className="text-xs text-center text-red-400 bg-red-500/20 rounded-xl px-3 py-2">{error}</p>}
-        <button
-          onClick={handleUnlock}
-          disabled={paying}
+        {baseActive && (
+          <p className="text-center text-sm text-miami-text/70">ROMRxBodybuilding is a $149/yr add-on to your Base.</p>
+        )}
+        <a
+          href={UNLOCK_URL}
           className="w-full py-4 bg-gold text-charcoal font-display font-bold text-base rounded-2xl hover:bg-gold-hover transition-colors flex items-center justify-center gap-2"
         >
-          {paying ? 'Setting up payment...' : <>
-            <Unlock size={18} /> Get Base + ROMRxBodybuilding ($209/yr)
-          </>}
-        </button>
+          <Unlock size={18} /> {baseActive ? 'Add ROMRxBodybuilding ($149/yr)' : 'Get Base + ROMRxBodybuilding ($209/yr)'}
+        </a>
         <p className="text-center text-xs text-miami-text/50">
-          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.
+          {baseActive
+            ? `Charged ${PACK_CHARGE_DATE_TEXT}, then every year until you cancel. A card is needed at checkout. You can cancel anytime in Settings, under Subscription. Canceling Base also cancels ROMRxBodybuilding and ends your access right away. There are no refunds after a charge, except where the law requires one.`
+            : 'Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.'}
         </p>
         <p className="text-center text-xs text-miami-text/30">
           Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
