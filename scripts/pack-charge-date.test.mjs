@@ -14,7 +14,7 @@ assert.ok(
   'Base-active small print must be the approved wording',
 )
 // No-Base branch stays as written.
-assert.ok(s.includes('Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.'), 'no-Base branch unchanged')
+assert.ok(s.includes('Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. A card is needed at checkout. Canceling Base also cancels ROMRxBodybuilding.'), 'no-Base branch unchanged')
 const placeholder = m[1] === '[DATE TO CONFIRM]' || /\[.*\]/.test(m[1]) || m[1].trim() === ''
 const strict = process.env.CONTEXT === 'production' || process.env.PACK_DATE_STRICT === '1'
 if (placeholder && strict) {
