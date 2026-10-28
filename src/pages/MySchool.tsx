@@ -6,6 +6,7 @@ import {
   submitWaitlist,
   isValidWaitlistEmail,
   WAITLIST_MSG_ERR,
+  WAITLIST_MSG_RATE,
   WAITLIST_MSG_NAME,
   WAITLIST_MSG_EMAIL,
   WAITLIST_CONSENT_LEAD,
@@ -18,6 +19,7 @@ export function MySchool() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
+  const [hp, setHp] = useState('')
   const [error, setError] = useState('')
 
   async function handleNotify() {
@@ -34,10 +36,10 @@ export function MySchool() {
       return
     }
     setSending(true)
-    const ok = await submitWaitlist({ name: trimmedName, email: trimmedEmail, role: 'gym' })
+    const result = await submitWaitlist({ name: trimmedName, email: trimmedEmail, role: 'gym', hp_website: hp })
     setSending(false)
-    if (ok) setSubmitted(true)
-    else setError(WAITLIST_MSG_ERR)
+    if (result === 'ok') setSubmitted(true)
+    else setError(result === 'rate_limited' ? WAITLIST_MSG_RATE : WAITLIST_MSG_ERR)
   }
 
   return (
@@ -110,6 +112,16 @@ export function MySchool() {
                   {WAITLIST_CONSENT_LEAD}
                   <a href={WAITLIST_CONSENT_LINK_URL} className="text-miami underline">{WAITLIST_CONSENT_LINK_TEXT}</a>.
                 </p>
+                <input
+                  type="text"
+                  name="hp_website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={hp}
+                  onChange={e => setHp(e.target.value)}
+                  style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+                />
               </div>
             )}
           </div>

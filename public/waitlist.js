@@ -1,6 +1,7 @@
 /* ROMRxBodyBuilding waitlist sign-up (static pages).
  * ONE config for every static page on this site. The React app has its own copy in src/lib/waitlist.ts.
- * Contract (Avery, final): POST JSON {name, email, site, role, consent:true} to WAITLIST_URL.
+ * Contract (Avery, final): POST JSON {name, email, site, role, consent:true, hp_website} to WAITLIST_URL
+ * (CONTRACT.md). hp_website is the hidden honeypot field: always sent, '' for real people. 429 = rate limited.
  * Any 2xx = success (duplicates also 2xx {ok:true}). Anything else, or a network error = error.
  * No apikey / Authorization header is sent. */
 (function () {
@@ -11,6 +12,7 @@
   var CONSENT_LINK_TEXT = 'Privacy Policy';
   var CONSENT_LINK_URL = 'https://romrx.io/legal';
   var MSG_OK = "You're on the list. We'll email you to confirm.";
+  var MSG_RATE = 'Too many tries. Please wait a minute and try again.';
   var MSG_ERR = 'Something went wrong. Please try again, or email hello@romrx.io.';
   var MSG_NAME = 'Please enter your name.';
   var MSG_EMAIL = 'Please enter a valid email address.';
@@ -46,6 +48,7 @@
     var nameEl = form.querySelector('[name="name"]');
     var emailEl = form.querySelector('[name="email"]');
     var roleEl = form.querySelector('[name="role"]');
+    var hpEl = form.querySelector('[name="hp_website"]');
     var btn = form.querySelector('button[type="submit"]');
     var scope = form.parentNode;
     var okEl = scope.querySelector('[data-waitlist-success]');
@@ -75,13 +78,16 @@
           email: email,
           site: WAITLIST_SITE,
           role: roleEl.value,
-          consent: true
+          consent: true,
+          hp_website: hpEl ? hpEl.value : ''
         }),
         signal: ctl ? ctl.signal : undefined
       }).then(function (res) {
         if (res.status >= 200 && res.status < 300) {
           form.style.display = 'none';
           show(okEl, MSG_OK_FOR(okEl));
+        } else if (res.status === 429) {
+          show(errEl, MSG_RATE);
         } else {
           show(errEl, MSG_ERR);
         }
