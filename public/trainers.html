@@ -42,6 +42,7 @@
     .wl-btn{background:var(--gold);color:var(--bg);border:none;padding:14px 28px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;cursor:pointer}
     .wl-success{display:none;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:var(--gold)}
     .wl-note{font-size:0.75rem;color:rgba(240,237,232,0.3);margin-top:10px}
+    .waitlist-error{color:#8b1a1a;background:#fde8e8;border-radius:6px;padding:8px 12px;font-size:.85rem;font-weight:600;margin-top:10px}
     .footer{text-align:center;padding:40px 24px;border-top:1px solid rgba(255,255,255,0.04);margin-top:60px}
     .footer-links{display:flex;justify-content:center;gap:24px;margin-bottom:10px;flex-wrap:wrap}
     .footer-links a{font-size:0.75rem;color:rgba(240,237,232,0.25)}
@@ -80,7 +81,7 @@
         <button class="wl-btn" id="wl-btn" type="submit">Notify Me</button>
       </form>
       <div class="wl-success" id="wl-success" data-waitlist-success hidden>&check;&nbsp;You're on the list for Spring 2027.</div>
-      <p class="wl-note" data-waitlist-error role="alert" hidden></p>
+      <p class="waitlist-error" data-waitlist-error role="alert" hidden></p>
       <p class="wl-note" data-waitlist-consent data-link-style="color:var(--gold);"></p>
     </div>
   </main>
