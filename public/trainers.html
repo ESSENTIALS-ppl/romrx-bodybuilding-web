@@ -73,12 +73,15 @@
     </div>
     <div class="waitlist">
       <p class="waitlist-label">Notify me for Spring 2027</p>
-      <div class="wl-form" id="wl-form">
-        <input type="email" class="wl-input" id="wl-email" placeholder="your@email.com" autocomplete="email">
-        <button class="wl-btn" id="wl-btn" type="button">Notify Me</button>
-      </div>
-      <div class="wl-success" id="wl-success">&check;&nbsp;You're on the list for Spring 2027.</div>
-      <p class="wl-note">We use your email only to tell you when this opens. Privacy: romrx.io/legal. We will notify you at Spring 2027. Or email <a href="mailto:hello@romrx.io?subject=Trainer%20Spring%202027%20notify" style="color:var(--gold);">hello@romrx.io</a>.</p>
+      <form class="wl-form" id="wl-form" data-waitlist-form>
+        <input type="hidden" name="role" value="trainer">
+        <input type="text" class="wl-input" name="name" placeholder="Your name" aria-label="Your name" autocomplete="name" maxlength="100" required>
+        <input type="email" class="wl-input" id="wl-email" name="email" placeholder="your@email.com" aria-label="Your email" autocomplete="email" maxlength="254" required>
+        <button class="wl-btn" id="wl-btn" type="submit">Notify Me</button>
+      </form>
+      <div class="wl-success" id="wl-success" data-waitlist-success hidden>&check;&nbsp;You're on the list for Spring 2027.</div>
+      <p class="wl-note" data-waitlist-error role="alert" hidden></p>
+      <p class="wl-note" data-waitlist-consent data-link-style="color:var(--gold);"></p>
     </div>
   </main>
   <footer class="footer">
@@ -91,17 +94,6 @@
     <p class="footer-copy">&copy; 2026 ROMRx LLC &middot; Dublin, Ohio</p>
     <p class="footer-copy" style="margin-top:6px;">ROMRx&trade; and related marks are trademarks of ROMRx LLC. All rights reserved.</p>
   </footer>
-  <script>
-    const btn=document.getElementById('wl-btn');
-    const input=document.getElementById('wl-email');
-    const form=document.getElementById('wl-form');
-    const ok=document.getElementById('wl-success');
-    btn.addEventListener('click',()=>{
-      const email=input.value.trim().toLowerCase();
-      if(!email||!email.includes('@')){input.style.outline='2px solid #FFD700';input.focus();setTimeout(()=>input.style.outline='',2000);return;}
-      form.style.display='none';ok.style.display='block';
-    });
-    input.addEventListener('keydown',e=>{if(e.key==='Enter')btn.click();});
-  </script>
+  <script src="/waitlist.js" defer></script>
 </body>
 </html>

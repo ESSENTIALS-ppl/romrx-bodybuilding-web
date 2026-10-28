@@ -182,12 +182,15 @@
 
     <div class="waitlist">
       <p class="waitlist-label">Get the Gym Partner Brief</p>
-      <div class="wl-form" id="wl-form">
-        <input type="email" class="wl-input" id="wl-email" placeholder="gym@email.com" autocomplete="email">
-        <button class="wl-btn" id="wl-btn" type="button">Notify Me</button>
-      </div>
-      <div class="wl-success" id="wl-success">&check;&nbsp;You're on the gym partner list.</div>
-      <p class="wl-note">We use your email only to tell you when this opens. Privacy: romrx.io/legal.</p>
+      <form class="wl-form" id="wl-form" data-waitlist-form>
+        <input type="hidden" name="role" value="gym">
+        <input type="text" class="wl-input" name="name" placeholder="Your name" aria-label="Your name" autocomplete="name" maxlength="100" required>
+        <input type="email" class="wl-input" id="wl-email" name="email" placeholder="gym@email.com" aria-label="Your gym email" autocomplete="email" maxlength="254" required>
+        <button class="wl-btn" id="wl-btn" type="submit">Notify Me</button>
+      </form>
+      <div class="wl-success" id="wl-success" data-waitlist-success hidden>&check;&nbsp;You're on the gym partner list.</div>
+      <p class="wl-note" data-waitlist-error role="alert" hidden></p>
+      <p class="wl-note" data-waitlist-consent></p>
     </div>
 
   </main>
@@ -203,24 +206,7 @@
     <p class="footer-copy" style="margin-top:6px;">ROMRx&trade; and related marks are trademarks of ROMRx LLC. All rights reserved.</p>
   </footer>
 
-  <script>
-    const btn = document.getElementById('wl-btn');
-    const input = document.getElementById('wl-email');
-    const form = document.getElementById('wl-form');
-    const ok = document.getElementById('wl-success');
-    btn.addEventListener('click', () => {
-      const email = input.value.trim().toLowerCase();
-      if (!email || !email.includes('@')) {
-        input.style.outline = '2px solid #B44FE8';
-        input.focus();
-        setTimeout(() => input.style.outline = '', 2000);
-        return;
-      }
-      form.style.display = 'none';
-      ok.style.display = 'block';
-    });
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
-  </script>
+  <script src="/waitlist.js" defer></script>
 
 </body>
 </html>
