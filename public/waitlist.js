@@ -12,7 +12,7 @@
   var CONSENT_LINK_TEXT = 'Privacy Policy';
   var CONSENT_LINK_URL = 'https://romrx.io/legal';
   var MSG_OK = "You're on the list. We'll email you to confirm.";
-  var MSG_RATE = 'Too many tries. Please wait a minute and try again.';
+  var MSG_RATE = 'Too many tries. Please try again later.';
   var MSG_ERR = 'Something went wrong. Please try again, or email hello@romrx.io.';
   var MSG_NAME = 'Please enter your name.';
   var MSG_EMAIL = 'Please enter a valid email address.';

@@ -17,7 +17,7 @@ export const WAITLIST_CONSENT_LINK_TEXT = 'Privacy Policy'
 export const WAITLIST_CONSENT_LINK_URL = 'https://romrx.io/legal'
 
 export const WAITLIST_MSG_OK = "You're on the list. We'll email you to confirm."
-export const WAITLIST_MSG_RATE = 'Too many tries. Please wait a minute and try again.'
+export const WAITLIST_MSG_RATE = 'Too many tries. Please try again later.'
 export const WAITLIST_MSG_ERR = 'Something went wrong. Please try again, or email hello@romrx.io.'
 export const WAITLIST_MSG_NAME = 'Please enter your name.'
 export const WAITLIST_MSG_EMAIL = 'Please enter a valid email address.'
