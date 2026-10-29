@@ -120,6 +120,7 @@
       letter-spacing: 2px; color: var(--violet);
     }
     .wl-note { font-size: 0.75rem; color: rgba(240,237,232,0.3); margin-top: 10px; }
+    .wl-note[data-waitlist-consent] { color: var(--text-muted); }
     .waitlist-error { color:#8b1a1a;background:#fde8e8;border-radius:6px;padding:8px 12px;font-size:.85rem;font-weight:600; margin-top: 10px; }
 
     .footer {
@@ -133,6 +134,11 @@
     .footer-copy { font-size: 0.7rem; color: rgba(240,237,232,0.15); }
 
     @media (max-width: 800px) { .pitch-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) {
+      .wl-form { flex-direction: column; max-width: 100%; }
+      .wl-input { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
+      .wl-btn { width: 100%; }
+    }
   </style>
 <script src="/utm-forward.js" defer></script>
 </head>
@@ -192,7 +198,7 @@
       </form>
       <div class="wl-success" id="wl-success" data-waitlist-success hidden>&check;&nbsp;You're on the gym partner list.</div>
       <p class="waitlist-error" data-waitlist-error role="alert" hidden></p>
-      <p class="wl-note" data-waitlist-consent></p>
+      <p class="wl-note" data-waitlist-consent data-link-style="color:var(--teal);text-decoration:underline;"></p>
     </div>
 
   </main>
