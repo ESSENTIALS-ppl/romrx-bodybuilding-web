@@ -2,44 +2,14 @@ import { useState } from 'react'
 import { Building2 } from 'lucide-react'
 import { PageHeader } from '../components/PageHeader'
 import { SectionCard } from '../components/SectionCard'
-import {
-  submitWaitlist,
-  isValidWaitlistEmail,
-  WAITLIST_MSG_ERR,
-  WAITLIST_MSG_RATE,
-  WAITLIST_MSG_NAME,
-  WAITLIST_MSG_EMAIL,
-  WAITLIST_CONSENT_LEAD,
-  WAITLIST_CONSENT_LINK_TEXT,
-  WAITLIST_CONSENT_LINK_URL,
-} from '../lib/waitlist'
 
 export function MySchool() {
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [hp, setHp] = useState('')
-  const [error, setError] = useState('')
 
-  async function handleNotify() {
-    if (sending) return
-    setError('')
-    const trimmedName = name.trim()
-    const trimmedEmail = email.trim()
-    if (!trimmedName || trimmedName.length > 100) {
-      setError(WAITLIST_MSG_NAME)
-      return
-    }
-    if (!isValidWaitlistEmail(trimmedEmail)) {
-      setError(WAITLIST_MSG_EMAIL)
-      return
-    }
-    setSending(true)
-    const result = await submitWaitlist({ name: trimmedName, email: trimmedEmail, role: 'gym', hp_website: hp })
-    setSending(false)
-    if (result === 'ok') setSubmitted(true)
-    else setError(result === 'rate_limited' ? WAITLIST_MSG_RATE : WAITLIST_MSG_ERR)
+  function handleNotify() {
+    if (!email.trim()) return
+    setSubmitted(true)
   }
 
   return (
@@ -75,53 +45,22 @@ export function MySchool() {
                 <p className="text-xs text-green-600 mt-0.5">We'll reach out when school features go live.</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="flex gap-2">
                 <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleNotify()}
-                  placeholder="Your name"
-                  autoComplete="name"
-                  maxLength={100}
-                  className="w-full text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors"
+                  placeholder="your@email.com"
+                  className="flex-1 text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors"
                 />
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleNotify()}
-                    placeholder="your@email.com"
-                    autoComplete="email"
-                    maxLength={254}
-                    className="flex-1 text-sm rounded-xl border border-miami-light bg-surface px-3 py-2 focus:outline-none focus:border-miami focus:bg-white transition-colors"
-                  />
-                  <button
-                    onClick={handleNotify}
-                    disabled={sending || !name.trim() || !email.trim()}
-                    className="btn-primary text-sm px-4 py-2 disabled:opacity-50"
-                  >
-                    {sending ? 'Sending...' : 'Notify me'}
-                  </button>
-                </div>
-                {error && (
-                  <p className="text-xs text-red-tier bg-red-tier-bg rounded-xl px-3 py-2 text-left">{error}</p>
-                )}
-                <p className="text-xs text-charcoal-light text-left">
-                  {WAITLIST_CONSENT_LEAD}
-                  <a href={WAITLIST_CONSENT_LINK_URL} className="text-miami underline">{WAITLIST_CONSENT_LINK_TEXT}</a>.
-                </p>
-                <input
-                  type="text"
-                  name="hp_website"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  value={hp}
-                  onChange={e => setHp(e.target.value)}
-                  style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
-                />
+                <button
+                  onClick={handleNotify}
+                  disabled={!email.trim()}
+                  className="btn-primary text-sm px-4 py-2 disabled:opacity-50"
+                >
+                  Notify me
+                </button>
               </div>
             )}
           </div>
