@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BASE_ASSESSMENT_HREF } from '../lib/baseAssessment'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import type { Assessment } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
+import {
+  requestAccountDeletion, deletionErrorCopy, DELETION_BUTTON_LABEL, DELETION_SUCCESS_COPY,
+} from '../lib/accountDeletionRequest'
 import {
   Save, Loader2, ExternalLink, Mail, HelpCircle,
   LogOut, Trash2, ChevronRight, ClipboardList, TrendingUp,
@@ -122,6 +125,9 @@ function AthleteSettings() {
   const [showDelete, setShowDelete] = useState(false)
   const [deleteText, setDeleteText] = useState('')
   const [deleting, setDeleting]     = useState(false)
+  const [deleteDone, setDeleteDone] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const deleteInFlight = useRef(false)
 
   // ── Sync profile → local state ──
   useEffect(() => {
@@ -418,17 +424,24 @@ function AthleteSettings() {
     navigate('/login')
   }
 
-  // ── Delete account ──
+  // ── Request account deletion ──
+  // Emails privacy@romrx.io via the request-account-deletion edge function.
+  // Nothing is deleted or canceled here (the old athlete-row delete and
+  // subscription cancel were removed, FG-01). User stays signed in.
   const handleDelete = async () => {
-    if (!user || deleteText !== 'DELETE') return
+    if (!user || deleteText !== 'DELETE' || deleteDone || deleteInFlight.current) return
+    deleteInFlight.current = true
     setDeleting(true)
+    setDeleteError(null)
     try {
-      await supabase.from('athletes').delete().eq('user_id', user.id)
-      await supabase.from('users').update({ subscription_status: 'canceled' }).eq('id', user.id)
-      await supabase.auth.signOut()
-      navigate('/login')
-    } catch (e) {
-      console.error('Delete error', e)
+      const result = await requestAccountDeletion(
+        (name, opts) => supabase.functions.invoke(name, opts),
+        'romrxbodybuilding.com',
+      )
+      if (result.ok) setDeleteDone(true)
+      else setDeleteError(deletionErrorCopy(result.reason))
+    } finally {
+      deleteInFlight.current = false
       setDeleting(false)
     }
   }
@@ -1069,8 +1082,8 @@ function AthleteSettings() {
               >
                 <Trash2 size={15} className="shrink-0" />
                 <span className="flex-1 text-left">
-                  Delete account
-                  <span className="block text-xs font-normal mt-0.5 opacity-70">Removes all your data permanently</span>
+                  {DELETION_BUTTON_LABEL}
+                  <span className="block text-xs font-normal mt-0.5 opacity-70">Sends a deletion request to our privacy team</span>
                 </span>
                 <ChevronRight size={14} />
               </button>
@@ -1087,35 +1100,54 @@ function AthleteSettings() {
               <div className="w-9 h-9 rounded-full bg-red-tier-bg flex items-center justify-center shrink-0">
                 <Trash2 size={16} className="text-red-tier" />
               </div>
-              <h3 className="font-display font-bold text-lg text-charcoal">Delete Account</h3>
+              <h3 className="font-display font-bold text-lg text-charcoal">{DELETION_BUTTON_LABEL}</h3>
             </div>
-            <p className="text-sm text-charcoal-light leading-relaxed">
-              This removes your profile, assessments, and protocol data. It cannot be undone.
-              Type <span className="font-bold text-charcoal">DELETE</span> to confirm.
-            </p>
-            <input
-              type="text"
-              value={deleteText}
-              onChange={e => setDeleteText(e.target.value)}
-              placeholder="Type DELETE"
-              className="w-full rounded-xl border border-red-200 bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-red-400"
-            />
-            <div className="flex gap-3 pt-1">
-              <button
-                onClick={() => { setShowDelete(false); setDeleteText('') }}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleteText !== 'DELETE' || deleting}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-red-tier text-white text-sm font-medium disabled:opacity-40 hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
-              >
-                {deleting && <Loader2 size={14} className="animate-spin" />}
-                {deleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
+            {deleteDone ? (
+              <>
+                <p role="status" className="text-sm text-charcoal leading-relaxed">{DELETION_SUCCESS_COPY}</p>
+                <div className="flex gap-3 pt-1">
+                  <button
+                    onClick={() => { setShowDelete(false); setDeleteText('') }}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-charcoal-light leading-relaxed">
+                  This sends a deletion request to our privacy team. Nothing is deleted right away.
+                  Type <span className="font-bold text-charcoal">DELETE</span> to confirm.
+                </p>
+                <input
+                  type="text"
+                  value={deleteText}
+                  onChange={e => setDeleteText(e.target.value)}
+                  placeholder="Type DELETE"
+                  className="w-full rounded-xl border border-red-200 bg-surface px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-red-400"
+                />
+                {deleteError && (
+                  <p role="alert" className="text-sm text-red-tier">{deleteError}</p>
+                )}
+                <div className="flex gap-3 pt-1">
+                  <button
+                    onClick={() => { setShowDelete(false); setDeleteText(''); setDeleteError(null) }}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleteText !== 'DELETE' || deleting}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-red-tier text-white text-sm font-medium disabled:opacity-40 hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    {deleting && <Loader2 size={14} className="animate-spin" />}
+                    {deleting ? 'Sending...' : 'Send request'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

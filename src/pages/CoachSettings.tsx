@@ -1,8 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
+import {
+  requestAccountDeletion, deletionErrorCopy, DELETION_BUTTON_LABEL, DELETION_SUCCESS_COPY,
+} from '../lib/accountDeletionRequest'
 import { PageHeader } from '../components/PageHeader'
 import { Spinner } from '../components/Spinner'
 import { cn } from '../lib/utils'
@@ -73,6 +76,9 @@ export function CoachSettings() {
   // Delete
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleting, setDeleting]           = useState(false)
+  const [deleteDone, setDeleteDone]       = useState(false)
+  const [deleteError, setDeleteError]     = useState<string | null>(null)
+  const deleteInFlight = useRef(false)
 
   // Load profile data
   useEffect(() => {
@@ -161,15 +167,26 @@ export function CoachSettings() {
     navigate('/')
   }
 
-  // ── Delete account ──
+  // ── Request account deletion ──
+  // Emails privacy@romrx.io via the request-account-deletion edge function.
+  // Nothing is deleted or canceled here (the old subscription cancel was
+  // removed, FG-01). User stays signed in.
   async function handleDelete() {
-    if (deleteConfirm !== 'DELETE') return
+    if (deleteConfirm !== 'DELETE' || deleteDone || deleteInFlight.current) return
+    deleteInFlight.current = true
     setDeleting(true)
+    setDeleteError(null)
     try {
-      await supabase.from('users').update({ subscription_status: 'canceled' }).eq('id', user!.id)
-      await supabase.auth.signOut()
-      navigate('/')
-    } finally { setDeleting(false) }
+      const result = await requestAccountDeletion(
+        (name, opts) => supabase.functions.invoke(name, opts),
+        'romrxbodybuilding.com',
+      )
+      if (result.ok) setDeleteDone(true)
+      else setDeleteError(deletionErrorCopy(result.reason))
+    } finally {
+      deleteInFlight.current = false
+      setDeleting(false)
+    }
   }
 
   const isActive = ['active', 'trialing'].includes(profile?.subscription_status ?? '')
@@ -348,21 +365,30 @@ export function CoachSettings() {
             <p className="text-xs font-bold text-red-tier uppercase tracking-wide flex items-center gap-1.5">
               <Trash2 size={12} /> Danger Zone
             </p>
-            <p className="text-xs text-charcoal-light">
-              Deleting your account is permanent. All coach data, athlete connections, and teaching records will be removed.
-            </p>
-            <Field label='Type "DELETE" to confirm'>
-              <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
-                className={cn(inputCls, 'border-red-200 focus:border-red-tier')}
-                placeholder='DELETE' />
-            </Field>
-            <button
-              onClick={handleDelete}
-              disabled={deleteConfirm !== 'DELETE' || deleting}
-              className="flex items-center gap-2 text-sm font-semibold text-red-tier bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl transition-colors disabled:opacity-40"
-            >
-              <Trash2 size={14} /> {deleting ? 'Deleting...' : 'Delete Account'}
-            </button>
+            {deleteDone ? (
+              <p role="status" className="text-sm text-charcoal">{DELETION_SUCCESS_COPY}</p>
+            ) : (
+              <>
+                <p className="text-xs text-charcoal-light">
+                  This sends a deletion request to our privacy team. Nothing is deleted right away.
+                </p>
+                <Field label='Type "DELETE" to confirm'>
+                  <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
+                    className={cn(inputCls, 'border-red-200 focus:border-red-tier')}
+                    placeholder='DELETE' />
+                </Field>
+                {deleteError && (
+                  <p role="alert" className="text-sm text-red-tier">{deleteError}</p>
+                )}
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteConfirm !== 'DELETE' || deleting}
+                  className="flex items-center gap-2 text-sm font-semibold text-red-tier bg-red-50 hover:bg-red-100 px-4 py-2 rounded-xl transition-colors disabled:opacity-40"
+                >
+                  <Trash2 size={14} /> {deleting ? 'Sending...' : DELETION_BUTTON_LABEL}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </Section>
