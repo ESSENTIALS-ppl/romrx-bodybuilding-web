@@ -42,6 +42,8 @@ const inputCls = "w-full text-sm rounded-xl border border-teal-light bg-surface 
 const btnPrimary = "btn-primary text-sm px-5 py-2 flex items-center gap-2"
 const btnGhost = "text-sm px-4 py-2 rounded-xl border border-teal-light text-charcoal-light hover:text-charcoal hover:bg-surface transition-colors"
 
+const SHOW_NOTIFICATIONS = false
+
 export function CoachSettings() {
   const { user, signOut } = useAuth()
   const { profile, loading } = useProfile(user?.id)
@@ -294,7 +296,8 @@ export function CoachSettings() {
         </p>
       </Section>
 
-      {/* ── Notifications ── */}
+      {/* ── Notifications (hidden FG-04: no sender exists for Injury alerts or Team updates; restore when one ships) ── */}
+      {SHOW_NOTIFICATIONS && (
       <Section title="Notifications" icon={Bell}>
         <div className="space-y-3">
           {[
@@ -332,6 +335,7 @@ export function CoachSettings() {
           </button>
         </div>
       </Section>
+      )}
 
       {/* ── Support ── */}
       <Section title="Support" icon={HelpCircle}>
