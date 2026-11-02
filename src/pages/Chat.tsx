@@ -98,15 +98,53 @@ export function Chat() {
     loadAthletes()
   }, [isCoach, user])
 
+  // FG-38/FG-06: reopen the last ROMBot chat (one account-wide history, any app). Reads the user's own rows (RLS user_id = auth.uid()).
+  const [restoreDone, setRestoreDone] = useState(false)
+  const freshKey = user ? `romrx_rombot_fresh_${user.id}` : ''
   useEffect(() => {
-    if (messages.length === 0 && user && !profileLoading) {
+    if (!user) return
+    // A game plan hand-off (?gameplan=) starts its own message; do not restore over it.
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('gameplan')) { setRestoreDone(true); return }
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data: convo } = await supabase
+          .from('ai_conversations')
+          .select('id, updated_at')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        const clearedAt = Number(localStorage.getItem(freshKey) || 0)
+        if (convo && new Date(convo.updated_at).getTime() > clearedAt) {
+          const { data: rows } = await supabase
+            .from('ai_messages')
+            .select('role, content, created_at')
+            .eq('conversation_id', convo.id)
+            .order('created_at', { ascending: false })
+            .limit(50)
+          if (!cancelled && rows && rows.length > 0) {
+            setConvId(convo.id)
+            setMessages(rows.reverse()
+              .filter(r => r.role === 'user' || r.role === 'assistant')
+              .map(r => ({ role: r.role as 'user' | 'assistant', content: r.content as string })))
+          }
+        }
+      } catch { /* fall back to a fresh chat */ }
+      if (!cancelled) setRestoreDone(true)
+    })()
+    return () => { cancelled = true }
+  }, [user, freshKey])
+
+  useEffect(() => {
+    if (messages.length === 0 && user && !profileLoading && restoreDone) {
       const name = (profile?.full_name ?? 'there').split(' ')[0]
       const coachWelcome = isCoach
         ? `Hey ${name} \u2014 I'm ROMBot, your team intelligence assistant.\n\nI can see your athletes' ROM scores and training tiers. Ask me anything about your roster.\n\nNote: ROMBot provides educational information only and is not medical advice.`
         : `Hey ${name}, I'm ROMBot. I can see your ROM results (GREEN / YELLOW / RED) and your mobility priorities. Ask me anything:\n\u2022 "Which lifts give me the best stretch for my mobility?"\n\u2022 "Which joints should I work on first?"\n\u2022 "What do GREEN, YELLOW and RED mean for my lifts?"\n\nNote: ROMBot provides educational information only and is not medical advice. Consult a healthcare professional before changing your training if you have pain or injury.`
       setMessages([{ role: 'assistant', content: coachWelcome }])
     }
-  }, [user, profile, profileLoading, messages.length, isCoach])
+  }, [user, profile, profileLoading, messages.length, isCoach, restoreDone])
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
@@ -196,7 +234,7 @@ export function Chat() {
         subtitle={PROVIDERS.find(p => p.value === provider)?.label}
         action={
           <div className="flex gap-1">
-            <button onClick={() => { setMessages([]); setConvId(undefined) }}
+            <button onClick={() => { setMessages([]); setConvId(undefined); if (freshKey) localStorage.setItem(freshKey, String(Date.now())) }}
               className="p-2 rounded-xl hover:bg-red-tier-bg text-charcoal-light hover:text-red-tier transition-colors" title="Clear chat">
               <Trash2 size={15} />
             </button>
