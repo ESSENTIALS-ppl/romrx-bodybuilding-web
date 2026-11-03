@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import { PageHeader } from '../components/PageHeader'
 import { Spinner } from '../components/Spinner'
+import { RecentChats } from '../components/RecentChats'
 import { Send, Loader2, Trash2, Wand2 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
@@ -210,6 +211,7 @@ export function Chat() {
         title="ROMBot"
         action={
           <div className="flex gap-1">
+            <RecentChats accessToken={session?.access_token} onOpen={c => { setConvId(c.id); setMessages(c.messages) }} />
             <button onClick={() => { setMessages([]); setConvId(undefined); if (freshKey) localStorage.setItem(freshKey, String(Date.now())) }}
               className="p-2 rounded-xl hover:bg-red-tier-bg text-charcoal-light hover:text-red-tier transition-colors" title="Clear chat">
               <Trash2 size={15} />
