@@ -12,6 +12,7 @@
     "test:minimums": "node scripts/minimums-rescale.test.mjs",
     "test:coach-pause": "node scripts/coach-checkout-paused.test.mjs",
     "test:hip": "node scripts/hip-scored.test.mjs",
+    "test:color-movement": "node scripts/color-movement-derive.test.mjs",
     "test:bb-tier": "node scripts/bb-tier-picker.test.mjs",
     "test:export": "node scripts/export-my-data.test.mjs",
     "test:optin": "node scripts/reminder-opt-in.test.mjs"
