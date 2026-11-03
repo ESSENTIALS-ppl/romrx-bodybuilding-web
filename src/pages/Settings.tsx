@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { bbTierColor, bbTierLabel, cn } from '../lib/utils'
 import { FeedbackWidget } from '../components/FeedbackWidget'
+import { useHipFlexCutover } from '../lib/hipFlexCutover'
 import { computePRS, readinessBand } from '../lib/readiness'
 import { BAND_FULL } from '../lib/mobilityBands'
 
@@ -58,6 +59,7 @@ import { CoachSettings } from './CoachSettings'
 const SHOW_NOTIFICATIONS = false
 
 export function Settings() {
+  useHipFlexCutover() // re-render when the FG-36 cutover is read
   const { user } = useAuth()
   const isCoach = user?.user_metadata?.portal_role === 'coach' ||
                   (user?.app_metadata as Record<string,string> | undefined)?.portal_role === 'coach'

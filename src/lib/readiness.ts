@@ -3,6 +3,7 @@
 // (Steady, Building, Needs focus) as Base. The math lives in ./mobilityBands.ts, copied verbatim from
 // Base app/src/lib/mobilityBands.ts (with ./lumbarFlag.ts). Hip flexion is scored (target 120, FG-36).
 // Older assessments are not recomputed in storage: the score is derived from the saved joint values.
+import { hipFlexScoredFor } from './hipFlexCutoverState'
 import { mobilityScoreForAssessment, overallBandForAssessment, type BandScore } from './mobilityBands'
 
 export interface BilateralJoint { l: string; r: string; riskBelow: number; normalMin: number }
@@ -18,21 +19,12 @@ export const PRS_BILATERAL: readonly BilateralJoint[] = [
   { l: 'cervical_lat_l',  r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
 ]
 
-/**
- * FG-36 cutover (Avery, scoring_cutovers row hip_flex_scored, migration 20261103000000). Assessments saved before this moment keep
- * hip flexion UNSCORED, exactly as before (J4: past results are not recomputed). PLACEHOLDER = migration date. Avery gives the exact
- * timestamp at apply time; change this one constant to match.
- */
-export const HIP_FLEX_SCORED_AT = '2026-11-03T00:00:00Z'
-
-/** true when hip flexion counts for this assessment (saved at or after the cutover). */
+/** true when hip flexion counts for this assessment (see hipFlexCutoverState.ts: saved at or after scoring_cutovers.hip_flex_scored). */
 export function hipFlexScored(a: object): boolean {
-  const rec = a as Record<string, unknown>
-  const t = Date.parse(String(rec.assessed_at ?? rec.created_at ?? ''))
-  return !(Number.isFinite(t) && t < Date.parse(HIP_FLEX_SCORED_AT))
+  return hipFlexScoredFor(a)
 }
 
-function scoredView(a: object): object {
+export function scoredView(a: object): object {
   if (hipFlexScored(a)) return a
   const { hip_flex_l: _l, hip_flex_r: _r, ...rest } = a as Record<string, unknown>
   void _l; void _r

@@ -11,7 +11,7 @@ const src = (p) => readFileSync(join(ROOT, p), 'utf8');
 const tmp = mkdtempSync(join(tmpdir(), 'hipflex-'));
 async function load(rel) {
   const out0 = ts.transpileModule(src(rel), { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
-  const out = out0.replace(/from '\.\/(mobilityBands|lumbarFlag)'/g, "from './src_lib_$1.mjs'");
+  const out = out0.replace(/from '\.\/(mobilityBands|lumbarFlag|hipFlexCutoverState)'/g, "from './src_lib_$1.mjs'");
   const f = join(tmp, rel.replace(/[\/]/g, '_').replace(/\.ts$/, '.mjs'));
   writeFileSync(f, out);
   return import(pathToFileURL(f).href);
@@ -19,6 +19,10 @@ async function load(rel) {
 let n = 0; const ok = (name, fn) => { fn(); n++; console.log('ok', n, name); };
 const hip = await load('src/lib/hipFlex.ts');
 await load('src/lib/lumbarFlag.ts');
+const st = await load('src/lib/hipFlexCutoverState.ts');
+// The real cutover is read at runtime from scoring_cutovers; the test injects one.
+const CUT = Date.parse('2026-11-03T00:00:00Z');
+st.setHipFlexScoredAtMs(CUT);
 const mb = await load('src/lib/mobilityBands.ts');
 const rd = await load('src/lib/readiness.ts');
 
@@ -60,6 +64,17 @@ ok('J4: an assessment saved before the cutover keeps hip flexion unscored (not r
   assert.equal(rd.readinessBand(old), 3);
   assert.equal(rd.hipFlexScored(full), true);
 });
+ok('cutover unknown (row missing, table missing or signed out): everything is pre-cutover, even a brand new row', () => {
+  st.setHipFlexScoredAtMs(null);
+  try {
+    assert.equal(rd.hipFlexScored(full), false);
+    assert.equal(rd.computePRS({ ...full, hip_flex_l: 40, hip_flex_r: 40 }), 100);
+  } finally { st.setHipFlexScoredAtMs(CUT); }
+});
+ok('boundary: exactly at the cutover is scored, a second before is not', () => {
+  assert.equal(rd.hipFlexScored({ assessed_at: '2026-11-03T00:00:00Z' }), true);
+  assert.equal(rd.hipFlexScored({ assessed_at: '2026-11-02T23:59:59Z' }), false);
+});
 ok('pack score equals the Base function (mobilityScoreForAssessment) on the same row', () => {
   const row = { ...full, hip_er_l: 20, shoulder_flex_l: 120, ankle_df_r: 4 };
   assert.equal(rd.computePRS(row), mb.mobilityScoreForAssessment(row));
@@ -71,9 +86,16 @@ ok('lumbar is out of the overall (Base rule)', () => {
 
 // Source checks (pages)
 const B = src('src/pages/MyBody.tsx'), R = src('src/pages/ResultsPreview.tsx'), S = src('src/pages/Settings.tsx'), A = src('src/pages/Assessment.tsx');
-ok('my body: hip flexion is a normal scored bar, no Not scored row, nothing filtered out', () => {
-  assert.match(B, /hipFlexScored\(assessment\) && <JointBar label="Hip Flexion"[^>]*optimal=\{OPTIMAL\['Hip Flex'\]\}/);
+ok('my body: rows come from Base joint rows and Base targets, measured joints only, no lumbar, hip flexion hidden before the cutover', () => {
+  assert.match(B, /jointDisplayRowsForAssessment\(hipView\(assessment\)\)\s*\.filter\(r => !isLumbarKey\(r\.key\)\)/);
+  assert.match(B, /if \(pct == null\) return null/);
   assert.doesNotMatch(B, /NotScoredRow|HIP_FLEX_NOT_SCORED|withoutHipFlex/);
+  const hv = readFileSync(join(ROOT, 'src/lib/readiness.ts'), 'utf8');
+  assert.match(hv, /hipFlexScoredFor\(a\)/);
+  assert.doesNotMatch(hv, /HIP_FLEX_SCORED_AT\b/);
+});
+ok('the cutover is read from scoring_cutovers at runtime', () => {
+  assert.match(src('src/lib/hipFlexCutover.ts'), /from\('scoring_cutovers'\)\.select\('effective_at'\)\.eq\('key', 'hip_flex_scored'\)/);
 });
 ok('one shared score and band: pages import from readiness, bands come from Base labels, no old tier names', () => {
   for (const [name, s] of [['MyBody', B], ['ResultsPreview', R], ['Settings', S]]) {

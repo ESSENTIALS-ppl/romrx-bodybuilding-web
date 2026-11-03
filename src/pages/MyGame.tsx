@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile, type Assessment } from '../hooks/useProfile'
 import { PageHeader } from '../components/PageHeader'
+import { ColorMovement } from '../components/ColorMovement'
 import { SectionCard } from '../components/SectionCard'
 import { EmptyState } from '../components/EmptyState'
 import { Spinner } from '../components/Spinner'
@@ -246,6 +247,8 @@ export function MyGame() {
           </a>
         }
       />
+
+      <ColorMovement />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-miami-light overflow-x-auto scrollbar-none">
