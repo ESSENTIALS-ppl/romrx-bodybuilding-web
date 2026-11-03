@@ -8,24 +8,22 @@ import { Spinner } from '../components/Spinner'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { cn, bbTierColor, bbTierLabel, formatJoint } from '../lib/utils'
 import { AlertTriangle, Activity, TrendingUp } from 'lucide-react'
-import { computePRS } from '../lib/readiness'
-import { HipSidesNote } from '../components/HipSidesNote'
-import { HIP_FLEX_NOT_SCORED_CHIP, HIP_FLEX_NOT_SCORED_LINE, withoutHipFlex, withoutHipFlexReasons } from '../lib/hipFlex'
+import { computePRS, readinessBand } from '../lib/readiness'
+import { BAND_FULL } from '../lib/mobilityBands'
 
 // ── Position Readiness Score ──────────────────────────────────────────────────
 // computePRS lives in ../lib/readiness (hip flexion is not in the score).
 
-function getPRSTier(s: number) {
-  if (s >= 85) return { label: 'ELITE',      color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
-  if (s >= 70) return { label: 'NEAR TARGET', color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
-  if (s >= 55) return { label: 'BELOW TARGET', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
-  if (s >= 40) return { label: 'WELL BELOW TARGET', color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
-  return              { label: 'AT RISK',    color: 'text-red-tier',   bg: 'bg-red-tier-bg',     ring: 'border-red-tier/40' }
+function getPRSTier(a: object) {
+  // FG-37 J1: Base bands (Steady / Building / Needs focus) from the same worst-joint rule as Base mobilityBands.ts
+  const band = readinessBand(a)
+  if (band === 3) return { label: BAND_FULL[3],      color: 'text-miami',      bg: 'bg-miami-light',     ring: 'border-miami/40' }
+  if (band === 2) return { label: BAND_FULL[2], color: 'text-yellow-tier', bg: 'bg-yellow-tier-bg',  ring: 'border-yellow-tier/40' }
+  return { label: BAND_FULL[1],    color: 'text-red-tier',   bg: 'bg-red-tier-bg',     ring: 'border-red-tier/40' }
 }
 
 const OPTIMAL: Record<string, number> = {
-  // No hip flexion entry: it is saved for each leg and not scored (no bar, no %).
-  'Hip ER': 55, 'Hip IR': 40, 'Hip Abd': 50,
+  'Hip Flex': 120, 'Hip ER': 55, 'Hip IR': 40, 'Hip Abd': 50,
   'Shoulder ER': 80, 'Shoulder Flex': 165, 'Ankle DF': 15,
   'Lumbar Flex': 50, 'Lumbar Ext': 25,
   'Cervical Lat': 45, 'Cervical Flex': 55, 'Cervical Ext': 65,
@@ -84,25 +82,6 @@ function JointBar({ label, left, right, midline, optimal }: {
   )
 }
 
-// Hip flexion row: numbers for each leg, a "Not scored" chip, no bar and no %.
-function NotScoredRow({ label, left, right }: { label: string; left?: number | null; right?: number | null }) {
-  return (
-    <div className="flex items-start gap-3 py-2">
-      <div className="w-32 shrink-0">
-        <p className="text-xs font-medium text-charcoal">{label}</p>
-        <HipSidesNote left={left} right={right} className="text-xs text-charcoal-light mt-0.5" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <span className="inline-block text-xs font-semibold text-charcoal-light bg-gray-100 px-2 py-0.5 rounded-full">{HIP_FLEX_NOT_SCORED_CHIP}</span>
-        <p className="text-xs text-charcoal-light mt-1">{HIP_FLEX_NOT_SCORED_LINE}</p>
-      </div>
-      <div className="w-28 text-right shrink-0 text-xs text-charcoal-light">
-        {`L ${left ?? '-'}° / R ${right ?? '-'}°`}
-      </div>
-    </div>
-  )
-}
-
 export function MyBody() {
   const { user } = useAuth()
   const { profile, assessment, loading } = useProfile(user?.id)
@@ -121,10 +100,10 @@ export function MyBody() {
   const radarData = buildRadar(assessment)
   const bbTier = profile?.active_bb_tier ?? null
   const prs = computePRS(assessment)
-  const tier = getPRSTier(prs)
+  const tier = getPRSTier(assessment)
   // Older rows may still list hip flexion; it is never a priority joint or a red flag.
-  const priorityJoints = withoutHipFlex(assessment.worst_joints)
-  const redFlagReasons = withoutHipFlexReasons(assessment.red_flag_reasons)
+  const priorityJoints = (assessment.worst_joints ?? [])
+  const redFlagReasons = (assessment.red_flag_reasons ?? [])
 
   return (
     <div className="space-y-5">
@@ -213,7 +192,7 @@ export function MyBody() {
           <JointBar label="Hip ER"         left={assessment.hip_er_l}        right={assessment.hip_er_r}        optimal={OPTIMAL['Hip ER']} />
           <JointBar label="Hip IR"         left={assessment.hip_ir_l}        right={assessment.hip_ir_r}        optimal={OPTIMAL['Hip IR']} />
           <JointBar label="Hip Abduction"  left={assessment.hip_abd_l}       right={assessment.hip_abd_r}       optimal={OPTIMAL['Hip Abd']} />
-          <NotScoredRow label="Hip Flexion" left={assessment.hip_flex_l} right={assessment.hip_flex_r} />
+          <JointBar label="Hip Flexion"   left={assessment.hip_flex_l}       right={assessment.hip_flex_r}       optimal={OPTIMAL['Hip Flex']} />
           <JointBar label="Shoulder ER"    left={assessment.shoulder_er_l}   right={assessment.shoulder_er_r}   optimal={OPTIMAL['Shoulder ER']} />
           <JointBar label="Shoulder Flex"  left={assessment.shoulder_flex_l} right={assessment.shoulder_flex_r} optimal={OPTIMAL['Shoulder Flex']} />
           <JointBar label="Ankle DF"       left={assessment.ankle_df_l}      right={assessment.ankle_df_r}      optimal={OPTIMAL['Ankle DF']} />

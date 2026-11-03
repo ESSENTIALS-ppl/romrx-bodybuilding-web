@@ -1,10 +1,13 @@
-// Position Readiness Score (PRS), shared by My Body, Results preview and Settings (one copy, was three).
-// Hip flexion is NOT in the score: it is saved for each leg and not scored (see ./hipFlex.ts).
-// Everything else is unchanged: same thresholds, same deductions, same AT RISK / ELITE tiers on each page.
+// Readiness score for My Body, Results preview and Settings (FG-37 J1).
+// A sport pack is Base plus sport, so the pack shows the SAME /100 score and the SAME three bands
+// (Steady, Building, Needs focus) as Base. The math lives in ./mobilityBands.ts, copied verbatim from
+// Base app/src/lib/mobilityBands.ts (with ./lumbarFlag.ts). Hip flexion is scored (target 120, FG-36).
+// Older assessments are not recomputed in storage: the score is derived from the saved joint values.
+import { mobilityScoreForAssessment, overallBandForAssessment, type BandScore } from './mobilityBands'
 
 export interface BilateralJoint { l: string; r: string; riskBelow: number; normalMin: number }
-export interface MidlineJoint { key: string; riskBelow: number; normalMin: number }
 
+/** Joint pairs used only to list the biggest left/right gaps on the Results preview. */
 export const PRS_BILATERAL: readonly BilateralJoint[] = [
   { l: 'hip_er_l',        r: 'hip_er_r',        riskBelow: 40,  normalMin: 40  },
   { l: 'hip_ir_l',        r: 'hip_ir_r',        riskBelow: 30,  normalMin: 30  },
@@ -15,36 +18,12 @@ export const PRS_BILATERAL: readonly BilateralJoint[] = [
   { l: 'cervical_lat_l',  r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
 ]
 
-export const PRS_UNILATERAL: readonly MidlineJoint[] = [
-  { key: 'lumbar_flex',   riskBelow: 40, normalMin: 40 },
-  { key: 'lumbar_ext',    riskBelow: 15, normalMin: 20 },
-  { key: 'cervical_flex', riskBelow: 35, normalMin: 45 },
-  { key: 'cervical_ext',  riskBelow: 40, normalMin: 55 },
-]
+/** Base /100 score for one assessment (same function Base uses). */
+export function computePRS(a: object): number {
+  return mobilityScoreForAssessment(a)
+}
 
-type Row = Record<string, unknown>
-const num = (v: unknown): number | null => (v == null || v === '' || !Number.isFinite(Number(v)) ? null : Number(v))
-
-export function computePRS(a: Row | object): number {
-  const row = a as Row
-  let score = 100
-  for (const j of PRS_BILATERAL) {
-    const l = num(row[j.l]), r = num(row[j.r])
-    if (l != null && r != null) {
-      const minVal = Math.min(l, r)
-      const gap    = Math.abs(l - r)
-      if (minVal < j.riskBelow) score -= 8
-      else if (minVal < j.normalMin) score -= 4
-      if (gap >= 15) score -= 6
-      else if (gap >= 8) score -= 3
-    }
-  }
-  for (const j of PRS_UNILATERAL) {
-    const v = num(row[j.key])
-    if (v != null) {
-      if (v < j.riskBelow) score -= 6
-      else if (v < j.normalMin) score -= 3
-    }
-  }
-  return Math.max(0, Math.min(100, Math.round(score)))
+/** Base band for one assessment: worst scored joint, 3 Steady, 2 Building, 1 Needs focus. */
+export function readinessBand(a: object): BandScore {
+  return overallBandForAssessment(a) ?? 3
 }
