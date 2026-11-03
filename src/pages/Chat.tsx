@@ -3,9 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import { PageHeader } from '../components/PageHeader'
-import { SectionCard } from '../components/SectionCard'
 import { Spinner } from '../components/Spinner'
-import { Send, Loader2, Settings, Trash2, Wand2 } from 'lucide-react'
+import { Send, Loader2, Trash2, Wand2 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { supabase, SUPABASE_URL, SUPABASE_ANON } from '../lib/supabase'
 
@@ -27,13 +26,6 @@ const STYLE_LABELS: Record<string, string> = {
 const AI_CHAT_URL = `${SUPABASE_URL}/functions/v1/ai-chat`
 
 interface Message { role: 'user' | 'assistant'; content: string }
-const PROVIDERS = [
-  { value: 'rombot',     label: 'ROMBot (included)' },
-  { value: 'openai',     label: 'OpenAI (BYOK)' },
-  { value: 'anthropic',  label: 'Anthropic (BYOK)' },
-  { value: 'google',     label: 'Google Gemini (BYOK)' },
-  { value: 'perplexity', label: 'Perplexity (BYOK)' },
-]
 
 
 
@@ -53,20 +45,12 @@ export function Chat() {
   const [input, setInput]                   = useState('')
   const [busy, setBusy]                     = useState(false)
   const [convId, setConvId]                 = useState<string | undefined>()
-  const [showSettings, setShowSettings]     = useState(false)
-  const [provider, setProvider]             = useState('rombot')
-  const [providerKey, setProviderKey]       = useState('')
   const [error, setError]                   = useState('')
   const [gamePlanBanner, setGamePlanBanner] = useState<string | null>(null)
   const autoSentRef = useRef(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   const isCoach = profile?.portal_role === 'coach'
-
-  useEffect(() => {
-    const saved = localStorage.getItem('romrx_provider_pref')
-    if (saved) { const p = JSON.parse(saved); setProvider(p.provider ?? 'rombot'); setProviderKey(p.key ?? '') }
-  }, [])
 
   // Load athlete roster for coach
   useEffect(() => {
@@ -174,7 +158,7 @@ export function Chat() {
         const res = await fetch(AI_CHAT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}`, 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({ message: msg, sport: 'bodybuilding', provider, provider_key: providerKey }),
+          body: JSON.stringify({ message: msg, sport: 'bodybuilding' }),
         })
         const data = await res.json()
         if (data.error) throw new Error(data.error)
@@ -197,8 +181,6 @@ export function Chat() {
         message: msg,
         conversation_id: convId,
         sport: 'bodybuilding',
-        provider,
-        provider_key: providerKey,
       }
       // Coach mode: roster-level context is loaded server-side automatically
       const res = await fetch(AI_CHAT_URL, {
@@ -219,11 +201,6 @@ export function Chat() {
     } finally { setBusy(false) }
   }
 
-  const savePrefs = () => {
-    localStorage.setItem('romrx_provider_pref', JSON.stringify({ provider, key: providerKey }))
-    setShowSettings(false)
-  }
-
   if (profileLoading) return <Spinner />
 
 
@@ -231,43 +208,15 @@ export function Chat() {
     <div className="flex flex-col" style={{ height: 'calc(100vh - 7rem)' }}>
       <PageHeader
         title="ROMBot"
-        subtitle={PROVIDERS.find(p => p.value === provider)?.label}
         action={
           <div className="flex gap-1">
             <button onClick={() => { setMessages([]); setConvId(undefined); if (freshKey) localStorage.setItem(freshKey, String(Date.now())) }}
               className="p-2 rounded-xl hover:bg-red-tier-bg text-charcoal-light hover:text-red-tier transition-colors" title="Clear chat">
               <Trash2 size={15} />
             </button>
-            <button onClick={() => setShowSettings(s => !s)}
-              className="p-2 rounded-xl hover:bg-miami-light text-charcoal-light hover:text-miami transition-colors" title="Settings">
-              <Settings size={15} />
-            </button>
           </div>
         }
       />
-
-      {showSettings && (
-        <SectionCard className="mb-4">
-          <div className="space-y-3">
-            <p className="text-xs bg-miami-light text-miami rounded-xl px-3 py-2">
-              ROMBot (GPT-4o-mini) is included free. Use your own key for other models.
-            </p>
-            <select value={provider} onChange={e => setProvider(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-miami-light bg-surface text-sm focus:outline-none focus:border-miami">
-              {PROVIDERS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
-            </select>
-            {provider !== 'rombot' && (
-              <input type="password" value={providerKey} onChange={e => setProviderKey(e.target.value)}
-                placeholder="API key..."
-                className="w-full px-3 py-2 rounded-xl border border-miami-light bg-surface text-sm font-mono focus:outline-none focus:border-miami" />
-            )}
-            <div className="flex gap-2">
-              <button onClick={savePrefs} className="btn-primary flex-1 py-2 text-sm">Save</button>
-              <button onClick={() => setShowSettings(false)} className="flex-1 py-2 text-sm rounded-xl border border-miami-light text-charcoal-light hover:bg-surface">Cancel</button>
-            </div>
-          </div>
-        </SectionCard>
-      )}
 
       {/* Coach team context badge */}
       {isCoach && (
