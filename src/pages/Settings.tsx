@@ -5,7 +5,9 @@ import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import type { Assessment } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
-import { requestMyDataExport, saveJsonDownload, EXPORT_BUTTON_LABEL, EXPORT_ERROR_COPY } from '../lib/exportMyData'
+import { reminderStateFromRow, saveReminderChanges, REMINDER_MARKER_COLUMNS, NO_REMINDERS, type ReminderState } from '../lib/reminderOptIn'
+import { loadDeletionStatus, DELETION_STATUS_COPY, type DeletionStatus } from '../lib/deletionStatus'
+import { requestMyDataExport, saveJsonDownload, exportErrorCopy, EXPORT_BUTTON_LABEL } from '../lib/exportMyData'
 import {
   requestAccountDeletion, deletionErrorCopy, DELETION_BUTTON_LABEL, DELETION_SUCCESS_COPY,
 } from '../lib/accountDeletionRequest'
@@ -62,6 +64,8 @@ const SHOW_NOTIFICATIONS = false
 const SHOW_PUSH = false
 // FG-13: "Export my data" stays hidden until the export-my-data function flag is on and Jim approves the wording.
 const SHOW_EXPORT_MY_DATA = false
+// FG-21: show the deletion request status (new copy, NEEDS JIM WORDING). Off: nothing is read or shown.
+const SHOW_DELETION_STATUS = false
 
 export function Settings() {
   useHipFlexCutover() // re-render when the FG-36 cutover is read
@@ -128,7 +132,7 @@ function AthleteSettings() {
   const [pushReminders, setPushReminders]     = useState(false)
   const [reminderTime, setReminderTime]       = useState('08:00')
   const [pushLoading, setPushLoading]         = useState(false)
-  const [retestReminders, setRetestReminders] = useState(true)
+  const [retestReminders, setRetestReminders] = useState(false)
   const [weeklyDigest, setWeeklyDigest]       = useState(false)
   const [exportBusy, setExportBusy]           = useState(false)
   const [exportErr, setExportErr]             = useState<string | null>(null)
@@ -142,6 +146,9 @@ function AthleteSettings() {
   const [deleteDone, setDeleteDone] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   const deleteInFlight = useRef(false)
+  const [deletionStatus, setDeletionStatus] = useState<DeletionStatus | null>(null)
+  // What the database holds for the three reminder switches (ON = toggle AND server-set opt-in marker). Save only calls set_reminder_opt_in for switches that changed.
+  const reminderBaseline = useRef<ReminderState>(NO_REMINDERS)
 
   // ── Sync profile → local state ──
   useEffect(() => {
@@ -205,17 +212,22 @@ function AthleteSettings() {
     if (!user) return
     async function loadNotifPrefs() {
       setNotifLoading(true)
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('notification_preferences')
-        .select('email_reminders, push_reminders, reminder_time, timezone, retest_reminders, weekly_digest')
+        .select(`email_reminders, push_reminders, reminder_time, timezone, retest_reminders, weekly_digest, ${REMINDER_MARKER_COLUMNS}`)
         .eq('user_id', user!.id)
         .maybeSingle()
-      if (data) {
-        setEmailReminders(data.email_reminders ?? false)
+      if (error) {
+        // Could not read the saved settings: change nothing (never write defaults over settings we could not read).
+        setNotifErr('Could not load your reminder settings.')
+      } else if (data) {
+        const shown = reminderStateFromRow(data)
+        reminderBaseline.current = shown
+        setEmailReminders(shown.protocol)
         setPushReminders(data.push_reminders ?? false)
         setReminderTime(data.reminder_time ?? '08:00')
-        setRetestReminders(data.retest_reminders !== false)
-        setWeeklyDigest(!!data.weekly_digest)
+        setRetestReminders(shown.retest)
+        setWeeklyDigest(shown.digest)
       } else {
         // First load — upsert defaults
         await supabase.from('notification_preferences').upsert(
@@ -237,28 +249,44 @@ function AthleteSettings() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
+  // ── FG-21: deletion request status (only when SHOW_DELETION_STATUS) ──
+  useEffect(() => {
+    if (!SHOW_DELETION_STATUS || !user) return
+    let live = true
+    loadDeletionStatus((t) => supabase.from(t) as never).then((s) => { if (live) setDeletionStatus(s) })
+    return () => { live = false }
+  }, [user, deleteDone])
+
   // ── Save notification settings ──
   const handleSaveNotifications = async () => {
     if (!user) return
     setNotifSaving(true)
     setNotifErr(null)
+    // The three email reminder switches are NOT part of this upsert: a plain save can never opt anyone in. They go through set_reminder_opt_in (below).
     const { error } = await supabase
       .from('notification_preferences')
       .upsert(
         {
           user_id: user.id,
-          email_reminders: emailReminders,
           push_reminders: pushReminders,
           reminder_time: reminderTime,
           timezone: browserTimezone,
-          retest_reminders: retestReminders,
-          weekly_digest: weeklyDigest,
         },
         { onConflict: 'user_id' }
       )
+    let failure: string | null = error ? error.message : null
+    if (!failure) {
+      const r = await saveReminderChanges(
+        (fn, args) => supabase.rpc(fn, args),
+        reminderBaseline.current,
+        { retest: retestReminders, protocol: emailReminders, digest: weeklyDigest },
+      )
+      reminderBaseline.current = r.applied
+      if (!r.ok) failure = r.message
+    }
     setNotifSaving(false)
-    if (error) {
-      setNotifErr(error.message)
+    if (failure) {
+      setNotifErr(failure)
     } else {
       setNotifSaved(true)
       setTimeout(() => setNotifSaved(false), 2500)
@@ -313,7 +341,7 @@ function AthleteSettings() {
     setExportErr(null)
     const r = await requestMyDataExport((name, opts) => supabase.functions.invoke(name, opts))
     if (r.ok) saveJsonDownload(r.filename, r.json)
-    else setExportErr(EXPORT_ERROR_COPY)
+    else setExportErr(exportErrorCopy(r.reason))
     setExportBusy(false)
   }
 
@@ -1173,6 +1201,9 @@ function AthleteSettings() {
 
             <div className="border-t border-red-100 pt-3">
               <p className="text-xs text-charcoal-light mb-2">Danger zone</p>
+              {SHOW_DELETION_STATUS && deletionStatus && (
+                <p role="status" className="text-xs text-charcoal mb-2">{DELETION_STATUS_COPY[deletionStatus]}</p>
+              )}
               <button
                 onClick={() => setShowDelete(true)}
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-tier-bg border border-red-200 text-sm font-medium text-red-tier hover:bg-red-100 transition-colors"
