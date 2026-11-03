@@ -186,7 +186,7 @@ export function MyBody() {
         </SectionCard>
       </div>
 
-      <SectionCard title="Joint Breakdown" subtitle="Worse side shown - % of your Base target">
+      <SectionCard title="Joint Breakdown" subtitle="Worse side shown: % of your Base target">
         <div className="divide-y divide-miami-light/60">
           {jointDisplayRowsForAssessment(hipView(assessment))
             .filter(r => !isLumbarKey(r.key))
