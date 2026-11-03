@@ -928,7 +928,7 @@ function AthleteSettings() {
         {/* ── FEEDBACK ── */}
         <Section title="Feedback" icon={<MessageSquarePlus size={14} />}>
           <p className="text-xs text-charcoal-light -mt-2">
-            Found a bug or have an idea? Tell us directly — it comes straight to the team.
+            Found a bug or have an idea? Tell us directly - it comes straight to the team.
           </p>
           <FeedbackWidget />
         </Section>
