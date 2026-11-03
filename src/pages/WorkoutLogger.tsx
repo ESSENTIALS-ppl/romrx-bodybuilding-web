@@ -410,7 +410,7 @@ export function WorkoutLogger() {
                   <th className="text-left pb-2 w-12">Type</th>
                   <th className="text-left pb-2">Weight ({unit})</th>
                   <th className="text-left pb-2">Reps</th>
-                  <th className="text-left pb-2" title="Reps in reserve - how many reps you left in the tank">RIR</th>
+                  <th className="text-left pb-2" title="Reps in reserve: how many reps you left in the tank">RIR</th>
                   <th className="text-left pb-2">RPE</th>
                   <th className="text-left pb-2 w-12"></th>
                   <th className="text-left pb-2 w-8"></th>
@@ -439,7 +439,7 @@ export function WorkoutLogger() {
                           updateSet(bi, si, { set_type: nextType, saved: false })
                         }}
                         disabled={s.saved}
-                        title={SET_TYPE_META[s.set_type].label + ' - tap to change'}
+                        title={SET_TYPE_META[s.set_type].label + ': tap to change'}
                         className={cn(
                           'px-1.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide min-w-[28px]',
                           SET_TYPE_META[s.set_type].cls,

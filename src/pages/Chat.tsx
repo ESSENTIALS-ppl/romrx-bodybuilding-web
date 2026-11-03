@@ -125,7 +125,7 @@ export function Chat() {
     if (messages.length === 0 && user && !profileLoading && restoreDone) {
       const name = (profile?.full_name ?? 'there').split(' ')[0]
       const coachWelcome = isCoach
-        ? `Hey ${name} \u2014 I'm ROMBot, your team intelligence assistant.\n\nI can see your athletes' ROM scores and training tiers. Ask me anything about your roster.\n\nNote: ROMBot provides educational information only and is not medical advice.`
+        ? `Hey ${name}, I'm ROMBot, your team intelligence assistant.\n\nI can see your athletes' ROM scores and training tiers. Ask me anything about your roster.\n\nNote: ROMBot provides educational information only and is not medical advice.`
         : `Hey ${name}, I'm ROMBot. I can see your ROM results (GREEN / YELLOW / RED) and your mobility priorities. Ask me anything:\n\u2022 "Which lifts give me the best stretch for my mobility?"\n\u2022 "Which joints should I work on first?"\n\u2022 "What do GREEN, YELLOW and RED mean for my lifts?"\n\nNote: ROMBot provides educational information only and is not medical advice. Consult a healthcare professional before changing your training if you have pain or injury.`
       setMessages([{ role: 'assistant', content: coachWelcome }])
     }
@@ -224,7 +224,7 @@ export function Chat() {
       {isCoach && (
         <div className="flex items-center gap-2 bg-miami-light border border-miami/20 rounded-xl px-3 py-2 mb-2">
           <span className="text-xs font-medium text-miami flex-1">
-            Team mode - ROMBot has full access to all your athletes' ROM profiles and technique readiness
+            Team mode: ROMBot has full access to all your athletes' ROM profiles and technique readiness
           </span>
         </div>
       )}
@@ -242,7 +242,7 @@ export function Chat() {
       {/* Disclaimer banner */}
       <div className="flex items-start gap-2 bg-surface border border-miami-light rounded-xl px-3 py-2 mb-2">
         <span className="text-xs text-charcoal-light leading-relaxed">
-          <span className="font-semibold text-charcoal">Educational use only.</span> ROMBot is not medical advice - consult a healthcare professional for pain or injury, and a qualified coach before attempting new lifts.
+          <span className="font-semibold text-charcoal">Educational use only.</span> ROMBot is not medical advice. Consult a healthcare professional for pain or injury, and a qualified coach before attempting new lifts.
         </span>
       </div>
 

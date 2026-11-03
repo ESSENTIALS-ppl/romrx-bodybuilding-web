@@ -182,7 +182,7 @@ export function ResultsPreview() {
               <p className="text-xs text-miami-text/60">lift ratings, full protocol, ROMBot</p>
             </div>
           </div>
-          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game - Lift Readiness</p>
+          <p className="text-xs font-bold text-miami uppercase tracking-wide mb-2">My Game: Lift Readiness</p>
           <div className="flex gap-2">
             <span className="text-xs bg-miami/20 text-miami px-3 py-1 rounded-full font-bold">GREEN</span>
             <span className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full font-bold">YELLOW</span>
@@ -190,7 +190,7 @@ export function ResultsPreview() {
           </div>
           <p className="text-xs text-miami-text/40">Readiness colors compare your range of motion to what a lift needs. They are not medical clearance and do not say whether a move is safe for you.</p>
           <div className="space-y-2">
-            {['My Protocol - Top 3 Priority Joints', 'My Game - Exercise Library + Program Generator', 'ROMBot - Ask about your ROM results'].map(item => (
+            {['My Protocol: Top 3 Priority Joints', 'My Game: Exercise Library + Program Generator', 'ROMBot: Ask about your ROM results'].map(item => (
               <div key={item} className="flex items-center gap-2">
                 <CheckCircle size={14} className="text-miami/40" />
                 <span className="text-sm text-miami-text/40 blur-sm select-none">{item}</span>
