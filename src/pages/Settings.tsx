@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import type { Assessment } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
+import { requestMyDataExport, saveJsonDownload, EXPORT_BUTTON_LABEL, EXPORT_ERROR_COPY } from '../lib/exportMyData'
 import {
   requestAccountDeletion, deletionErrorCopy, DELETION_BUTTON_LABEL, DELETION_SUCCESS_COPY,
 } from '../lib/accountDeletionRequest'
@@ -57,6 +58,10 @@ import { CoachSettings } from './CoachSettings'
 // Router: coaches get CoachSettings, athletes get AthleteSettings
 // MUST be a separate component so hook call order is never violated
 const SHOW_NOTIFICATIONS = false
+// FG-12: browser push toggle stays hidden until a push sender exists and VITE_VAPID_PUBLIC_KEY is set.
+const SHOW_PUSH = false
+// FG-13: "Export my data" stays hidden until the export-my-data function flag is on and Jim approves the wording.
+const SHOW_EXPORT_MY_DATA = false
 
 export function Settings() {
   useHipFlexCutover() // re-render when the FG-36 cutover is read
@@ -123,6 +128,10 @@ function AthleteSettings() {
   const [pushReminders, setPushReminders]     = useState(false)
   const [reminderTime, setReminderTime]       = useState('08:00')
   const [pushLoading, setPushLoading]         = useState(false)
+  const [retestReminders, setRetestReminders] = useState(true)
+  const [weeklyDigest, setWeeklyDigest]       = useState(false)
+  const [exportBusy, setExportBusy]           = useState(false)
+  const [exportErr, setExportErr]             = useState<string | null>(null)
   const [pushMsg, setPushMsg]                 = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
@@ -198,13 +207,15 @@ function AthleteSettings() {
       setNotifLoading(true)
       const { data } = await supabase
         .from('notification_preferences')
-        .select('email_reminders, push_reminders, reminder_time, timezone')
+        .select('email_reminders, push_reminders, reminder_time, timezone, retest_reminders, weekly_digest')
         .eq('user_id', user!.id)
         .maybeSingle()
       if (data) {
         setEmailReminders(data.email_reminders ?? false)
         setPushReminders(data.push_reminders ?? false)
         setReminderTime(data.reminder_time ?? '08:00')
+        setRetestReminders(data.retest_reminders !== false)
+        setWeeklyDigest(!!data.weekly_digest)
       } else {
         // First load — upsert defaults
         await supabase.from('notification_preferences').upsert(
@@ -213,6 +224,8 @@ function AthleteSettings() {
             email_reminders: false,
             push_reminders: false,
             reminder_time: '08:00',
+            retest_reminders: true,
+            weekly_digest: false,
             timezone: browserTimezone,
           },
           { onConflict: 'user_id' }
@@ -238,6 +251,8 @@ function AthleteSettings() {
           push_reminders: pushReminders,
           reminder_time: reminderTime,
           timezone: browserTimezone,
+          retest_reminders: retestReminders,
+          weekly_digest: weeklyDigest,
         },
         { onConflict: 'user_id' }
       )
@@ -290,6 +305,16 @@ function AthleteSettings() {
     } finally {
       setPushLoading(false)
     }
+  }
+
+  // ── Export my data (FG-13, hidden behind SHOW_EXPORT_MY_DATA) ──
+  const handleExportMyData = async () => {
+    setExportBusy(true)
+    setExportErr(null)
+    const r = await requestMyDataExport((name, opts) => supabase.functions.invoke(name, opts))
+    if (r.ok) saveJsonDownload(r.filename, r.json)
+    else setExportErr(EXPORT_ERROR_COPY)
+    setExportBusy(false)
   }
 
   // ── Save profile (SECURITY DEFINER RPC — bypasses RLS) ──
@@ -942,7 +967,57 @@ function AthleteSettings() {
                 )}
               </div>
 
-              {/* Push notifications toggle */}
+              {/* FG-09/FG-11 toggles. Copy reused from the Base app; NEEDS JIM WORDING review (Stacy). Hidden with SHOW_NOTIFICATIONS. */}
+              {/* Retest reminders toggle */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-charcoal">Retest reminders</p>
+                  <p className="text-xs text-charcoal-light mt-0.5">Prompt to retake your assessment every 42 days</p>
+                </div>
+                <button
+                  role="switch"
+                  aria-checked={retestReminders}
+                  onClick={() => setRetestReminders(v => !v)}
+                  className={cn(
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-miami focus:ring-offset-2',
+                    retestReminders ? 'bg-miami' : 'bg-charcoal-light/30'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                      retestReminders ? 'translate-x-6' : 'translate-x-1'
+                    )}
+                  />
+                </button>
+              </div>
+
+              {/* Weekly progress digest toggle */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-charcoal">Weekly progress digest</p>
+                  <p className="text-xs text-charcoal-light mt-0.5">Sunday summary of PRS trend and streak</p>
+                </div>
+                <button
+                  role="switch"
+                  aria-checked={weeklyDigest}
+                  onClick={() => setWeeklyDigest(v => !v)}
+                  className={cn(
+                    'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-miami focus:ring-offset-2',
+                    weeklyDigest ? 'bg-miami' : 'bg-charcoal-light/30'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
+                      weeklyDigest ? 'translate-x-6' : 'translate-x-1'
+                    )}
+                  />
+                </button>
+              </div>
+
+              {/* Push notifications toggle (FG-12, hidden by SHOW_PUSH) */}
+              {SHOW_PUSH && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div>
@@ -992,6 +1067,8 @@ function AthleteSettings() {
                   </div>
                 )}
               </div>
+
+              )}
 
               {/* Protocol schedule reference */}
               <div className="rounded-xl bg-surface border border-miami-light/60 px-4 py-3 space-y-1.5">
@@ -1080,6 +1157,19 @@ function AthleteSettings() {
                 <ChevronRight size={14} className="text-charcoal-light" />
               </button>
             </div>
+
+            {SHOW_EXPORT_MY_DATA && (
+              <div className="border-t border-miami-light pt-3 space-y-2">
+                <button
+                  onClick={handleExportMyData}
+                  disabled={exportBusy}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-surface border border-miami-light text-sm font-medium text-charcoal hover:bg-miami-light transition-colors disabled:opacity-50"
+                >
+                  <span className="flex-1 text-left">{exportBusy ? 'Preparing...' : EXPORT_BUTTON_LABEL}</span>
+                </button>
+                {exportErr && <p className="text-xs text-red-tier">{exportErr}</p>}
+              </div>
+            )}
 
             <div className="border-t border-red-100 pt-3">
               <p className="text-xs text-charcoal-light mb-2">Danger zone</p>
