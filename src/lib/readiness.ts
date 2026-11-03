@@ -18,12 +18,33 @@ export const PRS_BILATERAL: readonly BilateralJoint[] = [
   { l: 'cervical_lat_l',  r: 'cervical_lat_r',  riskBelow: 30,  normalMin: 40  },
 ]
 
+/**
+ * FG-36 cutover (Avery, scoring_cutovers row hip_flex_scored, migration 20261103000000). Assessments saved before this moment keep
+ * hip flexion UNSCORED, exactly as before (J4: past results are not recomputed). PLACEHOLDER = migration date. Avery gives the exact
+ * timestamp at apply time; change this one constant to match.
+ */
+export const HIP_FLEX_SCORED_AT = '2026-11-03T00:00:00Z'
+
+/** true when hip flexion counts for this assessment (saved at or after the cutover). */
+export function hipFlexScored(a: object): boolean {
+  const rec = a as Record<string, unknown>
+  const t = Date.parse(String(rec.assessed_at ?? rec.created_at ?? ''))
+  return !(Number.isFinite(t) && t < Date.parse(HIP_FLEX_SCORED_AT))
+}
+
+function scoredView(a: object): object {
+  if (hipFlexScored(a)) return a
+  const { hip_flex_l: _l, hip_flex_r: _r, ...rest } = a as Record<string, unknown>
+  void _l; void _r
+  return rest
+}
+
 /** Base /100 score for one assessment (same function Base uses). */
 export function computePRS(a: object): number {
-  return mobilityScoreForAssessment(a)
+  return mobilityScoreForAssessment(scoredView(a))
 }
 
 /** Base band for one assessment: worst scored joint, 3 Steady, 2 Building, 1 Needs focus. */
 export function readinessBand(a: object): BandScore {
-  return overallBandForAssessment(a) ?? 3
+  return overallBandForAssessment(scoredView(a)) ?? 3
 }

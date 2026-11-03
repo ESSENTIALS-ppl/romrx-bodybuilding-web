@@ -8,7 +8,7 @@ import { Spinner } from '../components/Spinner'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { cn, bbTierColor, bbTierLabel, formatJoint } from '../lib/utils'
 import { AlertTriangle, Activity, TrendingUp } from 'lucide-react'
-import { computePRS, readinessBand } from '../lib/readiness'
+import { computePRS, readinessBand, hipFlexScored } from '../lib/readiness'
 import { BAND_FULL } from '../lib/mobilityBands'
 
 // ── Position Readiness Score ──────────────────────────────────────────────────
@@ -192,7 +192,7 @@ export function MyBody() {
           <JointBar label="Hip ER"         left={assessment.hip_er_l}        right={assessment.hip_er_r}        optimal={OPTIMAL['Hip ER']} />
           <JointBar label="Hip IR"         left={assessment.hip_ir_l}        right={assessment.hip_ir_r}        optimal={OPTIMAL['Hip IR']} />
           <JointBar label="Hip Abduction"  left={assessment.hip_abd_l}       right={assessment.hip_abd_r}       optimal={OPTIMAL['Hip Abd']} />
-          <JointBar label="Hip Flexion"   left={assessment.hip_flex_l}       right={assessment.hip_flex_r}       optimal={OPTIMAL['Hip Flex']} />
+          {hipFlexScored(assessment) && <JointBar label="Hip Flexion"   left={assessment.hip_flex_l}       right={assessment.hip_flex_r}       optimal={OPTIMAL['Hip Flex']} />}
           <JointBar label="Shoulder ER"    left={assessment.shoulder_er_l}   right={assessment.shoulder_er_r}   optimal={OPTIMAL['Shoulder ER']} />
           <JointBar label="Shoulder Flex"  left={assessment.shoulder_flex_l} right={assessment.shoulder_flex_r} optimal={OPTIMAL['Shoulder Flex']} />
           <JointBar label="Ankle DF"       left={assessment.ankle_df_l}      right={assessment.ankle_df_r}      optimal={OPTIMAL['Ankle DF']} />

@@ -39,7 +39,7 @@ ok('the not scored copy and filters are gone from hipFlex.ts', () => {
 ok('Base band labels are used verbatim', () => {
   assert.deepEqual({ ...mb.BAND_FULL }, { 1: 'Needs focus', 2: 'Building', 3: 'Steady' });
 });
-const full = { hip_er_l: 30, hip_er_r: 30, hip_ir_l: 30, hip_ir_r: 30, hip_abd_l: 45, hip_abd_r: 45, hip_flex_l: 125, hip_flex_r: 125,
+const full = { assessed_at: '2026-11-05T12:00:00Z', hip_er_l: 30, hip_er_r: 30, hip_ir_l: 30, hip_ir_r: 30, hip_abd_l: 45, hip_abd_r: 45, hip_flex_l: 125, hip_flex_r: 125,
   shoulder_er_l: 90, shoulder_er_r: 90, shoulder_flex_l: 150, shoulder_flex_r: 150, ankle_df_l: 7, ankle_df_r: 7,
   cervical_lat_l: 40, cervical_lat_r: 40, cervical_flex: 45, cervical_ext: 50 };
 ok('everything at or above target is 100 and Steady', () => {
@@ -53,6 +53,13 @@ ok('hip flexion is scored: it moves the /100 and the band', () => {
   assert.equal(rd.readinessBand(low), 1);
   assert.equal(rd.readinessBand({ ...full, hip_flex_l: 110, hip_flex_r: 125 }), 2);
 });
+ok('J4: an assessment saved before the cutover keeps hip flexion unscored (not recomputed)', () => {
+  const old = { ...full, assessed_at: '2026-10-20T12:00:00Z', hip_flex_l: 40, hip_flex_r: 40 };
+  assert.equal(rd.hipFlexScored(old), false);
+  assert.equal(rd.computePRS(old), 100);
+  assert.equal(rd.readinessBand(old), 3);
+  assert.equal(rd.hipFlexScored(full), true);
+});
 ok('pack score equals the Base function (mobilityScoreForAssessment) on the same row', () => {
   const row = { ...full, hip_er_l: 20, shoulder_flex_l: 120, ankle_df_r: 4 };
   assert.equal(rd.computePRS(row), mb.mobilityScoreForAssessment(row));
@@ -65,7 +72,7 @@ ok('lumbar is out of the overall (Base rule)', () => {
 // Source checks (pages)
 const B = src('src/pages/MyBody.tsx'), R = src('src/pages/ResultsPreview.tsx'), S = src('src/pages/Settings.tsx'), A = src('src/pages/Assessment.tsx');
 ok('my body: hip flexion is a normal scored bar, no Not scored row, nothing filtered out', () => {
-  assert.match(B, /<JointBar label="Hip Flexion"[^>]*optimal=\{OPTIMAL\['Hip Flex'\]\}/);
+  assert.match(B, /hipFlexScored\(assessment\) && <JointBar label="Hip Flexion"[^>]*optimal=\{OPTIMAL\['Hip Flex'\]\}/);
   assert.doesNotMatch(B, /NotScoredRow|HIP_FLEX_NOT_SCORED|withoutHipFlex/);
 });
 ok('one shared score and band: pages import from readiness, bands come from Base labels, no old tier names', () => {
