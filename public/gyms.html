@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>For Gyms | ROMRxBodyBuilding™</title>
-  <meta name="description" content="Equip every gym member with a Gym Readiness Profile. Coming soon — join the waitlist for early access.">
+  <meta name="description" content="Equip every gym member with a Gym Readiness Profile. Coming soon.">
   <link rel="canonical" href="https://romrxbodybuilding.com/gyms">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,39 +88,6 @@
     }
     .pitch p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; }
 
-    .waitlist { max-width: 500px; margin: 32px auto 0; }
-    .waitlist-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: var(--text-muted); margin-bottom: 14px;
-    }
-    .wl-form {
-      display: flex; gap: 0;
-      border: 1px solid rgba(180,79,232,0.4);
-      border-radius: 4px; overflow: hidden;
-    }
-    .wl-input {
-      flex: 1; background: rgba(255,255,255,0.04); border: none;
-      padding: 14px 18px; color: var(--text);
-      font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none;
-    }
-    .wl-input::placeholder { color: rgba(240,237,232,0.3); }
-    .wl-btn {
-      background: var(--violet); color: #fff; border: none;
-      padding: 14px 28px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.1rem; letter-spacing: 2px; cursor: pointer;
-      transition: background 0.2s; white-space: nowrap;
-    }
-    .wl-btn:hover { background: #c468f0; }
-    .wl-success {
-      display: none; padding: 14px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 1.1rem; font-weight: 700;
-      letter-spacing: 2px; color: var(--violet);
-    }
-    .wl-note { font-size: 0.75rem; color: rgba(240,237,232,0.3); margin-top: 10px; }
-
     .footer {
       text-align: center; padding: 40px 24px;
       border-top: 1px solid rgba(255,255,255,0.04);
@@ -180,16 +147,6 @@
       </div>
     </div>
 
-    <div class="waitlist">
-      <p class="waitlist-label">Get the Gym Partner Brief</p>
-      <div class="wl-form" id="wl-form">
-        <input type="email" class="wl-input" id="wl-email" placeholder="gym@email.com" autocomplete="email">
-        <button class="wl-btn" id="wl-btn" type="button">Notify Me</button>
-      </div>
-      <div class="wl-success" id="wl-success">&check;&nbsp;You're on the gym partner list.</div>
-      <p class="wl-note">We use your email only to tell you when this opens. Privacy: romrx.io/legal.</p>
-    </div>
-
   </main>
 
   <footer class="footer">
@@ -202,25 +159,6 @@
     <p class="footer-copy">&copy; 2026 ROMRx LLC &middot; Dublin, Ohio</p>
     <p class="footer-copy" style="margin-top:6px;">ROMRx&trade; and related marks are trademarks of ROMRx LLC. All rights reserved.</p>
   </footer>
-
-  <script>
-    const btn = document.getElementById('wl-btn');
-    const input = document.getElementById('wl-email');
-    const form = document.getElementById('wl-form');
-    const ok = document.getElementById('wl-success');
-    btn.addEventListener('click', () => {
-      const email = input.value.trim().toLowerCase();
-      if (!email || !email.includes('@')) {
-        input.style.outline = '2px solid #B44FE8';
-        input.focus();
-        setTimeout(() => input.style.outline = '', 2000);
-        return;
-      }
-      form.style.display = 'none';
-      ok.style.display = 'block';
-    });
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
-  </script>
 
 </body>
 </html>
