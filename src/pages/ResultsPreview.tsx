@@ -210,9 +210,9 @@ export function ResultsPreview() {
             <Unlock size={18} /> Get Base + ROMRxBodybuilding ($209/yr)
           </>}
         </button>
-        {/* STACY TO CLEAR (2026-10-26): pack opens mid-February 2027, Base still charged Jan 1, 2027 */}
+        {/* STACY TO CLEAR (2026-10-26): pack opens Spring 2027, Base still charged Jan 1, 2027 */}
         <p className="text-center text-xs text-miami-text/50">
-          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Base is charged January 1, 2027, then every year until you cancel. Coming Spring 2027. We'll email you when they open. Card required. Canceling Base also cancels ROMRxBodybuilding.
+          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Base is charged January 1, 2027, then every year until you cancel. Sport packs open Spring 2027. We'll email you when they open. Card required. Canceling Base also cancels ROMRxBodybuilding.
         </p>
         <p className="text-center text-xs text-miami-text/30">
           Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
