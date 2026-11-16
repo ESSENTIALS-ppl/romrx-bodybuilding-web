@@ -212,7 +212,7 @@ export function ResultsPreview() {
         </button>
         {/* Pack date line: Jim's exact 'Coming Spring 2027' (L879/L1001, L1019). Base still charged Jan 1, 2027 */}
         <p className="text-center text-xs text-miami-text/50">
-          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Base is charged January 1, 2027, then every year until you cancel. Coming Spring 2027. Card required to buy a sport pack. Canceling Base also cancels ROMRxBodybuilding.
+          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Base is charged January 1, 2027, then every year until you cancel. Coming Spring 2027. Card required. Canceling Base also cancels ROMRxBodybuilding.
         </p>
         <p className="text-center text-xs text-miami-text/30">
           Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
