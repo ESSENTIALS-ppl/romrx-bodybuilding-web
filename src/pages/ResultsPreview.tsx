@@ -205,11 +205,11 @@ export function ResultsPreview() {
           className="w-full py-4 bg-gold text-charcoal font-display font-bold text-base rounded-2xl hover:bg-gold-hover transition-colors flex items-center justify-center gap-2"
         >
           {paying ? 'Setting up payment...' : <>
-            <Unlock size={18} /> Get Base + ROMRxBodybuilding ($209/yr)
+            <Unlock size={18} /> Get ROMRx Base ($60/yr)
           </>}
         </button>
         <p className="text-center text-xs text-miami-text/50">
-          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Charged January 1, 2027, then every year until you cancel. Card required. Canceling Base also cancels ROMRxBodybuilding.
+          Base is required. Base $60/yr, charged January 1, 2027, then every year until you cancel. ROMRxBodybuilding: Coming Spring 2027, $149 a year. Card required.
         </p>
         <p className="text-center text-xs text-miami-text/30">
           Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
