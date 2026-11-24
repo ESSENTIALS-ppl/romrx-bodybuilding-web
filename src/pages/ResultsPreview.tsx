@@ -210,9 +210,9 @@ export function ResultsPreview() {
             <Unlock size={18} /> Get ROMRx Base ($60/yr)
           </>}
         </button>
-        {/* Sport pack line: Jim's approved option B (L1038), no card sentence. Base still charged Jan 1, 2027 */}
+        {/* P1-33 R2 Cutover (Kai FINAL 182f63b7, whole paragraph). Replaced the Nov 15 option B (L1038) line; flagged to Grant. */}
         <p className="text-center text-xs text-miami-text/50">
-          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Base is charged January 1, 2027, then every year until you cancel. The Bodybuilding Sport Pack is coming Spring 2027 for $149/year. Get ROMRx Base now to be ready on day one. Canceling Base also cancels ROMRxBodybuilding.
+          Base is required. Base $60/yr, charged January 1, 2027, then every year until you cancel. ROMRxBodybuilding: Coming Spring 2027, $149 a year. Card required.
         </p>
         <p className="text-center text-xs text-miami-text/30">
           Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
