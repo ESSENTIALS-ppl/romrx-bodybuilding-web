@@ -57,7 +57,10 @@ const mockFetch = (reply) => {
   assert.match(s, /import \{ startBaseCheckout \} from '\.\.\/lib\/baseCheckout'/)
   assert.match(s, /startBaseCheckout\(\s*\{ url: CHECKOUT_URL, accessToken: session\.access_token, anonKey: [^,]+, userId: user\.id, email: user\.email \?\? '' \}/)
   assert.doesNotMatch(s, /plan: 'athlete'/)
-  assert.doesNotMatch(s, /pending_sport|\$209/)
+  assert.doesNotMatch(s, /pending_sport/)
+  // Button only: the L1038 fine print keeps its $209 sentence until Kai's minimal edit clears (Grant, Nov 24).
+  assert.doesNotMatch(s, /Get Base \+ ROMRx\w+ \(\$209\/yr\)/)
+  assert.doesNotMatch(s, /Card required/)
   assert.match(s, /Get ROMRx Base \(\$60\/yr\)/)
 }
 console.log('base-checkout: ok')
