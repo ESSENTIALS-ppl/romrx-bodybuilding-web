@@ -58,8 +58,9 @@ const mockFetch = (reply) => {
   assert.match(s, /startBaseCheckout\(\s*\{ url: CHECKOUT_URL, accessToken: session\.access_token, anonKey: [^,]+, userId: user\.id, email: user\.email \?\? '' \}/)
   assert.doesNotMatch(s, /plan: 'athlete'/)
   assert.doesNotMatch(s, /pending_sport/)
-  // Button only: the L1038 fine print keeps its $209 sentence until Kai's minimal edit clears (Grant, Nov 24).
-  assert.doesNotMatch(s, /Get Base \+ ROMRx\w+ \(\$209\/yr\)/)
+  // L1038 paragraph per Stacy clear STACY-P1-33-R1R2-L1038-CLEAR-20261124-1423 (sha d25d3c0b): no $209 anywhere on the page.
+  assert.equal((s.match(/\$209/g) || []).length, 0, 'no $209 on the page')
+  assert.equal(s.split('Base is required. Base is $60/yr, charged January 1, 2027, then every year until you cancel. The Bodybuilding Sport Pack is coming Spring 2027 for $149/year. Get ROMRx Base now to be ready on day one. Canceling Base also cancels ROMRxBodybuilding.').length - 1, 1, 'new L1038 paragraph present once')
   assert.doesNotMatch(s, /Card required/)
   assert.match(s, /Get ROMRx Base \(\$60\/yr\)/)
 }
