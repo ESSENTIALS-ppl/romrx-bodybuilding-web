@@ -207,15 +207,15 @@ export function ResultsPreview() {
           className="w-full py-4 bg-gold text-charcoal font-display font-bold text-base rounded-2xl hover:bg-gold-hover transition-colors flex items-center justify-center gap-2"
         >
           {paying ? 'Setting up payment...' : <>
-            <Unlock size={18} /> Get Base + ROMRxBodybuilding ($209/yr)
+            <Unlock size={18} /> Get ROMRx Base ($60/yr)
           </>}
         </button>
         {/* Sport pack line: Jim's approved option B (L1038), no card sentence. Base still charged Jan 1, 2027 */}
         <p className="text-center text-xs text-miami-text/50">
-          Base is required. Base $60/yr + ROMRxBodybuilding $149/yr = $209/yr. Base is charged January 1, 2027, then every year until you cancel. The Bodybuilding Sport Pack is coming Spring 2027 for $149/year. Get ROMRx Base now to be ready on day one. Canceling Base also cancels ROMRxBodybuilding.
+          Base is required. Base is free until March 1, 2027, our beta launch trial period, then $60/yr, charged March 1, 2027 and every year until you cancel. The Bodybuilding Sport Pack is coming Spring 2027 for $149/year. Get ROMRx Base now to be ready on day one. Canceling Base also cancels ROMRxBodybuilding.
         </p>
         <p className="text-center text-xs text-miami-text/30">
-          Canceling ends your access right away. Promo codes accepted at checkout. ROMRx is for adults 18 and older.
+          Cancel anytime in Settings. Canceling ends your access right away. ROMRx is for adults 18 and older.
         </p>
       </div>
     </div>
