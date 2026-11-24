@@ -275,7 +275,7 @@ function CoachSignupPaused() {
             <Users size={22} className="text-teal" />
           </div>
           <h1 className="font-display font-bold text-teal text-2xl">Coach accounts</h1>
-          <p className="text-sm text-charcoal-light mt-2">Not open during beta.</p>
+          <p className="text-sm text-charcoal-light mt-2">Not open yet.</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-teal-light p-6 shadow-sm text-center">
