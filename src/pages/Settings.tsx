@@ -766,7 +766,7 @@ function AthleteSettings() {
             <div className="flex items-center justify-between">
               <p className="text-sm text-charcoal-light">Plan</p>
               <span className="text-xs bg-miami-light text-miami font-semibold px-3 py-1 rounded-xl text-right capitalize">
-                {!profile?.subscription_tier || profile.subscription_tier === 'free' ? 'Free through December 31, 2026. Then $60/yr from January 1, 2027, renews yearly until you cancel. Canceling ends your access right away.' : profile.subscription_tier}
+                {!profile?.subscription_tier || profile.subscription_tier === 'free' ? 'Base: free until March 1, 2027, our beta launch trial period. Then $60/yr, charged March 1, 2027 and every year until you cancel. Canceling ends your access right away.' : profile.subscription_tier}
               </span>
             </div>
             {(profile?.sports_enabled ?? []).includes('bodybuilding') && (
