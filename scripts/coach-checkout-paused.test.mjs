@@ -7,7 +7,7 @@ assert.match(s, /e\.preventDefault\(\)\n\s+if \(!COACH_CHECKOUT_OPEN\) return\n/
 assert.match(s, /if \(!COACH_CHECKOUT_OPEN\) return <CoachSignupPaused \/>/, 'page must render the paused panel')
 const paused = s.slice(s.indexOf('function CoachSignupPaused'))
 assert.ok(paused.length > 0, 'paused component exists')
-assert.match(paused, /Not open during beta\./)
+assert.match(paused, /Not open yet\./) // Stacy 1518 A11 rule: 'Not open during beta' becomes 'Not open yet'
 assert.doesNotMatch(paused, /\$\d|\/year|Spring 20|Cancel anytime|<form|signUp\(|CHECKOUT_URL|Continue to Payment/, 'paused panel: no price, dates, form or checkout')
 assert.match(paused, /href="\/trainers"/)
 console.log('coach-checkout-paused: ok')
